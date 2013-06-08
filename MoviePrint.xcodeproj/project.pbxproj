@@ -156,7 +156,6 @@
 		3AAF414817623B5600F94546 /* TweenSelector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweenSelector.h; sourceTree = "<group>"; };
 		3AAF414917623B5600F94546 /* Tweenzor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tweenzor.cpp; sourceTree = "<group>"; };
 		3AAF414A17623B5600F94546 /* Tweenzor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tweenzor.h; sourceTree = "<group>"; };
-		3AAF414C17623B5600F94546 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		3AAF414E17623B5600F94546 /* ofxUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxUI.h; sourceTree = "<group>"; };
 		3AAF414F17623B5600F94546 /* ofxUI2DGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxUI2DGraph.h; sourceTree = "<group>"; };
 		3AAF415017623B5600F94546 /* ofxUI2DPad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxUI2DPad.h; sourceTree = "<group>"; };
@@ -456,7 +455,6 @@
 		3AAF414B17623B5600F94546 /* ofxUI */ = {
 			isa = PBXGroup;
 			children = (
-				3AAF414C17623B5600F94546 /* .gitignore */,
 				3AAF414D17623B5600F94546 /* src */,
 			);
 			name = ofxUI;
