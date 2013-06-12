@@ -271,7 +271,7 @@ void testApp::setGUI2(){
     gui2->addWidgetDown(new ofxUILabel("Prints are saved as PNGs in a folder", OFX_UI_FONT_SMALL));
     gui2->addWidgetDown(new ofxUILabel("named MoviePrints on the same level", OFX_UI_FONT_SMALL));
     gui2->addSpacer(10, 1);
-    gui2->addWidgetDown(new ofxUILabel("Hoovering over a Still one can", OFX_UI_FONT_SMALL));
+    gui2->addWidgetDown(new ofxUILabel("Hovering over a Still one can", OFX_UI_FONT_SMALL));
     gui2->addWidgetDown(new ofxUILabel("-jump 1/10/100 (Shift/Cmd) frames", OFX_UI_FONT_SMALL));
     gui2->addWidgetDown(new ofxUILabel(" forward or backward", OFX_UI_FONT_SMALL));
     gui2->addWidgetDown(new ofxUILabel("-set this Still as In- or Outpoint", OFX_UI_FONT_SMALL));
@@ -718,6 +718,7 @@ void testApp::update(){
         }
     } else {
         scrollAmountRel = 0;
+        
     }
     
     if (scrollBarList.sbActive) {
@@ -1367,19 +1368,35 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 	}
     else if(name == "1024px wide")
 	{
-        printSizeWidth = 1024;
+        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+        bool val = toggle->getValue();
+        if (val) {
+            printSizeWidth = 1024;
+        }
 	}
     else if(name == "2048px wide")
 	{
-        printSizeWidth = 2048;
+        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+        bool val = toggle->getValue();
+        if (val) {
+            printSizeWidth = 2048;
+        }
 	}
     else if(name == "3072px wide")
 	{
-        printSizeWidth = 3072;
+        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+        bool val = toggle->getValue();
+        if (val) {
+            printSizeWidth = 3072;
+        }
 	}
     else if(name == "4096px wide")
 	{
-        printSizeWidth = 4096;
+        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+        bool val = toggle->getValue();
+        if (val) {
+            printSizeWidth = 4096;
+        }
 	}
 
 }
@@ -1843,8 +1860,12 @@ void testApp::updateTimeSlider(bool _wholeRange) {
     timeSlider->setValueLow(0);
     
     if (_wholeRange) {
-        timeSlider->setValueHigh(totalFrames-1);
-        
+        if (totalFrames > 250) {
+            timeSlider->setValueLow(25);
+            timeSlider->setValueHigh(totalFrames-26);
+        } else {
+            timeSlider->setValueHigh(totalFrames-1);
+        }
     } else {
         timeSlider->setValueHigh(numberOfStills);
     }

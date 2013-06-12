@@ -444,7 +444,7 @@ public:
             string pathName = gmMovie.getMoviePath();
             pathName = gmLoadedFilePath.getFileName(pathName, TRUE);
             gmMovieName = wrapStringFontStashFranchise(pathName, _width , _height);
-            gmSetTitleInfo = FALSE;
+//            gmSetTitleInfo = FALSE;
         }
 
         gmFontStashFranchise.drawMultiLine(gmMovieName, franchiseFontRightSize, _x + tempStringMargin, _y + tempStringMargin + franchiseFontRightSize*0.8);
@@ -455,31 +455,35 @@ public:
         float tempFontSize = ofMap(_width, 0.0, 1000.0, 0.0, 45.0);
         float tempStringMargin = tempFontSize/4;
         int distance = 0;
-        gmFontStash.drawMultiLine(wrapStringFontStash(gmMIFileName, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*1);
+        if (gmSetTitleInfo) {
+            gmMIFileName = wrapStringFontStash(gmMIFileName, tempFontSize, (_width+tempStringMargin+tempStringMargin));
+            gmSetTitleInfo = FALSE;
+        }
+        gmFontStash.drawMultiLine(gmMIFileName, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*1);
         distance = CountNewlines(wrapStringFontStash(gmMIFileName, tempFontSize, (_width+tempStringMargin+tempStringMargin))) + 1;
         if (tempStringMargin + tempFontSize*1.03*(1+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIFormat, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(1+distance));
+            gmFontStash.drawMultiLine(gmMIFormat, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(1+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(2+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIFormatString, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(2+distance));
+            gmFontStash.drawMultiLine(gmMIFormatString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(2+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(3+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIFileSizeString, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(3+distance));
+            gmFontStash.drawMultiLine(gmMIFileSizeString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(3+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(4+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIDurationString1, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(4+distance));
+            gmFontStash.drawMultiLine(gmMIDurationString1, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(4+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(5+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIFrameCount, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(5+distance));
+            gmFontStash.drawMultiLine(gmMIFrameCount, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(5+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(6+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIWidth, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(6+distance));
+            gmFontStash.drawMultiLine(gmMIWidth, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(6+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(7+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIDisplayAspectRatioString, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(7+distance));
+            gmFontStash.drawMultiLine(gmMIDisplayAspectRatioString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(7+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(8+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIFrameRateString, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(8+distance));
+            gmFontStash.drawMultiLine(gmMIFrameRateString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(8+distance));
         }
     }
 
@@ -488,36 +492,36 @@ public:
         float tempFontSize = ofMap(_width, 0.0, 1000.0, 0.0, 45.0);
         float tempStringMargin = tempFontSize/4;
         int distance = 1;
-        gmFontStash.drawMultiLine(wrapStringFontStash(gmMIVFormat, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*1);
+        gmFontStash.drawMultiLine(gmMIVFormat, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*1);
         if (tempStringMargin + tempFontSize*1.03*(1+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIPixelAspectRatio, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(1+distance));
+            gmFontStash.drawMultiLine(gmMIPixelAspectRatio, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(1+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(2+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIDisplayAspectRatio, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(2+distance));
+            gmFontStash.drawMultiLine(gmMIDisplayAspectRatio, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(2+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(3+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIFrameRate_ModeString, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(3+distance));
+            gmFontStash.drawMultiLine(gmMIFrameRate_ModeString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(3+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(4+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIColorSpace, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(4+distance));
+            gmFontStash.drawMultiLine(gmMIColorSpace, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(4+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(5+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIChromaSubsampling, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(5+distance));
+            gmFontStash.drawMultiLine(gmMIChromaSubsampling, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(5+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(6+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIBitDepthString, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(6+distance));
+            gmFontStash.drawMultiLine(gmMIBitDepthString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(6+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(7+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIInterlacementString, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(7+distance));
+            gmFontStash.drawMultiLine(gmMIInterlacementString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(7+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(8+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIAFormat, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(8+distance));
+            gmFontStash.drawMultiLine(gmMIAFormat, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(8+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(9+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIAChannelsString, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(9+distance));
+            gmFontStash.drawMultiLine(gmMIAChannelsString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(9+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(10+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(gmMIASamplingRate, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(10+distance));
+            gmFontStash.drawMultiLine(gmMIASamplingRate, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(10+distance));
         }
     }
 
@@ -528,12 +532,12 @@ public:
         string tempDispFrames = "Displayed Frames : " + ofToString(gmNumberOfStills);
         string tempInPoint = "InPoint : " + ofToString(grabbedStill[0].gsFrameNumber);
         string tempOutPoint = "OutPoint : " + ofToString(grabbedStill[gmNumberOfStills-1].gsFrameNumber);
-        gmFontStash.drawMultiLine(wrapStringFontStash(tempDispFrames, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*1);
+        gmFontStash.drawMultiLine(tempDispFrames, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*1);
         if (tempStringMargin + tempFontSize*1.03*(1+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(tempInPoint, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(1+distance));
+            gmFontStash.drawMultiLine(tempInPoint, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(1+distance));
         }
         if (tempStringMargin + tempFontSize*1.03*(2+distance) < _height) {
-            gmFontStash.drawMultiLine(wrapStringFontStash(tempOutPoint, tempFontSize, (_width+tempStringMargin+tempStringMargin)), tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(2+distance));
+            gmFontStash.drawMultiLine(tempOutPoint, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(2+distance));
         }
     }
 
