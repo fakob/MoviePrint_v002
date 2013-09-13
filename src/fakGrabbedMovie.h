@@ -14,7 +14,7 @@
 #include "ofxFontStash.h"
 #include "boost/algorithm/string/split.hpp"
 #include "boost/algorithm/string/classification.hpp"
-#include "ofxModifierKeys.h"
+//#include "ofxModifierKeys.h"
 
 #include <string>
 #include <iostream>

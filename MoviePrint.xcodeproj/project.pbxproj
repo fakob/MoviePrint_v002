@@ -9,9 +9,6 @@
 /* Begin PBXBuildFile section */
 		3AAF41A417623B5600F94546 /* fontstash.c in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF412A17623B5600F94546 /* fontstash.c */; };
 		3AAF41A517623B5600F94546 /* ofxFontStash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF412F17623B5600F94546 /* ofxFontStash.cpp */; };
-		3AAF41A617623B5600F94546 /* ofxModifierKeys_impl_linux.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF413417623B5600F94546 /* ofxModifierKeys_impl_linux.cpp */; };
-		3AAF41A717623B5600F94546 /* ofxModifierKeys_impl_mac.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF413517623B5600F94546 /* ofxModifierKeys_impl_mac.mm */; };
-		3AAF41A817623B5600F94546 /* ofxModifierKeys_impl_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF413617623B5600F94546 /* ofxModifierKeys_impl_win.cpp */; };
 		3AAF41A917623B5600F94546 /* ofxMSATimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF413A17623B5600F94546 /* ofxMSATimer.cpp */; };
 		3AAF41AA17623B5600F94546 /* ofxNotify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF413E17623B5600F94546 /* ofxNotify.cpp */; };
 		3AAF41AB17623B5600F94546 /* Tween.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF414417623B5600F94546 /* Tween.cpp */; };
@@ -138,10 +135,6 @@
 		3AAF412D17623B5600F94546 /* stb_truetype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_truetype.h; sourceTree = "<group>"; };
 		3AAF412F17623B5600F94546 /* ofxFontStash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxFontStash.cpp; sourceTree = "<group>"; };
 		3AAF413017623B5600F94546 /* ofxFontStash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxFontStash.h; sourceTree = "<group>"; };
-		3AAF413317623B5600F94546 /* ofxModifierKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxModifierKeys.h; sourceTree = "<group>"; };
-		3AAF413417623B5600F94546 /* ofxModifierKeys_impl_linux.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxModifierKeys_impl_linux.cpp; sourceTree = "<group>"; };
-		3AAF413517623B5600F94546 /* ofxModifierKeys_impl_mac.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ofxModifierKeys_impl_mac.mm; sourceTree = "<group>"; };
-		3AAF413617623B5600F94546 /* ofxModifierKeys_impl_win.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxModifierKeys_impl_win.cpp; sourceTree = "<group>"; };
 		3AAF413817623B5600F94546 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		3AAF413A17623B5600F94546 /* ofxMSATimer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxMSATimer.cpp; sourceTree = "<group>"; };
 		3AAF413B17623B5600F94546 /* ofxMSATimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxMSATimer.h; sourceTree = "<group>"; };
@@ -366,26 +359,6 @@
 			children = (
 				3AAF412F17623B5600F94546 /* ofxFontStash.cpp */,
 				3AAF413017623B5600F94546 /* ofxFontStash.h */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
-		3AAF413117623B5600F94546 /* ofxModifierKeys */ = {
-			isa = PBXGroup;
-			children = (
-				3AAF413217623B5600F94546 /* src */,
-			);
-			name = ofxModifierKeys;
-			path = ../../../addons/ofxModifierKeys;
-			sourceTree = "<group>";
-		};
-		3AAF413217623B5600F94546 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				3AAF413317623B5600F94546 /* ofxModifierKeys.h */,
-				3AAF413417623B5600F94546 /* ofxModifierKeys_impl_linux.cpp */,
-				3AAF413517623B5600F94546 /* ofxModifierKeys_impl_mac.mm */,
-				3AAF413617623B5600F94546 /* ofxModifierKeys_impl_win.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -677,7 +650,6 @@
 				3AAF41B417623C0900F94546 /* ofxTweener */,
 				3AAF412317623B5600F94546 /* MediaInfoDLL */,
 				3AAF412817623B5600F94546 /* ofxFontStash */,
-				3AAF413117623B5600F94546 /* ofxModifierKeys */,
 				3AAF413717623B5600F94546 /* ofxMSATimer */,
 				3AAF413C17623B5600F94546 /* ofxNotify */,
 				3AAF414017623B5600F94546 /* ofxTweenzor */,
@@ -911,9 +883,6 @@
 				E4B69E210A3A1BDC003C02F2 /* testApp.cpp in Sources */,
 				3AAF41A417623B5600F94546 /* fontstash.c in Sources */,
 				3AAF41A517623B5600F94546 /* ofxFontStash.cpp in Sources */,
-				3AAF41A617623B5600F94546 /* ofxModifierKeys_impl_linux.cpp in Sources */,
-				3AAF41A717623B5600F94546 /* ofxModifierKeys_impl_mac.mm in Sources */,
-				3AAF41A817623B5600F94546 /* ofxModifierKeys_impl_win.cpp in Sources */,
 				3AAF41A917623B5600F94546 /* ofxMSATimer.cpp in Sources */,
 				3AAF41AA17623B5600F94546 /* ofxNotify.cpp in Sources */,
 				3AAF41AB17623B5600F94546 /* Tween.cpp in Sources */,
