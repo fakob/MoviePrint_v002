@@ -182,8 +182,6 @@ extern "C" {
 #define GLUT_LEFT_BUTTON		0
 #define GLUT_MIDDLE_BUTTON		1
 #define GLUT_RIGHT_BUTTON		2
-#define GLUT_WHEEL_UP			3
-#define GLUT_WHEEL_DOWN			4
 
 /* Mouse button  state. */
 #define GLUT_DOWN			0

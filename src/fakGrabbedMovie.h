@@ -746,7 +746,7 @@ public:
         }
     }
     
-    void drawStill(int i, float _x, float _y, float _w, float _h, float _alpha, bool _isBeingPrinted){
+    void drawStill(int i, float _x, float _y, float _w, float _h, float _alpha, bool _isBeingPrinted, bool _superKeyPressed, bool _shiftKeyPressed){
         
         if (isMovieLoaded) {
             
@@ -783,16 +783,17 @@ public:
             
             // draw update image
             if (grabbedStill[i].gsToBeGrabbed) {
+                ofPushMatrix();
                 ofPushStyle();
                 ofSetColor(255, 255, 255, 200);
 //                updatingStill.draw(floor(grabbedStill[i].gsX), floor(grabbedStill[i].gsY), grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
-                ofSetRectMode(OF_RECTMODE_CENTER);
 //                if (grabbedStill[i].gsDrawWidth < 160) { // doesnt work right now
 //                    updatingStill.drawSubsection(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, updatingStill.width/2 - grabbedStill[i].gsDrawWidth/4, updatingStill.height/2 - grabbedStill[i].gsDrawHeight/4, updatingStill.width/2, updatingStill.height/2);
 //                } else {
-                    updatingStill.drawSubsection(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, updatingStill.width/2 - grabbedStill[i].gsDrawWidth/2, updatingStill.height/2 - grabbedStill[i].gsDrawHeight/2);
+                updatingStill.drawSubsection(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight,updatingStill.width/2 - grabbedStill[i].gsDrawWidth/2, updatingStill.height/2 - grabbedStill[i].gsDrawHeight/2);
 //                }
                 ofPopStyle();
+                ofPopMatrix();
             }
 
             if (gmShowFramesUI) { // drawing UI
@@ -816,9 +817,9 @@ public:
                     if (grabbedStill[i].gsRollOver1) {
                         ofSetColor(255);
                     }
-                    if (ofGetModifierPressed(OF_KEY_SPECIAL)) {
+                    if (_superKeyPressed) {
                         frameBackward3Image.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
-                    } else if(ofGetModifierPressed(OF_KEY_SHIFT)){
+                    } else if(_shiftKeyPressed){
                         frameBackward2Image.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
                     } else {
                         frameBackwardImage.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
@@ -828,9 +829,9 @@ public:
                     if (grabbedStill[i].gsRollOver2) {
                         ofSetColor(255);
                     }
-                    if (ofGetModifierPressed(OF_KEY_SPECIAL)) {
+                    if (_superKeyPressed) {
                         frameForward3Image.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
-                    } else if(ofGetModifierPressed(OF_KEY_SHIFT)){
+                    } else if(_shiftKeyPressed){
                         frameForward2Image.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
                     } else {
                         frameForwardImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
@@ -843,7 +844,7 @@ public:
         }
     }
     
-    void drawGmMoviePrint(float _x, float _y, int _gridColumns, float _gridMargin, float _scrollAmount, float _scaleFactor, float _alpha, bool _isBeingPrinted, bool _isActive){
+    void drawGmMoviePrint(float _x, float _y, int _gridColumns, float _gridMargin, float _scrollAmount, float _scaleFactor, float _alpha, bool _isBeingPrinted, bool _isActive, bool _superKeyPressed, bool _shiftKeyPressed){
 
         if (_isBeingPrinted) {
             gmSetTitleInfo = TRUE; //create new title size und umbruch
@@ -902,7 +903,7 @@ public:
         for(int i=0; i<gmNumberOfStills; i++)
         {
             float tempY = ((gmGridHeight+_gridMargin)*((i+_gridColumns)/_gridColumns) + _y );
-            drawStill(i, (_x + (gmGridWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor, tempY * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted);
+            drawStill(i, (_x + (gmGridWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor, tempY * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, _superKeyPressed, _shiftKeyPressed);
         }
         
         

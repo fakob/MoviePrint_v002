@@ -894,6 +894,18 @@ void testApp::keyPressed(int key){
     currentKey = key;
     ofLog(OF_LOG_VERBOSE, "currentKey:" + ofToString(currentKey));
 
+    switch (key) {
+        case OF_KEY_LEFT_SUPER:
+        case OF_KEY_RIGHT_SUPER:
+            superKeyPressed = TRUE;
+            break;
+        case OF_KEY_LEFT_SHIFT:
+        case OF_KEY_RIGHT_SHIFT:
+            shiftKeyPressed = TRUE;
+            break;
+        default:
+            break;
+    }
     
     if(gui2->hasKeyboardFocus())
     {
@@ -999,6 +1011,9 @@ void testApp::keyReleased(int key){
     
     manipulateSlider = FALSE;
     loadedMovie.gmScrubMovie = FALSE;
+    
+    superKeyPressed = FALSE;
+    shiftKeyPressed = FALSE;
 
 }
 
@@ -1451,7 +1466,7 @@ void testApp::drawMoviePrint(int _scaleFactor, bool _hideInPNG, bool _isBeingPri
     }
     float tempX = (((gridWidth+gridMargin)*(0%gridColumns))+(ofGetWidth()/2 - gridAreaWidth/2) + menuWidth - menuWidth * tweenzorX1) * _scaleFactor;
     float tempY = ((ofGetHeight()/2 - _tempGridAreaHeight/2)+_scrollAmount) * _scaleFactor;
-    loadedMovie.drawGmMoviePrint(tempX, tempY, gridColumns, gridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE);
+    loadedMovie.drawGmMoviePrint(tempX, tempY, gridColumns, gridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed);
 }
 
 //--------------------------------------------------------------
@@ -1643,7 +1658,7 @@ void testApp::printImageToPNG(int _printSizeWidth){
         //        ofLog(OF_LOG_VERBOSE, "gmFboToSave:getDepthBuffer" + ofToString(gmFboToSave.getDepthBuffer()));
         //        ofLog(OF_LOG_VERBOSE, "gmFboToSave:getDepthBuffer" + ofToString(gmFboToSave.);
         //        ofLog(OF_LOG_VERBOSE, "gmPixToSave:getNumChannels" + ofToString(gmPixToSave.getNumChannels()));
-        loadedMovie.drawGmMoviePrint(gridMargin, gridMargin, gridColumns, gridMargin, 0, _newScaleFactor, 1, TRUE, TRUE);
+        loadedMovie.drawGmMoviePrint(gridMargin, gridMargin, gridColumns, gridMargin, 0, _newScaleFactor, 1, TRUE, TRUE, superKeyPressed, shiftKeyPressed);
         //        ofRect(100, 100, 300, 100);
         gmFboToSave.end();
         //        ofLog(OF_LOG_VERBOSE, "gmPixToSave:getImageType" + ofToString(gmPixToSave.getImageType()));
@@ -1757,9 +1772,9 @@ void testApp::rollOverButtonsClicked(int _rollOverMovieID, int _rollOverMovieBut
     } else if (_rollOverMovieButtonID == 1) {
         ofLog(OF_LOG_VERBOSE, "frame backwards" );
         int j = loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber;
-        if(ofGetModifierPressed(OF_KEY_SHIFT)) {
+        if(shiftKeyPressed) {
             j = j - 10;
-        } else if(ofGetModifierPressed(OF_KEY_SPECIAL)){
+        } else if(superKeyPressed){
             j = j - 100;
         } else {
             j = j - 1;
@@ -1785,9 +1800,9 @@ void testApp::rollOverButtonsClicked(int _rollOverMovieID, int _rollOverMovieBut
     } else if (_rollOverMovieButtonID == 2) {
         ofLog(OF_LOG_VERBOSE, "frame forward" );
         int j = loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber;
-        if(ofGetModifierPressed(OF_KEY_SHIFT)) {
+        if(shiftKeyPressed) {
             j = j + 10;
-        } else if(ofGetModifierPressed(OF_KEY_SPECIAL)){
+        } else if(superKeyPressed){
             j = j + 100;
         } else {
             j = j + 1;

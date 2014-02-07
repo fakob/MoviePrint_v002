@@ -88,6 +88,8 @@ public:
     ofImage inPointImage;
     ofImage outPointImage;
 
+    bool superKeyPressed = FALSE;
+    bool shiftKeyPressed = FALSE;
     
     bool threadIsRunning;
     
