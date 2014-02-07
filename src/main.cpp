@@ -1,13 +1,18 @@
 #include "ofMain.h"
 #include "testApp.h"
-#include "ofAppGlutWindow.h"
+#include "ofAppGLFWWindow.h"
 
 //========================================================================
 int main( ){
 
-    //ofAppGlutWindow window;
+    ofAppGLFWWindow window;
+    
 	ofSetupOpenGL(1200,700, OF_WINDOW);			// <-------- setup the GL context
 
+    window.setWindowTitle("MoviePrint");
+//    window.hideCursor();
+    window.setWindowPosition(1300, 300);
+    
 	// this kicks off the running of my app
 	// can be OF_WINDOW or OF_FULLSCREEN
 	// pass in width and height too:
