@@ -106,7 +106,9 @@ public:
             ofNotifyEvent(glClickedInside, gliID, this);
         }
     }
-    
+
+    void mouseScrolled(ofMouseEventArgs & args){}
+
     void setup(int _glID, int _glSize){
         gliFontStash.setup("Ubuntu-Light.ttf", 1.03);
         itemProperties.ipName = gliFile.getFileName();

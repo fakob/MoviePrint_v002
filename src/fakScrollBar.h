@@ -47,6 +47,9 @@ public:
         }
     }
     
+    void mouseScrolled(ofMouseEventArgs & args){}
+
+    
     bool inside(float _x, float _y ){ //function to check if mouse is inside grabbedStill
         return _x >= sbAreaX && _x < sbAreaX + sbAreaWidth && _y >= sbAreaY && _y < sbAreaY + sbAreaHeight;
     }
