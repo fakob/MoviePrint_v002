@@ -11,7 +11,7 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 
-//    ofSetLogLevel(OF_LOG_VERBOSE);
+    ofSetLogLevel(OF_LOG_VERBOSE);
     drawNotify = FALSE;
     
     setResourcePath();
@@ -1137,6 +1137,12 @@ void testApp::mouseReleased(int x, int y, int button){
     scrollList = FALSE;
     loadedMovie.gmRollOver = FALSE;
     
+}
+
+//--------------------------------------------------------------
+void testApp::mouseScrolled(double x, double y){
+//    scrollValueY = fmin(ofGetWindowHeight()-30,fmax(0.0,scrollValueY + y));
+    ofLog(OF_LOG_VERBOSE, "scrollAmount x:y " + ofToString(x) + ":" + ofToString(y) );
 }
 
 //--------------------------------------------------------------
