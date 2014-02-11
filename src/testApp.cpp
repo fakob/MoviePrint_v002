@@ -7,6 +7,8 @@
 #define FAK_MIDDLEDARKORANGECOLOR ofColor(170, 50, 0, 255)
 #define FAK_LIGHTERMIDDLEDARKORANGECOLOR ofColor(185, 55, 0, 255)
 
+#define FAK_GREENCOLOR ofColor(117, 130, 16, 255)
+
 
 //--------------------------------------------------------------
 void testApp::setup(){
@@ -54,6 +56,7 @@ void testApp::setup(){
     loaderBarHeight = 20;
     timeSliderHeight = 24;
     gridColumns = 4;
+    gridNumber = 4;
     menuWidth = 255;
     
     threadIsRunning = FALSE;
@@ -197,24 +200,24 @@ void testApp::setGUI2(){
 	
 	gui2 = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
     gui2->setFont("Ubuntu-Light.ttf");
-//    gui2->setFontSize(OFX_UI_FONT_LARGE, 18);            //These call are optional, but if you want to resize the LARGE, MEDIUM, and SMALL fonts, here is how to do it.
-//    gui2->setFontSize(OFX_UI_FONT_MEDIUM, 14);
-//    gui2->setFontSizeWithHeight(OFX_UI_FONT_SMALL, 10, 30.0);            //SUPER IMPORTANT NOTE: CALL THESE FUNTIONS BEFORE ADDING ANY WIDGETS, THIS AFFECTS THE SPACING OF THE GUI
 
     gui2->addWidgetDown(new ofxUILabel("SETTINGS", OFX_UI_FONT_LARGE));
     gui2->addSpacer(length-xInit, 1);
 	gui2->addWidgetDown(new ofxUILabel("SET RASTER", OFX_UI_FONT_MEDIUM));
     vector<string> names2;
-	names2.push_back("Rows Fit Screen");
-	names2.push_back("Set Rows Manually");
+	names2.push_back("Set Columns and Rows");
+	names2.push_back("Set Number of Frames");
     //	names2.push_back("SceneDetection");
-    gui2->addWidgetDown(new ofxUIRadio( dim, dim, "FitScreen-Manually", names2, OFX_UI_ORIENTATION_VERTICAL));
-    setFitManually = (ofxUIRadio *) gui2->getWidget("FitScreen-Manually");
-    setFitManually->activateToggle("Set Rows Manually");
+    gui2->addWidgetDown(new ofxUIRadio( dim, dim, "Grid-Number", names2, OFX_UI_ORIENTATION_VERTICAL));
+    setFitManually = (ofxUIRadio *) gui2->getWidget("Grid-Number");
+    setFitManually->activateToggle("Set Columns and Rows");
     
 	gui2->addSlider_jak("Columns", 4, 10, gridColumns, length-xInit,dim);
 	gui2->addSlider_jak("Rows", 1, 20, gridRows, length-xInit,dim);
+   	gui2->addSlider_jak("Number", 4, 200, gridNumber, length-xInit,dim);
+    columnSlider = (ofxUISlider_jak *) gui2->getWidget("Columns");
     rowSlider = (ofxUISlider_jak *) gui2->getWidget("Rows");
+    numberSlider = (ofxUISlider_jak *) gui2->getWidget("Number");
     
     vector<string> names;
 	names.push_back("Frames");
@@ -247,55 +250,7 @@ void testApp::setGUI2(){
     ddl2->setAutoClose(true);
     gui2->addSpacer(length-xInit, 1);
     gui2->addWidgetDown(ddl2);
-//    ofxUIColor tempColor = (0,255,0,255);
-//    ddl2->setDrawPadding(TRUE);
-    
-//    gui2->addSpacer(length-xInit, 0);
-//    gui2->addSpacer(length-xInit, 0);
-//    gui2->addSpacer(length-xInit, 0);
-//    gui2->addSpacer(length-xInit, 0);
-//    gui2->addSpacer(length-xInit, 0);
-    gui2->addSpacer(length-xInit, 0);
-    gui2->addSpacer(length-xInit, 0);
-    gui2->addSpacer(length-xInit, 2);
-	gui2->addWidgetDown(new ofxUILabel("HELP", OFX_UI_FONT_LARGE));
-    gui2->addSpacer(length-xInit, 1);
-    gui2->addWidgetDown(new ofxUILabel("Drop in one or more movies", OFX_UI_FONT_SMALL));
-//    gui2->addSpacer(10, 1);
-    gui2->addWidgetDown(new ofxUILabel("Set the desired In- and Outpoints", OFX_UI_FONT_SMALL));
-//    gui2->addSpacer(10, 1);
-    gui2->addWidgetDown(new ofxUILabel("Press P to make a MoviePrint", OFX_UI_FONT_SMALL));
-//    gui2->addSpacer(10, 1);
-    gui2->addWidgetDown(new ofxUILabel("Press Esc to quit MoviePrint", OFX_UI_FONT_SMALL));
-    gui2->addSpacer(length-xInit, 1);
-    gui2->addWidgetDown(new ofxUILabel("Prints are saved as PNGs in a folder", OFX_UI_FONT_SMALL));
-    gui2->addWidgetDown(new ofxUILabel("named MoviePrints on the same level", OFX_UI_FONT_SMALL));
-    gui2->addSpacer(10, 1);
-    gui2->addWidgetDown(new ofxUILabel("Hovering over a Still one can", OFX_UI_FONT_SMALL));
-    gui2->addWidgetDown(new ofxUILabel("-jump 1/10/100 (Shift/Cmd) frames", OFX_UI_FONT_SMALL));
-    gui2->addWidgetDown(new ofxUILabel(" forward or backward", OFX_UI_FONT_SMALL));
-    gui2->addWidgetDown(new ofxUILabel("-set this Still as In- or Outpoint", OFX_UI_FONT_SMALL));
-    gui2->addWidgetDown(new ofxUILabel("-scrub the Still using the mouse", OFX_UI_FONT_SMALL));
-    gui2->addSpacer(10, 1);
-    gui2->addWidgetDown(new ofxUILabel("Set In- and Outpoints using the", OFX_UI_FONT_SMALL));
-    gui2->addWidgetDown(new ofxUILabel("timeline on the bottom", OFX_UI_FONT_SMALL));
-    gui2->addSpacer(10, 1);
-    gui2->addWidgetDown(new ofxUILabel("With Multiple movies", OFX_UI_FONT_SMALL));
-//    gui2->addSpacer(10, 1);
-    gui2->addWidgetDown(new ofxUILabel("Press P to make MoviePrints of all", OFX_UI_FONT_SMALL));
-//    gui2->addSpacer(10, 1);
-    gui2->addWidgetDown(new ofxUILabel("Press L to switch to ListView", OFX_UI_FONT_SMALL));
-    gui2->addSpacer(length-xInit, 1);
-    gui2->addWidgetDown(new ofxUILabel("Press H to view Settings and Help", OFX_UI_FONT_SMALL));
-    gui2->addSpacer(10, 1);
-    gui2->addWidgetDown(new ofxUILabel("Choose between >Set rows manually<", OFX_UI_FONT_SMALL));
-    gui2->addWidgetDown(new ofxUILabel("and >Fit to Screen<", OFX_UI_FONT_SMALL));
-//    gui2->addSpacer(10, 1);
-    gui2->addWidgetDown(new ofxUILabel("Set >Columns< and >Rows<", OFX_UI_FONT_SMALL));
-//    gui2->addSpacer(10, 1);
-    gui2->addWidgetDown(new ofxUILabel("Show >Frames< or >TimeCode<", OFX_UI_FONT_SMALL));
-//    gui2->addSpacer(10, 1);
-    gui2->addWidgetDown(new ofxUILabel("Choose >MoviePrint width<", OFX_UI_FONT_SMALL));
+
     
     
     ofLog(OF_LOG_VERBOSE, "getColorBack" + ofToString(gui2->getColorBack()));
@@ -391,8 +346,10 @@ void testApp::calculateNewGrid(int _windowWidth, int _windowHeight){
     if (gridSetManually) {
         numberOfStills = gridColumns*gridRows;
     } else {
-        numberOfStills = gridColumns*(floor((float)(_windowHeight-(topMargin + headerHeight + bottomMargin + footerHeight))/(float)(gridHeight+gridMargin))) - gridColumns;
-        numberOfStills = max(numberOfStills,gridColumns);
+        numberOfStills = gridNumber;
+//        gridColumns = 4;
+        gridRows = gridNumber/gridColumns;
+        
     }
     
     int tempGridAreaHeader = 1;
@@ -711,9 +668,9 @@ void testApp::update(){
 
     if (scrollBar.sbActive) {
         if (scrollGrid) {
-            scrollBar.update(mouseX, mouseY);
+            scrollBar.dragUpdate(mouseX, mouseY);
             scrollAmountRel = scrollBar.getPos();
-            ofLog(OF_LOG_VERBOSE, "scrollAmount:" + ofToString(scrollAmountRel) );
+            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
 
         }
     } else {
@@ -723,9 +680,9 @@ void testApp::update(){
     
     if (scrollBarList.sbActive) {
         if (scrollList) {
-            scrollBarList.update(mouseX, mouseY);
+            scrollBarList.dragUpdate(mouseX, mouseY);
             scrollListAmountRel = scrollBarList.getPos();
-            ofLog(OF_LOG_VERBOSE, "scrollAmount:" + ofToString(scrollListAmountRel) );
+            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollListAmountRel) );
         }
     } else {
         scrollListAmountRel = 0;
@@ -1142,7 +1099,10 @@ void testApp::mouseReleased(int x, int y, int button){
 //--------------------------------------------------------------
 void testApp::mouseScrolled(double x, double y){
 //    scrollValueY = fmin(ofGetWindowHeight()-30,fmax(0.0,scrollValueY + y));
-    ofLog(OF_LOG_VERBOSE, "scrollAmount x:y " + ofToString(x) + ":" + ofToString(y) );
+//    ofLog(OF_LOG_VERBOSE, "scrollAmount x:y " + ofToString(x) + ":" + ofToString(y) );
+    scrollBar.scrollUpdate(x, y, gridHeight*2);
+    scrollAmountRel = scrollBar.getPos();
+//    ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
 }
 
 //--------------------------------------------------------------
@@ -1297,6 +1257,14 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		gridRows = (int)slider->getScaledValue();
         windowResized(ofGetWidth(), ofGetHeight());
 	}
+	else if(name == "Number")
+	{
+		ofxUISlider_jak *slider = (ofxUISlider_jak *) e.widget;
+		ofLog(OF_LOG_VERBOSE, "Number " + ofToString(slider->getScaledValue()));
+        gridColumns = 4;
+		gridNumber = (int)slider->getScaledValue();
+        windowResized(ofGetWidth(), ofGetHeight());
+	}
 	else if(name == "PrintScale")
 	{
 		ofxUISlider *slider = (ofxUISlider *) e.widget;
@@ -1332,23 +1300,27 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         string output = textinput->getTextString();
         ofLog(OF_LOG_VERBOSE, output );
     }
-    else if(name == "Set Rows Manually")
+    else if(name == "Set Columns and Rows")
 	{
         ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
         bool val = toggle->getValue();
         if (val) {
             gridSetManually = TRUE;
+            columnSlider->setVisible(TRUE);
             rowSlider->setVisible(TRUE);
+            numberSlider->setVisible(FALSE);
             windowResized(ofGetWidth(), ofGetHeight());
         }
     }
-    else if(name == "Rows Fit Screen")
+    else if(name == "Set Number of Frames")
 	{
         ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
         bool val = toggle->getValue();
         if (val) {
             gridSetManually = FALSE;
             rowSlider->setVisible(FALSE);
+            columnSlider->setVisible(true);
+            numberSlider->setVisible(true);
             windowResized(ofGetWidth(), ofGetHeight());
         }
 	}

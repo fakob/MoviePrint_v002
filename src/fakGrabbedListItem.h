@@ -108,7 +108,7 @@ public:
     }
 
     void mouseScrolled(ofMouseEventArgs & args){
-        ofLog(OF_LOG_VERBOSE, "scrollAmount x:y " + ofToString(args.x) + ":" + ofToString(args.y) );
+//        ofLog(OF_LOG_VERBOSE, "scrollAmount x:y " + ofToString(args.x) + ":" + ofToString(args.y) );
     }
     
     void setup(int _glID, int _glSize){

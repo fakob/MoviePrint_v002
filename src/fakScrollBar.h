@@ -48,7 +48,7 @@ public:
     }
     
     void mouseScrolled(ofMouseEventArgs & args){
-        ofLog(OF_LOG_VERBOSE, "scrollAmount x:y " + ofToString(args.x) + ":" + ofToString(args.y) );
+//        ofLog(OF_LOG_VERBOSE, "scrollAmount x:y " + ofToString(args.x) + ":" + ofToString(args.y) );
     }
     
     bool inside(float _x, float _y ){ //function to check if mouse is inside grabbedStill
@@ -113,11 +113,21 @@ public:
         sbY = sbMin;
         
     }
-    
-    void update(int _mouseX, int _mouseY){
+    // update scrollbar position through dragging
+    void dragUpdate(int _mouseX, int _mouseY){
         if (sbActive) {
             sbNewY = constrainBar(_mouseY-sbHeight/2, sbMin, sbMax);
             
+            if ((abs(sbNewY - sbY)) > 1) {
+                sbY = sbY + (sbNewY-sbY)/sbLoose;
+            }
+        }
+    }
+
+    // update scrollbar position through scrolling
+    void scrollUpdate(double _scrollX, double _scrollY, int _scrollMultiplier){
+        if (sbActive) {
+            sbNewY = constrainBar(sbY - _scrollY*_scrollMultiplier, sbMin, sbMax);
             if ((abs(sbNewY - sbY)) > 1) {
                 sbY = sbY + (sbNewY-sbY)/sbLoose;
             }
