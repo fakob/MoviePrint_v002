@@ -124,15 +124,15 @@ void testApp::setup(){
     updateDropped = FALSE;
     
     
-    scrollBar.setup(0, ofGetWidth()-scrollBarWidth, 0, scrollBarWidth, ofGetHeight(), ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, ofGetHeight()/2, 4);
-    scrollBar.setScrollBarHeight((float)scrollBar.sbAreaHeight/(float)gridAreaHeight);
+    scrollBar.setup(0, ofGetWidth()-scrollBarWidth, 0, scrollBarWidth, ofGetHeight(), ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 4);
+    scrollBar.setScrollHeight((float)gridAreaHeight);
     scrollBar.registerMouseEvents();
-    ofAddListener(scrollBar.sbClickedInside, this, &testApp::scroll);
-    
-    scrollBarList.setup(0, ofGetWidth()-scrollBarWidth, 0, scrollBarWidth, ofGetHeight(), ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, ofGetHeight()/2, 4);
-    scrollBarList.setScrollBarHeight(0.5);
+    ofAddListener(scrollBar.sbScrollingGoingOn, this, &testApp::scrollEvent);
+
+    scrollBarList.setup(0, ofGetWidth()-scrollBarWidth, 0, scrollBarWidth, ofGetHeight(), ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 4);
+    scrollBarList.setScrollHeight(0.5);
     scrollBarList.unregisterMouseEvents();
-    ofAddListener(scrollBarList.sbClickedInside, this, &testApp::scroll);
+    ofAddListener(scrollBarList.sbScrollingGoingOn, this, &testApp::scrollEvent);
     
     setGUI1();  
     setGUI2();
@@ -377,7 +377,7 @@ void testApp::calculateNewGrid(int _windowWidth, int _windowHeight){
     
     scrollBar.updateScrollBar(_windowWidth, _windowHeight, gridAreaHeight, 0, 0);
     scrollBar.setToTop();
-    scrollAmountRel = scrollBar.getPos();
+    scrollAmountRel = scrollBar.getRelativePos();
     
     ofxNotify() << "New Grid is Calculated - Total Number of Stills: " + ofToString(numberOfStills);
 
@@ -434,7 +434,7 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
     }
     scrollBar.updateScrollBar(ofGetWidth(), ofGetHeight(), gridAreaHeight, 0, 0);
     scrollBar.setToTop();
-    scrollAmountRel = scrollBar.getPos();
+    scrollAmountRel = scrollBar.getRelativePos();
     
     ofLog(OF_LOG_VERBOSE, "scrollAmountRel: " + ofToString(scrollAmountRel));
     
@@ -668,10 +668,13 @@ void testApp::update(){
 
     if (scrollBar.sbActive) {
         if (scrollGrid) {
-            scrollBar.dragUpdate(mouseX, mouseY);
-            scrollAmountRel = scrollBar.getPos();
-            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
-
+            if (!scrollBar.sbMouseScrollCalculateInertia && !scrollBar.sbScrollBarDrag) {
+                scrollGrid = false;
+            } else {
+            scrollBar.update();
+            scrollAmountRel = scrollBar.getRelativePos();
+//            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
+            }
         }
     } else {
         scrollAmountRel = 0;
@@ -680,9 +683,15 @@ void testApp::update(){
     
     if (scrollBarList.sbActive) {
         if (scrollList) {
-            scrollBarList.dragUpdate(mouseX, mouseY);
-            scrollListAmountRel = scrollBarList.getPos();
-            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollListAmountRel) );
+            if (!scrollBarList.sbMouseScrollCalculateInertia && !scrollBar.sbScrollBarDrag) {
+                scrollList = false;
+            } else {
+//            scrollBarList.dragUpdate(mouseX, mouseY);
+//            scrollListAmountRel = scrollBarList.getRelativePos();
+            scrollBarList.update();
+            scrollListAmountRel = scrollBarList.getRelativePos();
+//            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollListAmountRel) );
+            }
         }
     } else {
         scrollListAmountRel = 0;
@@ -1100,9 +1109,16 @@ void testApp::mouseReleased(int x, int y, int button){
 void testApp::mouseScrolled(double x, double y){
 //    scrollValueY = fmin(ofGetWindowHeight()-30,fmax(0.0,scrollValueY + y));
 //    ofLog(OF_LOG_VERBOSE, "scrollAmount x:y " + ofToString(x) + ":" + ofToString(y) );
-    scrollBar.scrollUpdate(x, y, gridHeight*2);
-    scrollAmountRel = scrollBar.getPos();
+//    scrollBar.scrollUpdate(x, y, gridHeight*2);
+//    scrollAmountRel = scrollBar.getRelativePos();
 //    ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
+//    if (!updateScrub) {
+//        if (showDroppedList) {
+//            scrollList = TRUE;
+//        } else {
+//            scrollGrid = TRUE;
+//        }
+//    }
 }
 
 //--------------------------------------------------------------
@@ -1132,7 +1148,7 @@ void testApp::windowResized(int w, int h){
 //    if (showDroppedList) {
         scrollBarList.updateScrollBar(w, h, droppedList.getListHeight(), 0, 0);
         scrollBarList.setToTop();
-        scrollListAmountRel = scrollBarList.getPos();
+        scrollListAmountRel = scrollBarList.getRelativePos();
 //    }
     
     gui->setPosition(ofGetWidth()/2-gridAreaWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, h -(footerHeight/2 + timeSliderHeight/2) * tweenzorY1);
@@ -1173,7 +1189,7 @@ void testApp::dragEvent(ofDragInfo dragInfo){
             droppedList.setup(droppedFiles);
             scrollBarList.updateScrollBar(ofGetWidth(), ofGetHeight(), droppedList.getListHeight(), 0, 0);
             scrollBarList.setToTop();
-            scrollListAmountRel = scrollBarList.getPos();
+            scrollListAmountRel = scrollBarList.getRelativePos();
 
             if(droppedFiles.size() > 1){
                 moveToList();
@@ -1395,7 +1411,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 }
 
 //--------------------------------------------------------------
-void testApp::scroll(ofVec2f & e){
+void testApp::scrollEvent(ofVec2f & e){
     if (!updateScrub) {
         if (showDroppedList) {
             scrollList = TRUE;
@@ -1436,7 +1452,7 @@ void testApp::drawMoviePrint(int _scaleFactor, bool _hideInPNG, bool _isBeingPri
     
     float _scrollAmount = 0;
     if (scrollBar.sbActive) {
-        _scrollAmount = ((_tempGridAreaHeight-scrollBar.sbAreaHeight)+(bottomMargin+topMargin)*2)*(1-_scrollAmountRel)+(ofGetHeight()/2 - _tempGridAreaHeight/2)-(bottomMargin+topMargin);
+        _scrollAmount = ((_tempGridAreaHeight-scrollBar.sbScrollAreaHeight)+(bottomMargin+topMargin)*2)*(1-_scrollAmountRel)+(ofGetHeight()/2 - _tempGridAreaHeight/2)-(bottomMargin+topMargin);
     }
 //    ofLog(OF_LOG_VERBOSE, "scrollAmountRel: " + ofToString(scrollAmountRel));
     if (isnan(_scrollAmount)) {
@@ -1453,7 +1469,7 @@ void testApp::drawList(float _scrollAmountRel){
     float _scrollAmount = 0;
     if (scrollBarList.sbActive) {
 //        _scrollAmount = ((droppedList.getListHeight()-scrollBarList.sbAreaHeight)+(bottomMargin+topMargin)*2)*(1-_scrollAmountRel)+(ofGetHeight()/2 - droppedList.getListHeight()/2)-(bottomMargin+topMargin);
-        _scrollAmount = ((droppedList.getListHeight()-scrollBarList.sbAreaHeight)+(bottomMargin+topMargin)*2)*-1*(_scrollAmountRel)+topMargin;
+        _scrollAmount = ((droppedList.getListHeight()-scrollBarList.sbScrollAreaHeight)+(bottomMargin+topMargin)*2)*-1*(_scrollAmountRel)+topMargin;
     }
     if (isnan(_scrollAmount)) {
         _scrollAmount = 0;

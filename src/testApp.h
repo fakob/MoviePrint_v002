@@ -52,7 +52,7 @@ public:
     void setResourcePath();
     void moveToMovie();
     void moveToList();
-    void scroll(ofVec2f & e);
+    void scrollEvent(ofVec2f & e);
     void setGUI1();
     void setGUI2();
     void setGUI3();
