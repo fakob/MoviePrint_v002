@@ -43,6 +43,7 @@ public:
         sbMouseIsScrolling = false;
         sbCalculateScrollInertia = false;
         scrollMultiplier = _scrollMultiplier;
+        sbFirstNoTouchMouseEvent = true;
         
         // should not be lower then 1000ms as the magic mouse sends still after having stopped scrolling
         // as the magic mouse sends shaky values it is difficult to control it
@@ -172,7 +173,12 @@ public:
             }
         } else { // no touchmouse used
             if ((ofGetElapsedTimeMillis() > 50) || (ofGetElapsedTimeMillis() < 10)) {
-                sbMouseScrollVelocity = ofVec2f(args.x * scrollMultiplier, args.y * scrollMultiplier);
+                int noTouchMouseMultiplier = 2;
+                if (sbFirstNoTouchMouseEvent) {
+                    sbDecelarationConstant = sbDecelarationConstant / 2.0;
+                    sbFirstNoTouchMouseEvent = false;
+                }
+                sbMouseScrollVelocity = ofVec2f(args.x * scrollMultiplier * noTouchMouseMultiplier, args.y * scrollMultiplier * noTouchMouseMultiplier);
                 sbMouseIsScrolling = true;
                 sbCalculateScrollInertia = true;
                 ofNotifyEvent(sbScrollingGoingOn, args, this);
@@ -314,6 +320,7 @@ public:
     int sbOvershootHeight;
     float scrollMultiplier;
     
+    bool sbFirstNoTouchMouseEvent;
     float sbDecelarationConstant;
     float sbReturnToBaseConstant;
     float sbBounceDecelerationConstant;
