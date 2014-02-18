@@ -21,7 +21,7 @@ public:
     
     // Functions
     
-    void setup(int _sbID, int _sbScrollAreaX, int _sbScrollAreaY, int _sbScrollAreaWidth, int _sbScrollAreaHeight, float _sbScrollBarX, float _sbScrollBarY, int _sbScrollBarWidth, float _sbLoose){
+    void setup(int _sbID, int _sbScrollAreaX, int _sbScrollAreaY, int _sbScrollAreaWidth, int _sbScrollAreaHeight, float _sbScrollBarX, float _sbScrollBarY, int _sbScrollBarWidth, float _sbLoose, float _scrollMultiplier){
         sbFirstClick = false;
         sbFirstClickMouseY = 0;
         sbScrollBarWidth = _sbScrollBarWidth;
@@ -36,19 +36,21 @@ public:
         sbScrollBarYNew = sbScrollBarY;
         sbScrollBarYMin = _sbScrollAreaY;
         sbScrollBarYMax = _sbScrollAreaY + sbScrollAreaHeight - sbScrollBarHeight;
-        sbLoose = _sbLoose;
+        sbDecelarationConstant = _sbLoose;
         setToTop();
         sbScrollBarDrag = false;
-        sbOvershootHeight = 20;
+        sbOvershootHeight = 200;
         sbMouseIsScrolling = false;
         sbCalculateScrollInertia = false;
-        sbMaxBottomOverShootArea = false;
-        sbMaxTopOverShootArea = false;
-        scrollMultiplier = 10.0;
+        scrollMultiplier = _scrollMultiplier;
         
         // should not be lower then 1000ms as the magic mouse sends still after having stopped scrolling
         // as the magic mouse sends shaky values it is difficult to control it
         sbBounceBackTimeMs = 1000;
+        
+        sbReturnToBaseConstant = 0.5;
+        sbBounceDecelerationConstant = 10.0;
+        sbMaxVelocity = 10.0;
         
         sbNumberOfTouches = 0;
         sbMaxNumberOfTouches = 0;
@@ -68,7 +70,7 @@ public:
     
     void updateScrollBar(int _newWindowWidth, int _newWindowHeight, int _newScrollHeight, int _headerHeight, int _footerHeight){
         unregisterMouseEvents();
-        setup(0, _newWindowWidth-sbScrollBarWidth, _headerHeight, sbScrollBarWidth, _newWindowHeight-_headerHeight-_footerHeight, _newWindowWidth-sbScrollBarWidth, _newWindowHeight/2, sbScrollBarWidth, 16);
+        setup(0, _newWindowWidth-sbScrollBarWidth, _headerHeight, sbScrollBarWidth, _newWindowHeight-_headerHeight-_footerHeight, _newWindowWidth-sbScrollBarWidth, _newWindowHeight/2, sbScrollBarWidth, 16, scrollMultiplier);
         setScrollHeight((float)_newScrollHeight);
         if (sbActive) {
             registerMouseEvents();
@@ -138,12 +140,14 @@ public:
             sbScrollBarDrag = TRUE;
         }
         sbMousePos = ofVec2f(args.x, args.y);
+        ofNotifyEvent(sbScrollingGoingOn, args, this);
     }
     
     void mouseReleased(ofMouseEventArgs & args){
         sbMousePos = ofVec2f(args.x, args.y);
         sbFirstClick = false;
         sbScrollBarDrag = false;
+        ofNotifyEvent(sbScrollingGoingOn, args, this);
     }
     
     void mousePressed(ofMouseEventArgs & args){
@@ -151,6 +155,7 @@ public:
             sbScrollBarDrag = TRUE;
         }
         sbMousePos = ofVec2f(args.x, args.y);
+        ofNotifyEvent(sbScrollingGoingOn, args, this);
     }
     
     void mouseScrolled(ofMouseEventArgs & args){
@@ -179,12 +184,10 @@ public:
     void padUpdates(int & t) {
         sbNumberOfTouches = t;
         sbMaxNumberOfTouches = fmax(t, sbNumberOfTouches);
-        //        ofLog(OF_LOG_VERBOSE, "padUpdates " + ofToString(t));
     }
     
     void removedTouch(int & r) {
         sbNumberOfTouches = r;
-        //        ofLog(OF_LOG_VERBOSE, "removedTouch " + ofToString(r));
     }
     
     void update(){
@@ -192,57 +195,67 @@ public:
             
             
             if (sbScrollBarDrag) {
+                ofLog(OF_LOG_VERBOSE, "_____________barUpdate " + ofToString(sbMousePos.y) );
                 if (sbRollOverScrollBar) {
                     if (!sbFirstClick) {
                         sbFirstClickMouseY = sbMousePos.y - sbScrollBarY;
                         sbFirstClick = true;
                     }
-                    //                    ofLog(OF_LOG_VERBOSE, "_mouseY:sbY " + ofToString(sbMousePos.y) + " :sbY " + ofToString(sbScrollBarY));
                     sbScrollBarYNew = valMinMax(sbMousePos.y - sbFirstClickMouseY, sbScrollBarYMin, sbScrollBarYMax);
                     if ((abs(sbScrollBarYNew - sbScrollBarY)) > 1) {
-                        sbScrollBarY = sbScrollBarY + (sbScrollBarYNew-sbScrollBarY)/sbLoose;
+                        sbScrollBarY = sbScrollBarY + (sbScrollBarYNew-sbScrollBarY)/sbDecelarationConstant;
                     }
                 } else { // click insidescrollarea but not inside insidescrollbar
                     sbScrollBarYNew = valMinMax(sbMousePos.y - sbScrollBarHeight/2, sbScrollBarYMin, sbScrollBarYMax);
                     if ((abs(sbScrollBarYNew - sbScrollBarY)) > 1) {
-                        sbScrollBarY = sbScrollBarY + (sbScrollBarYNew-sbScrollBarY)/sbLoose;
+                        sbScrollBarY = sbScrollBarY + (sbScrollBarYNew-sbScrollBarY)/sbDecelarationConstant;
                     }
                 }
-                //                ofLog(OF_LOG_VERBOSE, "_____________dragUpdate " + ofToString(sbMousePos.y) );
-                
                 
             } else if (sbCalculateScrollInertia){
-                //                ofLog(OF_LOG_VERBOSE, "_____________scrollUpdate " + ofToString(sbMouseScrollVelocity.y) );
-                if ((sbScrollBarY >= (sbScrollBarYMax + sbOvershootHeight - 1.0))) {
-                    sbMaxBottomOverShootArea = true;
-                }
-                if ((sbScrollBarY <= (sbScrollBarYMin - sbOvershootHeight + 1.0))){
-                    sbMaxTopOverShootArea = true;
-                }
-                if ((sbScrollBarY > sbScrollBarYMax) && !sbMouseIsScrolling) {
-                    if (sbMaxBottomOverShootArea) {
-                        float tempDelta = (sbOvershootHeight - 1.0) * pow(getTimeRampDown(),4);
-                        sbScrollBarY = sbScrollBarYMax + tempDelta;
-                        //                        ofLog(OF_LOG_VERBOSE, "sbMaxBottomOverShootArea " + ofToString(sbMaxBottomOverShootArea) + " sbScrollBarY " + ofToString(sbScrollBarY) + " tempDelta " + ofToString(tempDelta));
-                    } else {
-                        int howFarInOverShootArea = sbScrollBarY - sbScrollBarYMax;
-                        sbScrollBarY = sbScrollBarYMax + howFarInOverShootArea * getTimeRampDown();
+                ofLog(OF_LOG_VERBOSE, "_____________scrollUpdate " + ofToString(sbMouseScrollVelocity.y) );
+                
+                if ((sbScrollBarY > sbScrollBarYMax)) {
+                    
+                    if ( sbMouseScrollVelocity.y <= 0 ) { // Return to bottom position
+                        sbMouseScrollVelocity.y = sbReturnToBaseConstant * abs(sbScrollBarY - sbScrollBarYMax) *-1;
+                        ofLog(OF_LOG_VERBOSE, "Return " + ofToString(sbScrollBarY,2));
+                    } else { // Slow down
+                        float change = sbBounceDecelerationConstant * getTimeRampDown();
+                        sbMouseScrollVelocity.y -= change;
+                        sbMouseScrollVelocity.y = fmin(sbMouseScrollVelocity.y, sbMaxVelocity);
+                        ofLog(OF_LOG_VERBOSE, "Slow down " + ofToString(sbScrollBarY,2));
                     }
-                } else if ((sbScrollBarY < sbScrollBarYMin) && !sbMouseIsScrolling) {
-                    if (sbMaxTopOverShootArea){
-                        float tempDelta = (sbOvershootHeight - 1.0) * pow(getTimeRampDown(),4);
-                        sbScrollBarY = sbScrollBarYMin - tempDelta;
-                        //                        ofLog(OF_LOG_VERBOSE, "sbMaxTopOverShootArea " + ofToString(sbMaxTopOverShootArea) + " sbScrollBarY " + ofToString(sbScrollBarY) + " tempDelta " + ofToString(tempDelta));
-                    } else {
-                        int howFarInOverShootArea = sbScrollBarY - sbScrollBarYMin;
-                        sbScrollBarY = sbScrollBarYMin + howFarInOverShootArea * getTimeRampDown();
+                    
+                    sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y * getTimeRampDown();
+                    
+                    if (sbScrollBarY < (sbScrollBarYMax + 0.001)){ // when close to aim (threshold 0.001), lead to aim manually
+                        sbScrollBarY = sbScrollBarYMax;
+                        sbMouseScrollVelocity = ofVec2f(0.0,0.0);
                     }
+                    
+                } else if ((sbScrollBarY < sbScrollBarYMin)) {
+                    
+                    if ( sbMouseScrollVelocity.y > 0 ) { // Return to bottom position
+                        sbMouseScrollVelocity.y = sbReturnToBaseConstant * abs(sbScrollBarY);
+                    } else { // Slow down
+                        float change = sbBounceDecelerationConstant * getTimeRampDown();
+                        sbMouseScrollVelocity.y += change;
+                        sbMouseScrollVelocity.y = fmax(sbMouseScrollVelocity.y, sbMaxVelocity * -1);
+                    }
+                    
+                    sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y * getTimeRampDown();
+                    
+                    if (sbScrollBarY > -0.001){ // when close to aim (threshold 0.001), lead to aim manually
+                        sbScrollBarY = 0;
+                        sbMouseScrollVelocity = ofVec2f(0.0,0.0);
+                    }
+                    
                 } else {
-                    sbMouseScrollVelocity.y = sbMouseScrollVelocity.y / sbLoose;
-                    sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y;
-                    sbScrollBarY = valMinMax(sbScrollBarY, sbScrollBarYMin-sbOvershootHeight, sbScrollBarYMax+sbOvershootHeight);
-                    //                    ofLog(OF_LOG_VERBOSE, "sbNormalScrollArea " + ofToString(sbMaxTopOverShootArea) + " sbScrollBarY " + ofToString(sbScrollBarY));
+                    sbMouseScrollVelocity.y = sbMouseScrollVelocity.y / sbDecelarationConstant;
+                    sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y * getTimeRampDown();
                 }
+                
                 if (ofGetElapsedTimeMillis() > 50) {
                     sbMouseIsScrolling = false;
                     if (ofGetElapsedTimeMillis() > sbBounceBackTimeMs) {
@@ -251,8 +264,6 @@ public:
                 }
             }
         }
-        //        ofLog(OF_LOG_VERBOSE, ofToString(ofGetElapsedTimeMillis()));
-        //        ofLog(OF_LOG_VERBOSE, "sbScrollBarY " + ofToString(sbScrollBarY));
     }
     
     float getTimeRampDown(){
@@ -281,7 +292,6 @@ public:
     int sbScrollBarHeight; //drawn height of ScrollBar
     float sbScrollBarYMin;
     float sbScrollBarYMax;
-    float sbLoose; //inertia factor
     bool sbActive;
     
     int sbScrollAreaWidth;
@@ -302,10 +312,12 @@ public:
     ofVec2f sbMouseScrollVelocity;
     
     int sbOvershootHeight;
-    bool sbMaxBottomOverShootArea;
-    bool sbMaxTopOverShootArea;
     float scrollMultiplier;
     
+    float sbDecelarationConstant;
+    float sbReturnToBaseConstant;
+    float sbBounceDecelerationConstant;
+    float sbMaxVelocity;
     int sbBounceBackTimeMs;
     
     ofxMultiTouchPad pad;

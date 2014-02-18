@@ -200,6 +200,7 @@ public:
     fakScrollBar scrollBarList;
     float scrollAmountRel;
     float scrollListAmountRel;
+    float scrollMultiplier;
        
     // Timer
     ofxMSATimer timer;

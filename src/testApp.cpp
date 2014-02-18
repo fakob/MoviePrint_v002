@@ -123,14 +123,15 @@ void testApp::setup(){
     manipulateSlider = FALSE;
     updateDropped = FALSE;
     
+    scrollMultiplier = 50.0;
     
-    scrollBar.setup(0, ofGetWidth()-scrollBarWidth, 0, scrollBarWidth, ofGetHeight(), ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 1.5);
+    scrollBar.setup(0, ofGetWidth()-scrollBarWidth, 0, scrollBarWidth, ofGetHeight(), ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 1.5, scrollMultiplier);
     scrollBar.setScrollHeight((float)gridAreaHeight);
     scrollBar.registerMouseEvents();
     scrollBar.registerTouchEvents();
     ofAddListener(scrollBar.sbScrollingGoingOn, this, &testApp::scrollEvent);
 
-    scrollBarList.setup(0, ofGetWidth()-scrollBarWidth, 0, scrollBarWidth, ofGetHeight(), ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 1.5);
+    scrollBarList.setup(0, ofGetWidth()-scrollBarWidth, 0, scrollBarWidth, ofGetHeight(), ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 1.5, scrollMultiplier);
     scrollBarList.setScrollHeight(0.5);
     scrollBarList.registerMouseEvents();
     scrollBarList.registerTouchEvents();
