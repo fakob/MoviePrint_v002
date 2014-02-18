@@ -124,15 +124,16 @@ void testApp::setup(){
     updateDropped = FALSE;
     
     
-    scrollBar.setup(0, ofGetWidth()-scrollBarWidth, 0, scrollBarWidth, ofGetHeight(), ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 4);
+    scrollBar.setup(0, ofGetWidth()-scrollBarWidth, 0, scrollBarWidth, ofGetHeight(), ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 1.5);
     scrollBar.setScrollHeight((float)gridAreaHeight);
     scrollBar.registerMouseEvents();
+    scrollBar.registerTouchEvents();
     ofAddListener(scrollBar.sbScrollingGoingOn, this, &testApp::scrollEvent);
 
-    scrollBarList.setup(0, ofGetWidth()-scrollBarWidth, 0, scrollBarWidth, ofGetHeight(), ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 4);
+    scrollBarList.setup(0, ofGetWidth()-scrollBarWidth, 0, scrollBarWidth, ofGetHeight(), ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 1.5);
     scrollBarList.setScrollHeight(0.5);
-    scrollBarList.unregisterMouseEvents();
-    ofAddListener(scrollBarList.sbScrollingGoingOn, this, &testApp::scrollEvent);
+    scrollBarList.registerMouseEvents();
+    scrollBarList.registerTouchEvents();
     
     setGUI1();  
     setGUI2();
@@ -667,13 +668,15 @@ void testApp::update(){
     }
 
     if (scrollBar.sbActive) {
+        ofLog(OF_LOG_VERBOSE, "scrollBar Active:" + ofToString(scrollAmountRel) );
         if (scrollGrid) {
-            if (!scrollBar.sbMouseScrollCalculateInertia && !scrollBar.sbScrollBarDrag) {
+            ofLog(OF_LOG_VERBOSE, "scrollGrid True:" + ofToString(scrollAmountRel) );
+            if (!scrollBar.sbCalculateScrollInertia && !scrollBar.sbScrollBarDrag) {
                 scrollGrid = false;
             } else {
             scrollBar.update();
             scrollAmountRel = scrollBar.getRelativePos();
-//            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
+            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
             }
         }
     } else {
@@ -683,7 +686,7 @@ void testApp::update(){
     
     if (scrollBarList.sbActive) {
         if (scrollList) {
-            if (!scrollBarList.sbMouseScrollCalculateInertia && !scrollBar.sbScrollBarDrag) {
+            if (!scrollBarList.sbCalculateScrollInertia && !scrollBar.sbScrollBarDrag) {
                 scrollList = false;
             } else {
 //            scrollBarList.dragUpdate(mouseX, mouseY);
