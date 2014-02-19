@@ -745,7 +745,7 @@ public:
         }
     }
     
-    void drawStill(int i, float _x, float _y, float _w, float _h, float _alpha, bool _isBeingPrinted, bool _superKeyPressed, bool _shiftKeyPressed){
+    void drawStill(int i, float _x, float _y, float _w, float _h, float _alpha, bool _isBeingPrinted, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
         
         if (isMovieLoaded) {
             
@@ -840,10 +840,38 @@ public:
             }
             ofPopStyle();
             ofSetColor(255);
-        }
+        } else if (_drawPlaceHolder){
+            ofPushStyle();
+            ofEnableAlphaBlending();
+            ofSetColor(255);
+            
+//            grabbedStill[i].gsX = _x;
+//            grabbedStill[i].gsY = _y;
+//            grabbedStill[i].gsDrawWidth = _w;
+//            grabbedStill[i].gsDrawHeight = _h;
+//            grabbedStill[i].gsResizeFactor = gmMovie.getWidth()/_w;
+            
+//            shader.begin(); // draw still with rounded corners
+//            shader.setUniformTexture("maskTex", maskFbo.getTextureReference(), 1 );
+//            grabbedStill[i].gsTexture.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
+//            shader.end();
+            
+
+            ofPushMatrix();
+            ofPushStyle();
+            ofSetColor(255, 255, 255, 200);
+//            updatingStill.drawSubsection(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight,updatingStill.width/2 - grabbedStill[i].gsDrawWidth/2, updatingStill.height/2 - grabbedStill[i].gsDrawHeight/2);
+            
+            ofRect(_x, _y, _w, _h);
+            
+            ofPopStyle();
+            ofPopMatrix();
+
+            ofPopStyle();
+            ofSetColor(255);        }
     }
     
-    void drawGmMoviePrint(float _x, float _y, int _gridColumns, float _gridMargin, float _scrollAmount, float _scaleFactor, float _alpha, bool _isBeingPrinted, bool _isActive, bool _superKeyPressed, bool _shiftKeyPressed){
+    void drawGmMoviePrint(float _x, float _y, int _gridColumns, float _gridMargin, float _scrollAmount, float _scaleFactor, float _alpha, bool _isBeingPrinted, bool _isActive, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
 
         if (_isBeingPrinted) {
             gmSetTitleInfo = TRUE; //create new title size und umbruch
@@ -853,92 +881,92 @@ public:
         ofPushStyle();
         ofEnableAlphaBlending();
         ofSetColor(FAK_ORANGECOLOR); // draw title rect
-        ofRectRounded((_x + (gmGridWidth+_gridMargin)*0) * _scaleFactor, _y * _scaleFactor , gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, gmGridWidth * _scaleFactor/64);
-        ofSetColor(30, 30, 30, 255); // draw info rect
-        ofRectRounded((_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor, _y * _scaleFactor, ((gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor, gmGridHeight * _scaleFactor, gmGridWidth * _scaleFactor/64);
-        ofSetColor(255); // draw title and infos
-        drawTitle((_x + (gmGridWidth+_gridMargin)*0) * _scaleFactor, _y * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
-        drawInfo1((_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor, _y * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
-        drawInfo2((_x + (gmGridWidth+_gridMargin)*2) * _scaleFactor, _y * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
-        drawInfo3((_x + (gmGridWidth+_gridMargin)*3) * _scaleFactor, _y * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
-        
-        ofSetColor(FAK_DARKORANGECOLOR); // draw mini timeline 
-        int tempTimelineHeight = 5;
-        ofRect((_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor, (_y + gmGridHeight - tempTimelineHeight) * _scaleFactor, ((gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor, tempTimelineHeight * _scaleFactor);
-        ofSetColor(FAK_ORANGECOLOR); // draw mini timeline range
-        ofRect(
-            ofMap(grabbedStill[0].gsFrameNumber,
-                  0,
-                  gmTotalFrames-1,
-                  (_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor,
-                  ((_x + (gmGridWidth+_gridMargin)*1) + (gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor),
-            (_y + gmGridHeight - tempTimelineHeight) * _scaleFactor,
-            ofMap(grabbedStill[gmNumberOfStills-1].gsFrameNumber - grabbedStill[0].gsFrameNumber,
-                  0,
-                  gmTotalFrames-1,
-                  0,
-                  ((gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor),
-            tempTimelineHeight * _scaleFactor);
-
-        for(int i=0; i<gmNumberOfStills; i++) // draw mini timeline stills positions
-        {
-            if (grabbedStill[i].gsManipulated) {
-                ofSetColor(200, 200, 200, 255);
-            } else {
-                ofSetColor(FAK_MIDDLEDARKORANGECOLOR, 255);
-            }
-            ofRect(
-                   ofMap(grabbedStill[i].gsFrameNumber,
-                         0,
-                         gmTotalFrames-1,
-                         (_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor,
-                         ((_x + (gmGridWidth+_gridMargin)*1) + (gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor),
-                   (_y + gmGridHeight - tempTimelineHeight) * _scaleFactor,
-                   1 * _scaleFactor,
-                   tempTimelineHeight * _scaleFactor);
-        }
+//        ofRectRounded((_x + (gmGridWidth+_gridMargin)*0) * _scaleFactor, _y * _scaleFactor , gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, gmGridWidth * _scaleFactor/64);
+//        ofSetColor(30, 30, 30, 255); // draw info rect
+//        ofRectRounded((_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor, _y * _scaleFactor, ((gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor, gmGridHeight * _scaleFactor, gmGridWidth * _scaleFactor/64);
+//        ofSetColor(255); // draw title and infos
+////        drawTitle((_x + (gmGridWidth+_gridMargin)*0) * _scaleFactor, _y * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
+////        drawInfo1((_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor, _y * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
+////        drawInfo2((_x + (gmGridWidth+_gridMargin)*2) * _scaleFactor, _y * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
+////        drawInfo3((_x + (gmGridWidth+_gridMargin)*3) * _scaleFactor, _y * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
+//        
+//        ofSetColor(FAK_DARKORANGECOLOR); // draw mini timeline 
+//        int tempTimelineHeight = 5;
+//        ofRect((_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor, (_y + gmGridHeight - tempTimelineHeight) * _scaleFactor, ((gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor, tempTimelineHeight * _scaleFactor);
+//        ofSetColor(FAK_ORANGECOLOR); // draw mini timeline range
+//        ofRect(
+//            ofMap(grabbedStill[0].gsFrameNumber,
+//                  0,
+//                  gmTotalFrames-1,
+//                  (_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor,
+//                  ((_x + (gmGridWidth+_gridMargin)*1) + (gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor),
+//            (_y + gmGridHeight - tempTimelineHeight) * _scaleFactor,
+//            ofMap(grabbedStill[gmNumberOfStills-1].gsFrameNumber - grabbedStill[0].gsFrameNumber,
+//                  0,
+//                  gmTotalFrames-1,
+//                  0,
+//                  ((gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor),
+//            tempTimelineHeight * _scaleFactor);
+//
+//        for(int i=0; i<gmNumberOfStills; i++) // draw mini timeline stills positions
+//        {
+//            if (grabbedStill[i].gsManipulated) {
+//                ofSetColor(200, 200, 200, 255);
+//            } else {
+//                ofSetColor(FAK_MIDDLEDARKORANGECOLOR, 255);
+//            }
+//            ofRect(
+//                   ofMap(grabbedStill[i].gsFrameNumber,
+//                         0,
+//                         gmTotalFrames-1,
+//                         (_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor,
+//                         ((_x + (gmGridWidth+_gridMargin)*1) + (gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor),
+//                   (_y + gmGridHeight - tempTimelineHeight) * _scaleFactor,
+//                   1 * _scaleFactor,
+//                   tempTimelineHeight * _scaleFactor);
+//        }
         
         ofSetColor(255, 255, 255, 255); // draw stills
         for(int i=0; i<gmNumberOfStills; i++)
         {
             float tempY = ((gmGridHeight+_gridMargin)*((i+_gridColumns)/_gridColumns) + _y );
-            drawStill(i, (_x + (gmGridWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor, tempY * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, _superKeyPressed, _shiftKeyPressed);
+            drawStill(i, (_x + (gmGridWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor, tempY * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, _superKeyPressed, _shiftKeyPressed, _drawPlaceHolder);
         }
         
         
-        // draw the inbetween frames linien
-        if (!_isBeingPrinted) {
-            for(int i=0; i<gmNumberOfStills-1; i++)
-            {
-                if (i%_gridColumns != _gridColumns-1) {
-                    float tempY = ((gmGridHeight+_gridMargin)*((i+_gridColumns)/_gridColumns) + _y );
-                    ofPushStyle();
-                    ofColor tempColor(FAK_DARKORANGECOLOR);
-                    ofSetColor(tempColor);
-                    int tempHeight = (gmGridHeight - gmGridWidth/32) * _scaleFactor;
-                    int deltaFrame = abs(grabbedStill[i+1].gsFrameNumber - grabbedStill[i].gsFrameNumber);
-                    //                int mappedDelta = ofMap(deltaFrame, 0, 20, 0, 3, TRUE);
-                    if (deltaFrame <= 1) {
-                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth) * _scaleFactor, (tempY + gmGridHeight/2) * _scaleFactor - _gridMargin*2, _gridMargin * _scaleFactor, _gridMargin*4);
-                    } else if (deltaFrame > 1 && deltaFrame <= 5){
-                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + _gridMargin/2) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
-                    } else if (deltaFrame > 5 && deltaFrame <= 10){
-                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/3)) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
-                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/3)*2) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
-                    } else if (deltaFrame > 10){
-                        //                    int mappedBrightness = ofMap(deltaFrame, 0, gmTotalFrames, 100, 200);
-                        //                    ofSetColor(mappedBrightness);
-                        //                    tempColor.setBrightness(mappedBrightness);
-                        //                    ofSetColor(tempColor);
-                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/4)) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
-                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/4)*2) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
-                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/4)*3) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
-                    }
-                    ofPopStyle();
-                }
-            }
-            
-        }
+//        // draw the inbetween frames linien
+//        if (!_isBeingPrinted) {
+//            for(int i=0; i<gmNumberOfStills-1; i++)
+//            {
+//                if (i%_gridColumns != _gridColumns-1) {
+//                    float tempY = ((gmGridHeight+_gridMargin)*((i+_gridColumns)/_gridColumns) + _y );
+//                    ofPushStyle();
+//                    ofColor tempColor(FAK_DARKORANGECOLOR);
+//                    ofSetColor(tempColor);
+//                    int tempHeight = (gmGridHeight - gmGridWidth/32) * _scaleFactor;
+//                    int deltaFrame = abs(grabbedStill[i+1].gsFrameNumber - grabbedStill[i].gsFrameNumber);
+//                    //                int mappedDelta = ofMap(deltaFrame, 0, 20, 0, 3, TRUE);
+//                    if (deltaFrame <= 1) {
+//                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth) * _scaleFactor, (tempY + gmGridHeight/2) * _scaleFactor - _gridMargin*2, _gridMargin * _scaleFactor, _gridMargin*4);
+//                    } else if (deltaFrame > 1 && deltaFrame <= 5){
+//                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + _gridMargin/2) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
+//                    } else if (deltaFrame > 5 && deltaFrame <= 10){
+//                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/3)) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
+//                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/3)*2) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
+//                    } else if (deltaFrame > 10){
+//                        //                    int mappedBrightness = ofMap(deltaFrame, 0, gmTotalFrames, 100, 200);
+//                        //                    ofSetColor(mappedBrightness);
+//                        //                    tempColor.setBrightness(mappedBrightness);
+//                        //                    ofSetColor(tempColor);
+//                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/4)) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
+//                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/4)*2) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
+//                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/4)*3) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
+//                    }
+//                    ofPopStyle();
+//                }
+//            }
+//            
+//        }
         
         if (_isBeingPrinted) {
             gmSetTitleInfo = TRUE; //create new title size und umbruch

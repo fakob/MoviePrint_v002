@@ -42,7 +42,7 @@ public:
     void calculateNewGrid(int _windowWidth, int _windowHeight);
     bool fequal(float _x, float _y, float _t);
     void drawUI(int _scaleFactor, bool _hideInPNG);
-    void drawMoviePrint(int _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel);
+    void drawMoviePrint(int _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _drawPlaceHolder);
     void drawList(float _scrollAmountRel);
     void printImageToPNG(int _printSizeWidth);
     void printListToPNG();
@@ -138,6 +138,7 @@ public:
     ofxUISlider_jak *rowSlider;
     ofxUISlider_jak *columnSlider;
     ofxUISlider_jak *numberSlider;
+    ofxUISlider_jak *thumbWidthSlider;
     ofxUIButton *setInPointButton;
     ofxUIButton *setOutPointButton;
     ofxUIRadio *setFrameDisplay;
@@ -151,7 +152,7 @@ public:
     int gui2Columns;
     int gui2Rows;
 
-    
+    bool showPlaceHolder;
     bool showFBO;
     
     // UI Design settings
@@ -174,7 +175,7 @@ public:
     int menuWidth;
     float gridMarginRatio;
     bool manualGridMargin;
-    float scrubWindowW, scrubWindowH;    
+    float scrubWindowW, scrubWindowH;
     
     // Printing
     float printScale;
