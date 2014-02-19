@@ -54,10 +54,10 @@ public:
     
     // functions
     
-    void setup(string vfMovieName, int _numberOfStills, int _gmGridWidth, int _gmGridHeight){
+    void setup(string vfMovieName, int _numberOfStills, int _gmThumbWidth, int _gmThumbHeight, bool _showPlaceHolder){
         
-        gmGridWidth = _gmGridWidth;
-        gmGridHeight = _gmGridHeight;
+        gmThumbWidth = _gmThumbWidth;
+        gmThumbHeight = _gmThumbHeight;
 
         
         string shaderProgram = "#version 120\n \
@@ -99,51 +99,54 @@ public:
 
         gmSetTitleInfo = TRUE; //create new title size und umbruch
         
-        loadNewMovieToBeGrabbed(vfMovieName, gmNumberOfStills);
+        loadNewMovieToBeGrabbed(vfMovieName, gmNumberOfStills, _showPlaceHolder);
         
         gmSetupFinished = TRUE;
         gmShowFramesUI = TRUE;
         
     }
     
-    bool loadNewMovieToBeGrabbed(string vfMovieName, int _numberOfStills){
+    bool loadNewMovieToBeGrabbed(string vfMovieName, int _numberOfStills, bool _showPlaceHolder){
         
         setNumberOfStills(_numberOfStills);
         stop(FALSE);
         
         isMovieLoaded = FALSE;
         
-        ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function");
-        gmMovie.loadMovie(vfMovieName);
-        ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function");
-        
-        if (gmMovie.isLoaded()) {
-            isMovieLoaded = TRUE;
-            if (gmMovie.getTotalNumFrames() < 2) { //check if movie has only one frame, if so than calculate totalframes and later use setPosition instead of setFrame
-                gmHasNoFrames = TRUE;
-                gmFrameRate = 25;
-                gmTotalFrames = gmMovie.getDuration() * gmFrameRate;
+        if (!_showPlaceHolder) {
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function");
+            gmMovie.loadMovie(vfMovieName);
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function");
+            
+            if (gmMovie.isLoaded()) {
+                isMovieLoaded = TRUE;
+                if (gmMovie.getTotalNumFrames() < 2) { //check if movie has only one frame, if so than calculate totalframes and later use setPosition instead of setFrame
+                    gmHasNoFrames = TRUE;
+                    gmFrameRate = 25;
+                    gmTotalFrames = gmMovie.getDuration() * gmFrameRate;
+                } else {
+                    gmHasNoFrames = FALSE;
+                    gmTotalFrames = gmMovie.getTotalNumFrames();
+                    gmFrameRate = ceil(gmTotalFrames/gmMovie.getDuration());
+                }
+                gmImageRatio = gmMovie.getWidth()/gmMovie.getHeight();
+                gmPixelRatio = gmMovie.getPixelFormat();
+                ofLog(OF_LOG_VERBOSE, "ImageRatio:" + ofToString(gmImageRatio) + " PixelRatio:" + ofToString(gmPixelRatio)  + " Framerate:" + ofToString(gmFrameRate) + " totalFrames:" + ofToString(gmTotalFrames) + " getDuration:" + ofToString(gmMovie.getDuration()));
+                
             } else {
-                gmHasNoFrames = FALSE;
-                gmTotalFrames = gmMovie.getTotalNumFrames();
-                gmFrameRate = ceil(gmTotalFrames/gmMovie.getDuration());
+                gmTotalFrames = gmNumberOfStills;
+                ofLog(OF_LOG_VERBOSE, "gmTotalFrames set manually");
+                
             }
-            gmImageRatio = gmMovie.getWidth()/gmMovie.getHeight();
-            gmPixelRatio = gmMovie.getPixelFormat();
-            ofLog(OF_LOG_VERBOSE, "ImageRatio:" + ofToString(gmImageRatio) + " PixelRatio:" + ofToString(gmPixelRatio)  + " Framerate:" + ofToString(gmFrameRate) + " totalFrames:" + ofToString(gmTotalFrames) + " getDuration:" + ofToString(gmMovie.getDuration()));
-
-        } else {
-            gmTotalFrames = gmNumberOfStills;
-            ofLog(OF_LOG_VERBOSE, "gmTotalFrames set manually");
             
         }
-        createGrid(gmNumberOfStills, gmGridWidth, gmGridHeight);
+        createGrid(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder);
         
-//        updatingStill.resize(gmGridWidth, gmGridHeight);
+//        updatingStill.resize(gmThumbWidth, gmThumbHeight);
         
-        getMovieInformation(vfMovieName);
-        
-        gmSetTitleInfo = TRUE;
+//        getMovieInformation(vfMovieName);
+//        
+//        gmSetTitleInfo = TRUE;
         
         return isMovieLoaded;
     }
@@ -244,11 +247,11 @@ public:
 
     }
     
-    void createGrid(int _numberOfStills, int _gmGridWidth, int _gmGridHeight){
+    void createGrid(int _numberOfStills, int _gmThumbWidth, int _gmThumbHeight, bool _drawPlaceHolder){
         if (isMovieLoaded) {
             
-            gmGridWidth = _gmGridWidth;
-            gmGridHeight = _gmGridHeight;
+            gmThumbWidth = _gmThumbWidth;
+            gmThumbHeight = _gmThumbHeight;
             
             stop(TRUE);
             while (isThreadRunning()) {
@@ -307,6 +310,10 @@ public:
             gmSetTitleInfo = TRUE; //create new title size und umbruch
 
             ofLog(OF_LOG_VERBOSE, "Allocations worked");
+        } else if (_drawPlaceHolder){
+            setNumberOfStills(_numberOfStills);
+            grabbedStill.clear();
+            grabbedStill.resize(_numberOfStills);
         }
     }
     
@@ -881,31 +888,31 @@ public:
         ofPushStyle();
         ofEnableAlphaBlending();
         ofSetColor(FAK_ORANGECOLOR); // draw title rect
-//        ofRectRounded((_x + (gmGridWidth+_gridMargin)*0) * _scaleFactor, _y * _scaleFactor , gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, gmGridWidth * _scaleFactor/64);
+//        ofRectRounded((_x + (gmThumbWidth+_gridMargin)*0) * _scaleFactor, _y * _scaleFactor , gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, gmThumbWidth * _scaleFactor/64);
 //        ofSetColor(30, 30, 30, 255); // draw info rect
-//        ofRectRounded((_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor, _y * _scaleFactor, ((gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor, gmGridHeight * _scaleFactor, gmGridWidth * _scaleFactor/64);
+//        ofRectRounded((_x + (gmThumbWidth+_gridMargin)*1) * _scaleFactor, _y * _scaleFactor, ((gmThumbWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor, gmThumbHeight * _scaleFactor, gmThumbWidth * _scaleFactor/64);
 //        ofSetColor(255); // draw title and infos
-////        drawTitle((_x + (gmGridWidth+_gridMargin)*0) * _scaleFactor, _y * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
-////        drawInfo1((_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor, _y * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
-////        drawInfo2((_x + (gmGridWidth+_gridMargin)*2) * _scaleFactor, _y * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
-////        drawInfo3((_x + (gmGridWidth+_gridMargin)*3) * _scaleFactor, _y * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
+////        drawTitle((_x + (gmThumbWidth+_gridMargin)*0) * _scaleFactor, _y * _scaleFactor, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
+////        drawInfo1((_x + (gmThumbWidth+_gridMargin)*1) * _scaleFactor, _y * _scaleFactor, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
+////        drawInfo2((_x + (gmThumbWidth+_gridMargin)*2) * _scaleFactor, _y * _scaleFactor, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
+////        drawInfo3((_x + (gmThumbWidth+_gridMargin)*3) * _scaleFactor, _y * _scaleFactor, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
 //        
 //        ofSetColor(FAK_DARKORANGECOLOR); // draw mini timeline 
 //        int tempTimelineHeight = 5;
-//        ofRect((_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor, (_y + gmGridHeight - tempTimelineHeight) * _scaleFactor, ((gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor, tempTimelineHeight * _scaleFactor);
+//        ofRect((_x + (gmThumbWidth+_gridMargin)*1) * _scaleFactor, (_y + gmThumbHeight - tempTimelineHeight) * _scaleFactor, ((gmThumbWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor, tempTimelineHeight * _scaleFactor);
 //        ofSetColor(FAK_ORANGECOLOR); // draw mini timeline range
 //        ofRect(
 //            ofMap(grabbedStill[0].gsFrameNumber,
 //                  0,
 //                  gmTotalFrames-1,
-//                  (_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor,
-//                  ((_x + (gmGridWidth+_gridMargin)*1) + (gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor),
-//            (_y + gmGridHeight - tempTimelineHeight) * _scaleFactor,
+//                  (_x + (gmThumbWidth+_gridMargin)*1) * _scaleFactor,
+//                  ((_x + (gmThumbWidth+_gridMargin)*1) + (gmThumbWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor),
+//            (_y + gmThumbHeight - tempTimelineHeight) * _scaleFactor,
 //            ofMap(grabbedStill[gmNumberOfStills-1].gsFrameNumber - grabbedStill[0].gsFrameNumber,
 //                  0,
 //                  gmTotalFrames-1,
 //                  0,
-//                  ((gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor),
+//                  ((gmThumbWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor),
 //            tempTimelineHeight * _scaleFactor);
 //
 //        for(int i=0; i<gmNumberOfStills; i++) // draw mini timeline stills positions
@@ -919,9 +926,9 @@ public:
 //                   ofMap(grabbedStill[i].gsFrameNumber,
 //                         0,
 //                         gmTotalFrames-1,
-//                         (_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor,
-//                         ((_x + (gmGridWidth+_gridMargin)*1) + (gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor),
-//                   (_y + gmGridHeight - tempTimelineHeight) * _scaleFactor,
+//                         (_x + (gmThumbWidth+_gridMargin)*1) * _scaleFactor,
+//                         ((_x + (gmThumbWidth+_gridMargin)*1) + (gmThumbWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor),
+//                   (_y + gmThumbHeight - tempTimelineHeight) * _scaleFactor,
 //                   1 * _scaleFactor,
 //                   tempTimelineHeight * _scaleFactor);
 //        }
@@ -929,8 +936,8 @@ public:
         ofSetColor(255, 255, 255, 255); // draw stills
         for(int i=0; i<gmNumberOfStills; i++)
         {
-            float tempY = ((gmGridHeight+_gridMargin)*((i+_gridColumns)/_gridColumns) + _y );
-            drawStill(i, (_x + (gmGridWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor, tempY * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, _superKeyPressed, _shiftKeyPressed, _drawPlaceHolder);
+            float tempY = ((gmThumbHeight+_gridMargin)*(i/_gridColumns) + _y );
+            drawStill(i, (_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor, tempY * _scaleFactor, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _isBeingPrinted, _superKeyPressed, _shiftKeyPressed, _drawPlaceHolder);
         }
         
         
@@ -939,28 +946,28 @@ public:
 //            for(int i=0; i<gmNumberOfStills-1; i++)
 //            {
 //                if (i%_gridColumns != _gridColumns-1) {
-//                    float tempY = ((gmGridHeight+_gridMargin)*((i+_gridColumns)/_gridColumns) + _y );
+//                    float tempY = ((gmThumbHeight+_gridMargin)*((i+_gridColumns)/_gridColumns) + _y );
 //                    ofPushStyle();
 //                    ofColor tempColor(FAK_DARKORANGECOLOR);
 //                    ofSetColor(tempColor);
-//                    int tempHeight = (gmGridHeight - gmGridWidth/32) * _scaleFactor;
+//                    int tempHeight = (gmThumbHeight - gmThumbWidth/32) * _scaleFactor;
 //                    int deltaFrame = abs(grabbedStill[i+1].gsFrameNumber - grabbedStill[i].gsFrameNumber);
 //                    //                int mappedDelta = ofMap(deltaFrame, 0, 20, 0, 3, TRUE);
 //                    if (deltaFrame <= 1) {
-//                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth) * _scaleFactor, (tempY + gmGridHeight/2) * _scaleFactor - _gridMargin*2, _gridMargin * _scaleFactor, _gridMargin*4);
+//                        ofRect((_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns) + gmThumbWidth) * _scaleFactor, (tempY + gmThumbHeight/2) * _scaleFactor - _gridMargin*2, _gridMargin * _scaleFactor, _gridMargin*4);
 //                    } else if (deltaFrame > 1 && deltaFrame <= 5){
-//                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + _gridMargin/2) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
+//                        ofRect((_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns) + gmThumbWidth + _gridMargin/2) * _scaleFactor, (tempY + gmThumbWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
 //                    } else if (deltaFrame > 5 && deltaFrame <= 10){
-//                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/3)) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
-//                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/3)*2) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
+//                        ofRect((_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns) + gmThumbWidth + (_gridMargin/3)) * _scaleFactor, (tempY + gmThumbWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
+//                        ofRect((_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns) + gmThumbWidth + (_gridMargin/3)*2) * _scaleFactor, (tempY + gmThumbWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
 //                    } else if (deltaFrame > 10){
 //                        //                    int mappedBrightness = ofMap(deltaFrame, 0, gmTotalFrames, 100, 200);
 //                        //                    ofSetColor(mappedBrightness);
 //                        //                    tempColor.setBrightness(mappedBrightness);
 //                        //                    ofSetColor(tempColor);
-//                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/4)) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
-//                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/4)*2) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
-//                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/4)*3) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
+//                        ofRect((_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns) + gmThumbWidth + (_gridMargin/4)) * _scaleFactor, (tempY + gmThumbWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
+//                        ofRect((_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns) + gmThumbWidth + (_gridMargin/4)*2) * _scaleFactor, (tempY + gmThumbWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
+//                        ofRect((_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns) + gmThumbWidth + (_gridMargin/4)*3) * _scaleFactor, (tempY + gmThumbWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
 //                    }
 //                    ofPopStyle();
 //                }
@@ -1080,8 +1087,8 @@ public:
     int gmLowerLimitY;
     int gmLeftLimitX;
     int gmRightLimitX;
-    int gmGridWidth;
-    int gmGridHeight;
+    int gmThumbWidth;
+    int gmThumbHeight;
     bool gmShowFramesUI;
     
     ofImage setInPointImage;

@@ -166,10 +166,10 @@ public:
     int timeSliderHeight;
     int gridColumns;
     int gridRows;
+    int thumbWidth;
+    int thumbHeight;
     int gridWidth;
     int gridHeight;
-    int gridAreaWidth;
-    int gridAreaHeight;
     int gridNumber;
     int numberOfStills;
     int menuWidth;

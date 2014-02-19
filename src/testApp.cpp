@@ -46,8 +46,8 @@ void testApp::setup(){
     // UI Values
     leftMargin = 15;
     rightMargin = 15;
-    topMargin = 5;
-    bottomMargin = 5;
+    topMargin = 15;
+    bottomMargin = 15;
     headerHeight = 5;
     footerHeight = 50;
     gridMargin = 2;
@@ -84,8 +84,8 @@ void testApp::setup(){
     gridRows = 6;
     gridSetManually = TRUE;
 
-    gridWidth = 80;
-    gridHeight = 45;
+    thumbWidth = 80;
+    thumbHeight = 45;
     scrollBarWidth = 15;
     scrollAmountRel = 0;
     scrollListAmountRel = 0;
@@ -116,9 +116,9 @@ void testApp::setup(){
     loadedMovie.gmLeftLimitX = menuWidth;
     loadedMovie.gmRightLimitX = ofGetWidth() - rightMargin;
     calculateNewGrid(ofGetWidth(), ofGetHeight());
-    loadedMovie.setup(loadedFile, numberOfStills, gridWidth, gridHeight);
+    loadedMovie.setup(loadedFile, numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
     totalFrames = 100;
-    loadedMovie.createGrid(numberOfStills, gridWidth, gridHeight);
+    loadedMovie.createGrid(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
 
     updateInOut = FALSE;
     manipulateSlider = FALSE;
@@ -127,7 +127,7 @@ void testApp::setup(){
     scrollMultiplier = 50.0;
     
     scrollBar.setup(0, ofGetWidth()-scrollBarWidth, 0, scrollBarWidth, ofGetHeight(), ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 1.5, scrollMultiplier);
-    scrollBar.setScrollHeight((float)gridAreaHeight);
+    scrollBar.setScrollHeight((float)gridHeight);
     scrollBar.registerMouseEvents();
     scrollBar.registerTouchEvents();
     ofAddListener(scrollBar.sbScrollingGoingOn, this, &testApp::scrollEvent);
@@ -150,7 +150,7 @@ void testApp::setup(){
 void testApp::setGUI1(){
     
     // setup gui
-    gui = new ofxUICanvas(ofGetWidth()/2-gridAreaWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, ofGetHeight()-(footerHeight/2) - timeSliderHeight/2, ofGetWidth(),footerHeight); //ofxUICanvas(float x, float y, float width, float height)
+    gui = new ofxUICanvas(ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, ofGetHeight()-(footerHeight/2) - timeSliderHeight/2, ofGetWidth(),footerHeight); //ofxUICanvas(float x, float y, float width, float height)
     gui->setFont("Ubuntu-Light.ttf");
     drawPadding = FALSE;
     gui->setDrawBack(FALSE);
@@ -159,7 +159,7 @@ void testApp::setGUI1(){
     gui->setColorPadded(paddingColor);
     gui->setColorBack(backgroundColor);
     
-	gui->addWidgetDown(new ofxUIRangeSliderJak("RSLIDER", 0.0, (float)totalFrames, 0.0, 100.0, gridAreaWidth, timeSliderHeight));
+	gui->addWidgetDown(new ofxUIRangeSliderJak("RSLIDER", 0.0, (float)totalFrames, 0.0, 100.0, gridWidth, timeSliderHeight));
     timeSlider = (ofxUIRangeSliderJak *) gui->getWidget("RSLIDER");
     timeSlider->setLabelPrecision(0);
     timeSlider->setLabelVisible(FALSE);
@@ -317,39 +317,11 @@ void testApp::calculateNewGrid(int _windowWidth, int _windowHeight){
     while (loadedMovie.isThreadRunning()) {
     }
     
-//    int gridFactor = floor((float)(_windowWidth - ((gridColumns * gridMargin) + leftMargin + rightMargin))/(float)gridColumns);
-//    ofLog(OF_LOG_VERBOSE, "gridFactor: " + ofToString(gridFactor));
-//   
-//    // limit window width and height so that its value doesnt get to small
-//    if (gridFactor < possStillResWidth169[0]) {
-//        gridFactor = possStillResWidth169[0];
-//    }
-//    
-//    if (fequal(gridRatio, 0.75, 0.02)) {
-//        int j = 0;
-//        for (j; j < 637; j++) {
-//            if (gridFactor < possStillResWidth43[j]){
-//                break;
-//            }
-//        }
-//        gridWidth = possStillResWidth43[j-1];
-//        gridHeight = gridWidth*gridRatio;
-//    } else {
-//        int j = 0;
-//        for (j; j < 637; j++) {
-//            if (gridFactor < possStillResWidth169[j]){
-//                break;
-//            }
-//        }
-//        gridWidth = possStillResWidth169[j-1];
-//        gridHeight = gridWidth*gridRatio;
-//    }
-    
-    gridHeight = gridWidth*gridRatio;
+    thumbHeight = thumbWidth*gridRatio;
 
     
     if (!manualGridMargin) {
-        gridMargin = gridWidth * gridMarginRatio;
+        gridMargin = thumbWidth * gridMarginRatio;
     }
     
     if (gridSetManually) {
@@ -357,17 +329,15 @@ void testApp::calculateNewGrid(int _windowWidth, int _windowHeight){
     } else {
         numberOfStills = gridNumber;
 //        gridColumns = 4;
-        gridRows = gridNumber/gridColumns;
+        gridRows = ceil(numberOfStills/(float)gridColumns);
         
     }
     
-    int tempGridAreaHeader = 1;
-
-    gridAreaWidth = (gridColumns * (gridWidth + gridMargin) - gridMargin);
-    gridAreaHeight = ((numberOfStills / gridColumns) * (gridHeight + gridMargin)) + (tempGridAreaHeader * (gridHeight + gridMargin)) - gridMargin;
+    gridWidth = (gridColumns * (thumbWidth + gridMargin) - gridMargin);
+    gridHeight = (gridRows * (thumbHeight + gridMargin)) - gridMargin;
     ofLog(OF_LOG_VERBOSE, "gridMargin: " + ofToString(gridMargin));
-    ofLog(OF_LOG_VERBOSE, "gridHeight: " + ofToString(gridHeight));
-    ofLog(OF_LOG_VERBOSE, "gridAreaHeight: " + ofToString(gridAreaHeight));
+    ofLog(OF_LOG_VERBOSE, "gridHeight: " + ofToString(thumbHeight));
+    ofLog(OF_LOG_VERBOSE, "gridAreaHeight: " + ofToString(gridHeight));
 
     if (!(gridTimeArray == 0)){
         delete[] gridTimeArray;
@@ -381,18 +351,18 @@ void testApp::calculateNewGrid(int _windowWidth, int _windowHeight){
         }
     }
     
-    loadedMovie.gmGridWidth = gridWidth;
-    loadedMovie.gmGridHeight = gridHeight;
+    loadedMovie.gmThumbWidth = thumbWidth;
+    loadedMovie.gmThumbHeight = thumbHeight;
     
-    scrollBar.updateScrollBar(_windowWidth, _windowHeight, gridAreaHeight, 0, 0);
+    scrollBar.updateScrollBar(_windowWidth, _windowHeight, gridHeight, 0, 0);
     scrollBar.setToTop();
     scrollAmountRel = scrollBar.getRelativePos();
     
     ofxNotify() << "New Grid is Calculated - Total Number of Stills: " + ofToString(numberOfStills);
 
     
-    ofLog(OF_LOG_VERBOSE, "gridWidth: " + ofToString(gridWidth));
-    ofLog(OF_LOG_VERBOSE, "gridHeight: " + ofToString(gridHeight));
+    ofLog(OF_LOG_VERBOSE, "gridWidth: " + ofToString(thumbWidth));
+    ofLog(OF_LOG_VERBOSE, "gridHeight: " + ofToString(thumbHeight));
 
 }
 
@@ -407,7 +377,7 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
     loadedMovie.stop(TRUE);
 
     ofxNotify() << "Movie has started to load";
-    loadedMovie.loadNewMovieToBeGrabbed(_newMoviePath, numberOfStills);
+    loadedMovie.loadNewMovieToBeGrabbed(_newMoviePath, numberOfStills, showPlaceHolder);
     windowResized(ofGetWidth(), ofGetHeight());
     if (loadedMovie.gmTotalFrames <=1) {
         movieProperlyLoaded = FALSE;
@@ -441,7 +411,7 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
         ofxNotify() << "Movie could not be loaded";
         ofxNotify() << "Movie could not be loaded";
     }
-    scrollBar.updateScrollBar(ofGetWidth(), ofGetHeight(), gridAreaHeight, 0, 0);
+    scrollBar.updateScrollBar(ofGetWidth(), ofGetHeight(), gridHeight, 0, 0);
     scrollBar.setToTop();
     scrollAmountRel = scrollBar.getRelativePos();
     
@@ -530,7 +500,7 @@ void testApp::update(){
     }
     
     gui2->setPosition(-menuWidth * tweenzorX1, 0);
-    gui->setPosition((ofGetWidth()/2-gridAreaWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING) + menuWidth - menuWidth * tweenzorX1, ofGetHeight()-(footerHeight/2 + timeSliderHeight/2) * tweenzorY1);
+    gui->setPosition((ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING) + menuWidth - menuWidth * tweenzorX1, ofGetHeight()-(footerHeight/2 + timeSliderHeight/2) * tweenzorY1);
     
     if (loadedMovie.isMovieLoaded) { // if no movie is loaded or we are in dev mode then only draw rects
         
@@ -540,15 +510,15 @@ void testApp::update(){
             updateScrub = TRUE;
             int i = loadedMovie.gmScrubID;
             
-            scrubDelta = (ofGetMouseX() - loadedMovie.grabbedStill[i].gsX - gridWidth/2); // used this before i let the mouse jump in the middle
+            scrubDelta = (ofGetMouseX() - loadedMovie.grabbedStill[i].gsX - thumbWidth/2); // used this before i let the mouse jump in the middle
 //            scrubDelta = (ofGetMouseX() - ofGetWidth()/2);  // used this with mouse jump in the middle
-            if (abs(scrubDelta) >= 0 && abs(scrubDelta) < gridWidth/4) {
+            if (abs(scrubDelta) >= 0 && abs(scrubDelta) < thumbWidth/4) {
                 scrubDelta = 0;
             }
-            if (scrubDelta >= gridWidth/4) {
-                scrubDelta = scrubDelta - gridWidth/4;
-            } else if (scrubDelta <= -gridWidth/4) {
-                scrubDelta = scrubDelta + gridWidth/4;
+            if (scrubDelta >= thumbWidth/4) {
+                scrubDelta = scrubDelta - thumbWidth/4;
+            } else if (scrubDelta <= -thumbWidth/4) {
+                scrubDelta = scrubDelta + thumbWidth/4;
             }
 
 //            if (abs(scrubDelta) > gridWidth/2) {
@@ -635,7 +605,7 @@ void testApp::update(){
         Tweener.addTween(scrubFade, 0, 0.5);
         if(scrubFade < 5){
             updateWindowResized = FALSE;
-            loadedMovie.createGrid(numberOfStills, gridWidth, gridHeight);
+            loadedMovie.createGrid(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
             updateAllStills();
             devTurnOffMovieSwitch = FALSE;
         }
@@ -756,6 +726,8 @@ void testApp::draw(){
     } else if(showPlaceHolder){ // test
         
         drawMoviePrint(1, FALSE, FALSE, scrollAmountRel, showPlaceHolder);
+        drawUI(1, false);
+        scrollBar.draw();
     
     } else {
         
@@ -1173,10 +1145,10 @@ void testApp::windowResized(int w, int h){
         scrollListAmountRel = scrollBarList.getRelativePos();
 //    }
     
-    gui->setPosition(ofGetWidth()/2-gridAreaWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, h -(footerHeight/2 + timeSliderHeight/2) * tweenzorY1);
+    gui->setPosition(ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, h -(footerHeight/2 + timeSliderHeight/2) * tweenzorY1);
     gui->setWidth(w);
     gui2->setHeight(h);
-    timeSlider->setWidth(gridAreaWidth);
+    timeSlider->setWidth(gridWidth);
     ofLog(OF_LOG_VERBOSE, "Timeslider Width:" + ofToString(timeSlider->getWidth()) );;
 
     windowResizedOnce++;
@@ -1307,7 +1279,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 	{
 		ofxUISlider_jak *slider = (ofxUISlider_jak *) e.widget;
 		ofLog(OF_LOG_VERBOSE, "ThumbWidth " + ofToString(slider->getScaledValue()));
-		gridWidth = possStillResWidth169[(int)slider->getScaledValue()];
+		thumbWidth = possStillResWidth169[(int)slider->getScaledValue()];
         windowResized(ofGetWidth(), ofGetHeight());
 	}
 	else if(name == "PrintScale")
@@ -1318,8 +1290,8 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         if (isnan(printScale) || printScale > 20.0 || printScale < 1.0) {
             printScale = 1.0;
         }
-        int tempOutputSizeWidth = (gridAreaWidth + gridMargin * 2) * printScale;
-        int tempOutputSizeHeight = (gridAreaHeight + gridMargin * 2) * printScale;
+        int tempOutputSizeWidth = (gridWidth + gridMargin * 2) * printScale;
+        int tempOutputSizeHeight = (gridHeight + gridMargin * 2) * printScale;
         
         ofLog(OF_LOG_VERBOSE, "tempOutputSize: " + ofToString(tempOutputSizeWidth) + "x" + ofToString(tempOutputSizeHeight));
 
@@ -1460,6 +1432,10 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPNG){
     ofRect(0, tempX * _scaleFactor, ofGetWidth() * _scaleFactor, footerHeight * _scaleFactor);
     ofSetColor(255);
     
+    ofSetColor(30, 255, 30);
+    ofRect(0, 0, ofGetWidth() * _scaleFactor, headerHeight * _scaleFactor);
+    ofSetColor(255);
+    
 //    if (!_hideInPNG) {
 //        // draw the percentage loaded bar
 //        // the background
@@ -1472,24 +1448,27 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPNG){
 }
 
 //--------------------------------------------------------------
-void testApp::drawMoviePrint(int _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _drawPlaceHolder){
+void testApp::drawMoviePrint(int _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _showPlaceHolder){
     
-    int _tempGridAreaHeight = gridAreaHeight;
+    int _tempGridAreaHeight = gridHeight;
     if (!_isBeingPrinted) {
         _tempGridAreaHeight = _tempGridAreaHeight + 40;
     }
     
     float _scrollAmount = 0;
     if (scrollBar.sbActive) {
-        _scrollAmount = ((_tempGridAreaHeight-scrollBar.sbScrollAreaHeight)+(bottomMargin+topMargin)*2)*(1-_scrollAmountRel)+(ofGetHeight()/2 - _tempGridAreaHeight/2)-(bottomMargin+topMargin);
+//        _scrollAmount = ((_tempGridAreaHeight-scrollBar.sbScrollAreaHeight)+(bottomMargin+topMargin)*2)*(1-_scrollAmountRel)+(ofGetHeight()/2 - _tempGridAreaHeight/2)-(bottomMargin+topMargin);
+        _scrollAmount = ((gridHeight + topMargin + bottomMargin - ofGetWindowHeight()) * -1) * _scrollAmountRel;
     }
 //    ofLog(OF_LOG_VERBOSE, "scrollAmountRel: " + ofToString(scrollAmountRel));
     if (isnan(_scrollAmount)) {
         _scrollAmount = 0;
     }
-    float tempX = (((gridWidth+gridMargin)*(0%gridColumns))+(ofGetWidth()/2 - gridAreaWidth/2) + menuWidth - menuWidth * tweenzorX1) * _scaleFactor;
-    float tempY = ((ofGetHeight()/2 - _tempGridAreaHeight/2)+_scrollAmount) * _scaleFactor;
-    loadedMovie.drawGmMoviePrint(tempX, tempY, gridColumns, gridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _drawPlaceHolder);
+//    float tempX = (((thumbWidth+gridMargin)*(0%gridColumns))+(ofGetWidth()/2 - gridWidth/2) + menuWidth - menuWidth * tweenzorX1) * _scaleFactor;
+    float tempX = (leftMargin + menuWidth - menuWidth * tweenzorX1) * _scaleFactor;
+//    float tempY = ((ofGetHeight()/2 - _tempGridAreaHeight/2)+_scrollAmount) * _scaleFactor;
+    float tempY = _scrollAmount * _scaleFactor + topMargin + headerHeight;
+    loadedMovie.drawGmMoviePrint(tempX, tempY, gridColumns, gridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
 }
 
 //--------------------------------------------------------------
@@ -1558,7 +1537,7 @@ void testApp::drawResizeScreen(){
     for(int i=0; i<(numberOfStills+gridColumns); i++)
     {
         ofSetColor(30,(int)scrubFade);
-        ofRectRounded(((gridWidth+gridMargin)*(i%gridColumns))+(ofGetWidth()/2 - gridAreaWidth/2), ((gridHeight+gridMargin)*(i/gridColumns))+(ofGetHeight()/2 - gridAreaHeight/2), gridWidth, gridHeight, gridWidth/64);
+        ofRectRounded(((thumbWidth+gridMargin)*(i%gridColumns))+(ofGetWidth()/2 - gridWidth/2), ((thumbHeight+gridMargin)*(i/gridColumns))+(ofGetHeight()/2 - gridHeight/2), thumbWidth, thumbHeight, thumbWidth/64);
     }
 
     ofPopStyle();
@@ -1643,9 +1622,9 @@ void testApp::printImageToPNG(int _printSizeWidth){
     ofLog(OF_LOG_VERBOSE, dir.getOriginalDirectory() );
     
     if (loadedMovie.isMovieLoaded) {
-        float _newScaleFactor = (float)_printSizeWidth / (float)(gridAreaWidth + gridMargin * 2);
-        int outputWidth = (gridAreaWidth + gridMargin * 2) * _newScaleFactor;
-        int outputHeight = (gridAreaHeight + gridMargin * 2) * _newScaleFactor;
+        float _newScaleFactor = (float)_printSizeWidth / (float)(gridWidth + gridMargin * 2);
+        int outputWidth = (gridWidth + gridMargin * 2) * _newScaleFactor;
+        int outputHeight = (gridHeight + gridMargin * 2) * _newScaleFactor;
 //        if (outputWidth > 9999.0) {
 //            _scaleFactor = 9950.0 / (gridAreaWidth + gridMargin * 2);
 //            outputWidth = (gridAreaWidth + gridMargin * 2) * _scaleFactor;
