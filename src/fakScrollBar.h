@@ -243,7 +243,7 @@ public:
                 } else if ((sbScrollBarY < sbScrollBarYMin)) {
                     
                     if ( sbMouseScrollVelocity.y > 0 ) { // Return to bottom position
-                        sbMouseScrollVelocity.y = sbReturnToBaseConstant * abs(sbScrollBarY);
+                        sbMouseScrollVelocity.y = sbReturnToBaseConstant * abs(sbScrollBarY - sbScrollBarYMin);
                     } else { // Slow down
                         float change = sbBounceDecelerationConstant * getTimeRampDown();
                         sbMouseScrollVelocity.y += change;
@@ -252,8 +252,8 @@ public:
                     
                     sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y * getTimeRampDown();
                     
-                    if (sbScrollBarY > -0.001){ // when close to aim (threshold 0.001), lead to aim manually
-                        sbScrollBarY = 0;
+                    if (sbScrollBarY > (sbScrollBarYMin - 0.001)){ // when close to aim (threshold 0.001), lead to aim manually
+                        sbScrollBarY = sbScrollBarYMin;
                         sbMouseScrollVelocity = ofVec2f(0.0,0.0);
                     }
                     

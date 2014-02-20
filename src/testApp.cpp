@@ -44,14 +44,14 @@ void testApp::setup(){
     loadNewMovieToBeScrubbedBool = FALSE;
     
     // UI Values
-    leftMargin = 15;
-    rightMargin = 15;
-    topMargin = 15;
-    bottomMargin = 15;
-    headerHeight = 5;
+    leftMargin = 5;
+    rightMargin = 5;
+    topMargin = 5;
+    bottomMargin = 5;
+    headerHeight = 40;
     footerHeight = 50;
-    gridMargin = 2;
-    gridMarginRatio = 10.0/320.0;
+    gridMargin = 5;
+    gridMarginRatio = gridMargin/256.0;
     manualGridMargin = FALSE;
     loaderBarHeight = 20;
     timeSliderHeight = 24;
@@ -126,13 +126,13 @@ void testApp::setup(){
     
     scrollMultiplier = 50.0;
     
-    scrollBar.setup(0, ofGetWidth()-scrollBarWidth, 0, scrollBarWidth, ofGetHeight(), ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 1.5, scrollMultiplier);
+    scrollBar.setup(0, ofGetWidth()-scrollBarWidth, headerHeight, scrollBarWidth, ofGetHeight()-headerHeight, ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 1.5, scrollMultiplier);
     scrollBar.setScrollHeight((float)gridHeight);
     scrollBar.registerMouseEvents();
     scrollBar.registerTouchEvents();
     ofAddListener(scrollBar.sbScrollingGoingOn, this, &testApp::scrollEvent);
 
-    scrollBarList.setup(0, ofGetWidth()-scrollBarWidth, 0, scrollBarWidth, ofGetHeight(), ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 1.5, scrollMultiplier);
+    scrollBarList.setup(0, ofGetWidth()-scrollBarWidth, headerHeight, scrollBarWidth, ofGetHeight()-headerHeight, ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 1.5, scrollMultiplier);
     scrollBarList.setScrollHeight(0.5);
     scrollBarList.registerMouseEvents();
     scrollBarList.registerTouchEvents();
@@ -354,7 +354,7 @@ void testApp::calculateNewGrid(int _windowWidth, int _windowHeight){
     loadedMovie.gmThumbWidth = thumbWidth;
     loadedMovie.gmThumbHeight = thumbHeight;
     
-    scrollBar.updateScrollBar(_windowWidth, _windowHeight, gridHeight, 0, 0);
+    scrollBar.updateScrollBar(_windowWidth, _windowHeight, gridHeight, headerHeight, 0);
     scrollBar.setToTop();
     scrollAmountRel = scrollBar.getRelativePos();
     
@@ -411,7 +411,7 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
         ofxNotify() << "Movie could not be loaded";
         ofxNotify() << "Movie could not be loaded";
     }
-    scrollBar.updateScrollBar(ofGetWidth(), ofGetHeight(), gridHeight, 0, 0);
+    scrollBar.updateScrollBar(ofGetWidth(), ofGetHeight(), gridHeight, headerHeight, 0);
     scrollBar.setToTop();
     scrollAmountRel = scrollBar.getRelativePos();
     
@@ -1140,7 +1140,7 @@ void testApp::windowResized(int w, int h){
             droppedList.setAllLimitsRight(ofGetWidth() - rightMargin);
         }
 //    if (showDroppedList) {
-        scrollBarList.updateScrollBar(w, h, droppedList.getListHeight(), 0, 0);
+        scrollBarList.updateScrollBar(w, h, droppedList.getListHeight(), headerHeight, 0);
         scrollBarList.setToTop();
         scrollListAmountRel = scrollBarList.getRelativePos();
 //    }
@@ -1181,7 +1181,7 @@ void testApp::dragEvent(ofDragInfo dragInfo){
             }
             
             droppedList.setup(droppedFiles);
-            scrollBarList.updateScrollBar(ofGetWidth(), ofGetHeight(), droppedList.getListHeight(), 0, 0);
+            scrollBarList.updateScrollBar(ofGetWidth(), ofGetHeight(), droppedList.getListHeight(), headerHeight, 0);
             scrollBarList.setToTop();
             scrollListAmountRel = scrollBarList.getRelativePos();
 
