@@ -7,7 +7,7 @@ int main( ){
 
     ofAppGLFWWindow window;
     
-	ofSetupOpenGL(1310,642, OF_WINDOW);			// <-------- setup the GL context
+	ofSetupOpenGL(1310,655, OF_WINDOW);			// <-------- setup the GL context
 
     window.setWindowTitle("MoviePrint");
 //    window.hideCursor();

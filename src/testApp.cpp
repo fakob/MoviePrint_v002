@@ -726,8 +726,8 @@ void testApp::draw(){
     } else if(showPlaceHolder){ // test
         
         drawMoviePrint(1, FALSE, FALSE, scrollAmountRel, showPlaceHolder);
-        drawUI(1, false);
         scrollBar.draw();
+        drawUI(1, false);
     
     } else {
         
@@ -1450,23 +1450,14 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPNG){
 //--------------------------------------------------------------
 void testApp::drawMoviePrint(int _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _showPlaceHolder){
     
-    int _tempGridAreaHeight = gridHeight;
-    if (!_isBeingPrinted) {
-        _tempGridAreaHeight = _tempGridAreaHeight + 40;
-    }
-    
     float _scrollAmount = 0;
     if (scrollBar.sbActive) {
-//        _scrollAmount = ((_tempGridAreaHeight-scrollBar.sbScrollAreaHeight)+(bottomMargin+topMargin)*2)*(1-_scrollAmountRel)+(ofGetHeight()/2 - _tempGridAreaHeight/2)-(bottomMargin+topMargin);
-        _scrollAmount = ((gridHeight + topMargin + bottomMargin - ofGetWindowHeight()) * -1) * _scrollAmountRel;
+        _scrollAmount = ((gridHeight - (ofGetWindowHeight() - headerHeight - topMargin - bottomMargin)) * -1) * _scrollAmountRel;
     }
-//    ofLog(OF_LOG_VERBOSE, "scrollAmountRel: " + ofToString(scrollAmountRel));
     if (isnan(_scrollAmount)) {
         _scrollAmount = 0;
     }
-//    float tempX = (((thumbWidth+gridMargin)*(0%gridColumns))+(ofGetWidth()/2 - gridWidth/2) + menuWidth - menuWidth * tweenzorX1) * _scaleFactor;
     float tempX = (leftMargin + menuWidth - menuWidth * tweenzorX1) * _scaleFactor;
-//    float tempY = ((ofGetHeight()/2 - _tempGridAreaHeight/2)+_scrollAmount) * _scaleFactor;
     float tempY = _scrollAmount * _scaleFactor + topMargin + headerHeight;
     loadedMovie.drawGmMoviePrint(tempX, tempY, gridColumns, gridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
 }
