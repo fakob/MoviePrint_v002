@@ -506,7 +506,13 @@ void testApp::update(){
         loadedMovie.gmMovieScrub.update();
     }
     
-    gui2->setPosition(-menuWidth * tweenzorX1, 0);
+//    gui2->setPosition(-menuWidth * tweenzorX1, 0);
+    
+    gui2->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY());
+    gui2->setWidth(menuSettings.getSizeW());
+    gui2->setHeight(menuSettings.getSizeH());
+    
+    
     gui->setPosition((ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING) + menuWidth - menuWidth * tweenzorX1, ofGetHeight()-(footerHeight/2 + timeSliderHeight/2) * tweenzorY1);
     
     if (loadedMovie.isMovieLoaded) { // if no movie is loaded or we are in dev mode then only draw rects
@@ -1444,7 +1450,7 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPNG){
     float tempY = 0;
     
     menuSettings.setPosition(tempX, tempY);
-    menuSettings.setSize(thumbWidth, headerHeight + (thumbHeight + gridMargin)*3);
+    menuSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*5);
     menuSettings.drawMenu();
 
     ofSetColor(255);

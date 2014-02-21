@@ -11,6 +11,7 @@
 
 #include "ofMain.h"
 #include "ofxTween.h"
+#include "ofxUI.h"
 
 #define FAK_ORANGECOLOR ofColor(238, 71, 0, 255)
 #define FAK_DARKORANGECOLOR ofColor(99, 30, 0, 255)
@@ -38,7 +39,7 @@ public:
         mMenuWidth = _mMenuWidth;
         mMenuHeight = _mMenuHeight;
         mMenuRollOverHeight = _mMenuRollOverHeight;
-        tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,1000,500);
+        tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,1000,0);
         
         mInsideMenuHead = FALSE;
     }
@@ -101,6 +102,22 @@ public:
 	void setSize(float _mMenuWidth, float _mMenuHeight){
         mMenuWidth = _mMenuWidth;
         mMenuHeight = _mMenuHeight;
+    }
+    
+    float getPositionX(){
+        return mMenuX;
+    }
+    
+    float getPositionY(){
+        return mMenuY;
+    }
+    
+	float getSizeW(){
+        return mMenuWidth;
+    }
+    
+	float getSizeH(){
+        return mMenuRollOverHeight + (mMenuHeight - mMenuRollOverHeight) * tweenMenuInOut.update();
     }
     
     void updateMenu(){
