@@ -100,6 +100,7 @@ void testApp::setup(){
     showMenu = FALSE;
     Tweenzor::add(&tweenzorX1, 0.f, 1.f, 0.f, 0.5f, EASE_IN_OUT_EXPO);
     Tweenzor::add(&tweenzorY1, 0.f, 1.f, 0.f, 0.5f, EASE_IN_OUT_EXPO);
+    Tweenzor::add(&menuTween1, 0.f, 1.f, 0.f, 0.5f, EASE_IN_OUT_EXPO);
 
     startImage.loadImage("MoviePrint_StartBildschirm_v001_00000.png");
     backgroundImage.loadImage("MoviePrint_Background_v001_00000.jpg");
@@ -143,6 +144,9 @@ void testApp::setup(){
     setGUI1();  
     setGUI2();
     gui2->loadSettings("guiSettings2.xml");
+    
+    menuSettings.setupMenu(0,0,0,0,headerHeight);
+    menuSettings.registerMouseEvents();
     
     moveInOutTimeline();
     
@@ -1434,13 +1438,14 @@ void testApp::scrollEvent(ofVec2f & e){
 //--------------------------------------------------------------
 void testApp::drawUI(int _scaleFactor, bool _hideInPNG){
     
-    float tempX = ofGetHeight() - footerHeight * tweenzorY1;
-    ofSetColor(30, 30, 30);
-    ofRect(0, tempX * _scaleFactor, ofGetWidth() * _scaleFactor, footerHeight * _scaleFactor);
-    ofSetColor(255);
-    
-//    ofSetColor(FAK_LIGHTGRAY);
     layoutHeaderImage.draw(0, 0, ofGetWindowWidth() * _scaleFactor, layoutHeaderImage.getHeight() * _scaleFactor);
+
+    float tempX = (leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*2) * _scaleFactor;
+    float tempY = 0;
+    
+    menuSettings.setPosition(tempX, tempY);
+    menuSettings.setSize(thumbWidth, headerHeight + (thumbHeight + gridMargin)*3);
+    menuSettings.drawMenu();
 
     ofSetColor(255);
     

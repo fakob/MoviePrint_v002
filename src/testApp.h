@@ -16,6 +16,7 @@
 #include "ofxMSATimer.h"
 //#include "ofxModifierKeys.h"
 #include <iostream>
+#include "fakMenu.h"
 
 
 class testApp : public ofBaseApp{
@@ -177,6 +178,10 @@ public:
     float gridMarginRatio;
     bool manualGridMargin;
     float scrubWindowW, scrubWindowH;
+    
+    // Menu
+    fakMenu menuSettings;
+    float menuTween1;
     
     // Printing
     float printScale;
