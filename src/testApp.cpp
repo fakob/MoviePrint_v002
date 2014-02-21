@@ -225,7 +225,7 @@ void testApp::setGUI2(){
 	gui2->addSlider_jak("Columns", 4, 10, gridColumns, length-xInit,dim);
 	gui2->addSlider_jak("Rows", 1, 20, gridRows, length-xInit,dim);
    	gui2->addSlider_jak("Number", 4, 200, gridNumber, length-xInit,dim);
-   	gui2->addSlider_jak("ThumbWidth", 5, 25, gridNumber, length-xInit,dim);
+   	gui2->addSlider_jak("ThumbWidth", 7, 25, gridNumber, length-xInit,dim);
     columnSlider = (ofxUISlider_jak *) gui2->getWidget("Columns");
     rowSlider = (ofxUISlider_jak *) gui2->getWidget("Rows");
     numberSlider = (ofxUISlider_jak *) gui2->getWidget("Number");
