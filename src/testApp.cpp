@@ -166,8 +166,8 @@ void testApp::setGUI1(){
     gui->setColorPadded(paddingColor);
     gui->setColorBack(backgroundColor);
     
-	gui->addWidgetDown(new ofxUIRangeSliderJak("RSLIDER", 0.0, (float)totalFrames, 0.0, 100.0, gridWidth, timeSliderHeight));
-    timeSlider = (ofxUIRangeSliderJak *) gui->getWidget("RSLIDER");
+	gui->addWidgetDown(new ofxUIRangeSlider("RSLIDER", 0.0, (float)totalFrames, 0.0, 100.0, gridWidth, timeSliderHeight));
+    timeSlider = (ofxUIRangeSlider *) gui->getWidget("RSLIDER");
     timeSlider->setLabelPrecision(0);
     timeSlider->setLabelVisible(FALSE);
 //    timeSlider->setDrawPadding(FALSE);
@@ -204,6 +204,16 @@ void testApp::setGUI2(){
 	float dim = 16;
 	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
     float length = menuWidth-xInit;
+    
+    vector<string> names2;
+	names2.push_back("Set Columns and Rows");
+	names2.push_back("Set Number of Frames");
+    
+    vector<string> names;
+	names.push_back("Frames");
+	names.push_back("TimeCode");
+	names.push_back("off");
+    
 	hideGUI2 = false;
     
     
@@ -211,35 +221,28 @@ void testApp::setGUI2(){
 	gui2 = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
     gui2->setFont("Ubuntu-Light.ttf");
 
-    gui2->addWidgetDown(new ofxUILabel("SETTINGS", OFX_UI_FONT_LARGE));
+    gui2->addLabel("SETTINGS", OFX_UI_FONT_LARGE);
     gui2->addSpacer(length-xInit, 1);
-	gui2->addWidgetDown(new ofxUILabel("SET RASTER", OFX_UI_FONT_MEDIUM));
-    vector<string> names2;
-	names2.push_back("Set Columns and Rows");
-	names2.push_back("Set Number of Frames");
-    //	names2.push_back("SceneDetection");
-    gui2->addWidgetDown(new ofxUIRadio( dim, dim, "Grid-Number", names2, OFX_UI_ORIENTATION_VERTICAL));
+    gui2->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
+
+    gui2->addRadio("Grid-Number", names2, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
     setFitManually = (ofxUIRadio *) gui2->getWidget("Grid-Number");
     setFitManually->activateToggle("Set Columns and Rows");
     
-	gui2->addSlider_jak("Columns", 4, 10, gridColumns, length-xInit,dim);
-	gui2->addSlider_jak("Rows", 1, 20, gridRows, length-xInit,dim);
-   	gui2->addSlider_jak("Number", 4, 200, gridNumber, length-xInit,dim);
-   	gui2->addSlider_jak("ThumbWidth", 7, 25, gridNumber, length-xInit,dim);
-    columnSlider = (ofxUISlider_jak *) gui2->getWidget("Columns");
-    rowSlider = (ofxUISlider_jak *) gui2->getWidget("Rows");
-    numberSlider = (ofxUISlider_jak *) gui2->getWidget("Number");
-    thumbWidthSlider = (ofxUISlider_jak *) gui2->getWidget("ThumbWidth");
-    
-    vector<string> names;
-	names.push_back("Frames");
-	names.push_back("TimeCode");
-	names.push_back("off");
+	gui2->addIntSlider("Columns", 4, 10, gridColumns, length-xInit,dim);
+	gui2->addIntSlider("Rows", 1, 20, gridRows, length-xInit,dim);
+   	gui2->addIntSlider("Number", 4, 200, gridNumber, length-xInit,dim);
+   	gui2->addIntSlider("ThumbWidth", 0, 18, 1, length-xInit,dim);
+//    columnSlider = (ofxUIIntSlider *) gui2->getWidget("Columns");
+//    rowSlider = (ofxUIIntSlider *) gui2->getWidget("Rows");
+//    numberSlider = (ofxUIIntSlider *) gui2->getWidget("Number");
+    thumbWidthSlider = (ofxUIIntSlider *) gui2->getWidget("ThumbWidth");
+    thumbWidthSlider->setVisible(FALSE);
+
     gui2->addSpacer(length-xInit, 1);
-    gui2->addWidgetDown(new ofxUILabel("SHOW INFO", OFX_UI_FONT_MEDIUM));
-	gui2->addWidgetDown(new ofxUIRadio( dim, dim, "RADIO HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL));
-    setFrameDisplay = (ofxUIRadio *) gui2->getWidget("RADIO HORIZONTAL");
-    //    ((ofxUIRadio*)gui2->getWidget("RADIO HORIZONTAL"))->activateToggle("TimeCode");
+    gui2->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
+    ofxUIRadio *setFrameDisplay = gui2->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
+//    setFrameDisplay = (ofxUIRadio *) gui2->getWidget("RADIO HORIZONTAL");
     setFrameDisplay->activateToggle("TimeCode");
     
     
@@ -249,8 +252,6 @@ void testApp::setGUI2(){
     ddl = new ofxUIDropDownList(length-xInit, "Choose Output Format", names3, OFX_UI_FONT_MEDIUM);
     ddl->setAllowMultiple(FALSE);
     ddl->setAutoClose(true);
-    //    gui2->addSpacer(length-xInit, 2);
-    //    gui2->addWidgetDown(ddl);
     
     vector<string> names4;
     names4.push_back("1024px wide");
@@ -287,7 +288,7 @@ void testApp::setGUI2(){
     ofxUIColor cfh = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_FILL_HIGHLIGHT
     ofxUIColor cp = ofxUIColor( 255, 255, 255, 100 ); // OFX_UI_COLOR_PADDED
     ofxUIColor cpo = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_PADDED_OUTLINE
-    gui2->setUIWidgetColorsBack(cb); //
+//    gui2->setUIWidgetColorsBack(cb); //
 //    gui2->setUIWidgetColorsFill(cf,cfh); //
 
 //    gui2->setTheme(OFX_UI_THEME_TEALLIME);
@@ -975,16 +976,16 @@ void testApp::keyReleased(int key){
     
     currentKey = -1;
     
-    if (timeSlider->getState()) {
-        
-        if (key == OF_KEY_RIGHT || key == OF_KEY_LEFT || key == OF_KEY_UP || key == OF_KEY_DOWN) {
-            uiSliderValueLow = timeSlider->getScaledValueLow();
-            uiSliderValueHigh = timeSlider->getScaledValueHigh();
-            updateAllStills();
-    ofLog(OF_LOG_VERBOSE, "asdfadfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfaf" );
-
-        }
-    }
+//    if (timeSlider->getState()) {
+//        
+//        if (key == OF_KEY_RIGHT || key == OF_KEY_LEFT || key == OF_KEY_UP || key == OF_KEY_DOWN) {
+//            uiSliderValueLow = timeSlider->getScaledValueLow();
+//            uiSliderValueHigh = timeSlider->getScaledValueHigh();
+//            updateAllStills();
+//    ofLog(OF_LOG_VERBOSE, "asdfadfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfaf" );
+//
+//        }
+//    }
     
     manipulateSlider = FALSE;
     loadedMovie.gmScrubMovie = FALSE;
@@ -1165,8 +1166,8 @@ void testApp::windowResized(int w, int h){
     gui->setPosition(ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, h -(footerHeight/2 + timeSliderHeight/2) * tweenzorY1);
     gui->setWidth(w);
     gui2->setHeight(h);
-    timeSlider->setWidth(gridWidth);
-    ofLog(OF_LOG_VERBOSE, "Timeslider Width:" + ofToString(timeSlider->getWidth()) );;
+//    timeSlider->setWidth(gridWidth);
+//    ofLog(OF_LOG_VERBOSE, "Timeslider Width:" + ofToString(timeSlider->getWidth()) );;
 
     windowResizedOnce++;
     }
@@ -1272,29 +1273,29 @@ void testApp::guiEvent(ofxUIEventArgs &e){
     }
 	else if(name == "Columns")
 	{
-		ofxUISlider_jak *slider = (ofxUISlider_jak *) e.widget;
+		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
 		ofLog(OF_LOG_VERBOSE, "Columns " + ofToString(slider->getScaledValue()));
 		gridColumns = (int)slider->getScaledValue();
         windowResized(ofGetWidth(), ofGetHeight());
 	}
 	else if(name == "Rows")
 	{
-		ofxUISlider_jak *slider = (ofxUISlider_jak *) e.widget;
+		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
 		ofLog(OF_LOG_VERBOSE, "Rows " + ofToString(slider->getScaledValue()));
 		gridRows = (int)slider->getScaledValue();
         windowResized(ofGetWidth(), ofGetHeight());
 	}
 	else if(name == "Number")
 	{
-		ofxUISlider_jak *slider = (ofxUISlider_jak *) e.widget;
+		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
 		ofLog(OF_LOG_VERBOSE, "Number " + ofToString(slider->getScaledValue()));
-        gridColumns = 4;
+//        gridColumns = 4;
 		gridNumber = (int)slider->getScaledValue();
         windowResized(ofGetWidth(), ofGetHeight());
 	}
 	else if(name == "ThumbWidth")
 	{
-		ofxUISlider_jak *slider = (ofxUISlider_jak *) e.widget;
+		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
 		ofLog(OF_LOG_VERBOSE, "ThumbWidth " + ofToString(slider->getScaledValue()));
 		thumbWidth = possStillResWidth169[(int)slider->getScaledValue()];
         windowResized(ofGetWidth(), ofGetHeight());

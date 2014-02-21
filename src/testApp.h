@@ -136,11 +136,11 @@ public:
     
     // UI Design
     ofxUICanvas *gui;
-    ofxUIRangeSliderJak *timeSlider;
-    ofxUISlider_jak *rowSlider;
-    ofxUISlider_jak *columnSlider;
-    ofxUISlider_jak *numberSlider;
-    ofxUISlider_jak *thumbWidthSlider;
+    ofxUIRangeSlider *timeSlider;
+    ofxUIIntSlider *rowSlider;
+    ofxUIIntSlider *columnSlider;
+    ofxUIIntSlider *numberSlider;
+    ofxUIIntSlider *thumbWidthSlider;
     ofxUIButton *setInPointButton;
     ofxUIButton *setOutPointButton;
     ofxUIRadio *setFrameDisplay;
