@@ -36,6 +36,9 @@ using namespace boost;
 #define FAK_MIDDLEDARKORANGECOLOR ofColor(170, 50, 0, 255)
 #define FAK_LIGHTERMIDDLEDARKORANGECOLOR ofColor(185, 55, 0, 255)
 
+#define FAK_GREENCOLOR ofColor(117, 130, 16, 255)
+#define FAK_LIGHTGRAY ofColor(205, 205, 205, 255)
+#define FAK_MIDDLEGRAY ofColor(195, 195, 195, 255)
 
 class fakGrabbedMovie : public ofThread {
     
@@ -866,7 +869,7 @@ public:
 
             ofPushMatrix();
             ofPushStyle();
-            ofSetColor(255, 255, 255, 200);
+            ofSetColor(FAK_MIDDLEGRAY);
 //            updatingStill.drawSubsection(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight,updatingStill.width/2 - grabbedStill[i].gsDrawWidth/2, updatingStill.height/2 - grabbedStill[i].gsDrawHeight/2);
             
             ofRect(_x, _y, _w, _h);

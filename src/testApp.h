@@ -88,6 +88,7 @@ public:
     ofImage updatingImage;
     ofImage inPointImage;
     ofImage outPointImage;
+    ofImage layoutHeaderImage;
 
     bool superKeyPressed = FALSE;
     bool shiftKeyPressed = FALSE;

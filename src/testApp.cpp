@@ -8,6 +8,8 @@
 #define FAK_LIGHTERMIDDLEDARKORANGECOLOR ofColor(185, 55, 0, 255)
 
 #define FAK_GREENCOLOR ofColor(117, 130, 16, 255)
+#define FAK_LIGHTGRAY ofColor(205, 205, 205, 255)
+#define FAK_MIDDLEGRAY ofColor(195, 195, 195, 255)
 
 
 //--------------------------------------------------------------
@@ -107,7 +109,8 @@ void testApp::setup(){
     inPointImage.loadImage("MoviePrint_InPoint_v001_00000.png");
     outPointImage.loadImage("MoviePrint_OutPoint_v001_00000.png");
     printListImage.loadImage("MoviePrint_PrintList_v001_00000.png");
-        
+    layoutHeaderImage.loadImage("MoviePrint_Layout_Header_v001_00000.png");
+    
     // load standard movie
     loadedFile = "Nothing";
 
@@ -725,6 +728,10 @@ void testApp::draw(){
         
     } else if(showPlaceHolder){ // test
         
+        ofPushStyle();
+        ofSetColor(FAK_LIGHTGRAY);
+        ofRect(0, 0, ofGetWidth(), ofGetHeight());
+        ofPopStyle();
         drawMoviePrint(1, FALSE, FALSE, scrollAmountRel, showPlaceHolder);
         scrollBar.draw();
         drawUI(1, false);
@@ -1432,8 +1439,9 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPNG){
     ofRect(0, tempX * _scaleFactor, ofGetWidth() * _scaleFactor, footerHeight * _scaleFactor);
     ofSetColor(255);
     
-    ofSetColor(30, 255, 30);
-    ofRect(0, 0, ofGetWidth() * _scaleFactor, headerHeight * _scaleFactor);
+//    ofSetColor(FAK_LIGHTGRAY);
+    layoutHeaderImage.draw(0, 0, ofGetWindowWidth() * _scaleFactor, layoutHeaderImage.getHeight() * _scaleFactor);
+
     ofSetColor(255);
     
 //    if (!_hideInPNG) {

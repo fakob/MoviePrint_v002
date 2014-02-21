@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3A71581818B616BD00821D50 /* MoviePrint_Layout_Header_v001_00000.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A71581718B616BD00821D50 /* MoviePrint_Layout_Header_v001_00000.png */; };
 		3A75C0FA18B35E6D0013648A /* ofxMultiTouchPad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A75C0F818B35E6D0013648A /* ofxMultiTouchPad.cpp */; };
 		3AAF41A417623B5600F94546 /* fontstash.c in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF412A17623B5600F94546 /* fontstash.c */; };
 		3AAF41A517623B5600F94546 /* ofxFontStash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF412F17623B5600F94546 /* ofxFontStash.cpp */; };
@@ -102,6 +103,7 @@
 
 /* Begin PBXFileReference section */
 		3A467811176259610099F7C8 /* MoviePrintDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoviePrintDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A71581718B616BD00821D50 /* MoviePrint_Layout_Header_v001_00000.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = MoviePrint_Layout_Header_v001_00000.png; path = ../../../../../../../07_Compositing/99_Render_Compositing/140220/MoviePrint_Layout_Header_v001_00000.png; sourceTree = "<group>"; };
 		3A75C0F718B35E6D0013648A /* MTTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTTypes.h; sourceTree = "<group>"; };
 		3A75C0F818B35E6D0013648A /* ofxMultiTouchPad.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxMultiTouchPad.cpp; sourceTree = "<group>"; };
 		3A75C0F918B35E6D0013648A /* ofxMultiTouchPad.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxMultiTouchPad.h; sourceTree = "<group>"; };
@@ -311,6 +313,7 @@
 		3AAF410A17623A1E00F94546 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				3A71581718B616BD00821D50 /* MoviePrint_Layout_Header_v001_00000.png */,
 				3AAF41E317624CE800F94546 /* Credits.rtf */,
 				3AAF41DC17623EC600F94546 /* MoviePrint_Logo_v002_00000.icns */,
 				3AAF41BC17623CDA00F94546 /* Franchise-Bold.ttf */,
@@ -851,6 +854,7 @@
 				3AAF41C417623DC500F94546 /* Ubuntu-Light.ttf in Resources */,
 				3AAF41C617623DC500F94546 /* MoviePrint_Updating_v001_00000.png in Resources */,
 				3AAF41C717623DC500F94546 /* MoviePrint_StillUpdating_v001_00000.png in Resources */,
+				3A71581818B616BD00821D50 /* MoviePrint_Layout_Header_v001_00000.png in Resources */,
 				3AAF41C817623DC500F94546 /* MoviePrint_StillUpdating_v001_00000.jpg in Resources */,
 				3AAF41C917623DC500F94546 /* MoviePrint_StartBildschirm_v001_00000.png in Resources */,
 				3AAF41CA17623DC500F94546 /* MoviePrint_SetOutPoint_v001_00000.png in Resources */,
