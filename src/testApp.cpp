@@ -324,13 +324,64 @@ void testApp::setGUIMovieInfo(){
     guiMovieInfo->addSpacer(length-xInit, 1);
     guiMovieInfo->addWidgetDown(new ofxUILabel("Drop in one or more movies", OFX_UI_FONT_SMALL));
     //    guiMovieInfo->addSpacer(10, 1);
-    guiMovieInfo->addWidgetDown(new ofxUILabel("Set the desired In- and Outpoints", OFX_UI_FONT_SMALL));
-    //    guiMovieInfo->addSpacer(10, 1);
-    guiMovieInfo->addWidgetDown(new ofxUILabel("Press P to make a MoviePrint", OFX_UI_FONT_SMALL));
-    //    guiMovieInfo->addSpacer(10, 1);
-    guiMovieInfo->addWidgetDown(new ofxUILabel("Press Esc to quit MoviePrint", OFX_UI_FONT_SMALL));
-    guiMovieInfo->addSpacer(length-xInit, 1);
+    string textString = "This widget is a text area widget. Use this when you need to display a paragraph of text. It takes care of formatting the text to fit the block.";
+    guiMovieInfo->addSpacer();
+    
+//    guiMovieInfo->addTextArea("movieInfo1", textString, OFX_UI_FONT_SMALL);
+//    movieInfo1 = (ofxUITextArea *) guiMovieInfo->getWidget("movieInfo1");
+//    guiMovieInfo->addWidgetDown(new ofxUITextArea("gmMIFileName", textString, OFX_UI_FONT_SMALL));
+    guiMovieInfo->addTextArea("gmMIFileName", "gmMIFileName", OFX_UI_FONT_SMALL);
+    gmMIFileName = (ofxUITextArea *) guiMovieInfo->getWidget("gmMIFileName");
+//    guiMovieInfo->addLabel("", OFX_UI_FONT_SMALL);
+//    guiMovieInfo->addLabel("", OFX_UI_FONT_SMALL);
 
+    guiMovieInfo->addTextArea("gmMIFilePath", "gmMIFilePath", OFX_UI_FONT_SMALL);
+    gmMIFilePath = (ofxUITextArea *) guiMovieInfo->getWidget("gmMIFilePath");
+//    guiMovieInfo->addLabel("", OFX_UI_FONT_SMALL);
+//    guiMovieInfo->addLabel("", OFX_UI_FONT_SMALL);
+    
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIFormat", "gmMIFormat", OFX_UI_FONT_SMALL));
+    gmMIFormat = (ofxUILabel *) guiMovieInfo->getWidget("gmMIFormat");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIFormatString", "gmMIFormatString", OFX_UI_FONT_SMALL));
+    gmMIFormatString = (ofxUILabel *) guiMovieInfo->getWidget("gmMIFormatString");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIFileSizeString", "gmMIFileSizeString", OFX_UI_FONT_SMALL));
+    gmMIFileSizeString = (ofxUILabel *) guiMovieInfo->getWidget("gmMIFileSizeString");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIDurationString1", "gmMIDurationString1", OFX_UI_FONT_SMALL));
+    gmMIDurationString1 = (ofxUILabel *) guiMovieInfo->getWidget("gmMIDurationString1");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIFrameCount", "gmMIFrameCount", OFX_UI_FONT_SMALL));
+    gmMIFrameCount = (ofxUILabel *) guiMovieInfo->getWidget("gmMIFrameCount");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIWidth", "gmMIWidth", OFX_UI_FONT_SMALL));
+    gmMIWidth = (ofxUILabel *) guiMovieInfo->getWidget("gmMIWidth");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIDisplayAspectRatioString", "gmMIDisplayAspectRatioString", OFX_UI_FONT_SMALL));
+    gmMIDisplayAspectRatioString = (ofxUILabel *) guiMovieInfo->getWidget("gmMIDisplayAspectRatioString");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIFrameRateString", "gmMIFrameRateString", OFX_UI_FONT_SMALL));
+    gmMIFrameRateString = (ofxUILabel *) guiMovieInfo->getWidget("gmMIFrameRateString");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIVFormat", "gmMIVFormat", OFX_UI_FONT_SMALL));
+    gmMIVFormat = (ofxUILabel *) guiMovieInfo->getWidget("gmMIVFormat");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIFormatInfo", "gmMIFormatInfo", OFX_UI_FONT_SMALL));
+    gmMIFormatInfo = (ofxUILabel *) guiMovieInfo->getWidget("gmMIFormatInfo");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIBitRate", "gmMIBitRate", OFX_UI_FONT_SMALL));
+    gmMIBitRate = (ofxUILabel *) guiMovieInfo->getWidget("gmMIBitRate");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIPixelAspectRatio", "gmMIPixelAspectRatio", OFX_UI_FONT_SMALL));
+    gmMIPixelAspectRatio = (ofxUILabel *) guiMovieInfo->getWidget("gmMIPixelAspectRatio");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIDisplayAspectRatio", "gmMIDisplayAspectRatio", OFX_UI_FONT_SMALL));
+    gmMIDisplayAspectRatio = (ofxUILabel *) guiMovieInfo->getWidget("gmMIDisplayAspectRatio");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIFrameRate_ModeString", "gmMIFrameRate_ModeString", OFX_UI_FONT_SMALL));
+    gmMIFrameRate_ModeString = (ofxUILabel *) guiMovieInfo->getWidget("gmMIFrameRate_ModeString");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIColorSpace", "gmMIColorSpace", OFX_UI_FONT_SMALL));
+    gmMIColorSpace = (ofxUILabel *) guiMovieInfo->getWidget("gmMIColorSpace");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIChromaSubsampling", "gmMIChromaSubsampling", OFX_UI_FONT_SMALL));
+    gmMIChromaSubsampling = (ofxUILabel *) guiMovieInfo->getWidget("gmMIChromaSubsampling");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIBitDepthString", "gmMIBitDepthString", OFX_UI_FONT_SMALL));
+    gmMIBitDepthString = (ofxUILabel *) guiMovieInfo->getWidget("gmMIBitDepthString");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIInterlacementString", "gmMIInterlacementString", OFX_UI_FONT_SMALL));
+    gmMIInterlacementString = (ofxUILabel *) guiMovieInfo->getWidget("gmMIInterlacementString");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIAFormat", "gmMIAFormat", OFX_UI_FONT_SMALL));
+    gmMIAFormat = (ofxUILabel *) guiMovieInfo->getWidget("gmMIAFormat");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIAChannelsString", "gmMIAChannelsString", OFX_UI_FONT_SMALL));
+    gmMIAChannelsString = (ofxUILabel *) guiMovieInfo->getWidget("gmMIAChannelsString");
+    guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIASamplingRate", "gmMIASamplingRate", OFX_UI_FONT_SMALL));
+    gmMIASamplingRate = (ofxUILabel *) guiMovieInfo->getWidget("gmMIASamplingRate");
     
     
     ofLog(OF_LOG_VERBOSE, "getColorBack" + ofToString(guiMovieInfo->getColorBack()));
@@ -570,6 +621,54 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
         scrollBar.unregisterMouseEvents();
         loadedMovie.disableMouseEvents();
     }
+    int tempMoveX = 0;
+    gmMIFileName->setTextString(loadedMovie.gmMIFileName);
+    tempMoveX = gmMIFileName->getTextHeightMinusOne();
+    gmMIFilePath->setTextString(loadedMovie.gmMIFilePath);
+    gmMIFilePath->setYOffset(tempMoveX);
+    tempMoveX += gmMIFilePath->getTextHeightMinusOne();
+    gmMIFormat->setLabel(ofToString(loadedMovie.gmMIFormat));
+    gmMIFormat->setYOffset(tempMoveX);
+    gmMIFormatString->setLabel(ofToString(loadedMovie.gmMIFormatString));
+    gmMIFormatString->setYOffset(tempMoveX);
+    gmMIFileSizeString->setLabel(ofToString(loadedMovie.gmMIFileSizeString));
+    gmMIFileSizeString->setYOffset(tempMoveX);
+    gmMIDurationString1->setLabel(ofToString(loadedMovie.gmMIDurationString1));
+    gmMIDurationString1->setYOffset(tempMoveX);
+    gmMIFrameCount->setLabel(ofToString(loadedMovie.gmMIFrameCount));
+    gmMIFrameCount->setYOffset(tempMoveX);
+    gmMIWidth->setLabel(ofToString(loadedMovie.gmMIWidth));
+    gmMIWidth->setYOffset(tempMoveX);
+    gmMIDisplayAspectRatioString->setLabel(ofToString(loadedMovie.gmMIDisplayAspectRatioString));
+    gmMIDisplayAspectRatioString->setYOffset(tempMoveX);
+    gmMIFrameRateString->setLabel(ofToString(loadedMovie.gmMIFrameRateString));
+    gmMIFrameRateString->setYOffset(tempMoveX);
+    gmMIVFormat->setLabel(ofToString(loadedMovie.gmMIVFormat));
+    gmMIVFormat->setYOffset(tempMoveX);
+    gmMIFormatInfo->setLabel(ofToString(loadedMovie.gmMIFormatInfo));
+    gmMIFormatInfo->setYOffset(tempMoveX);
+    gmMIBitRate->setLabel(ofToString(loadedMovie.gmMIBitRate));
+    gmMIBitRate->setYOffset(tempMoveX);
+    gmMIPixelAspectRatio->setLabel(ofToString(loadedMovie.gmMIPixelAspectRatio));
+    gmMIPixelAspectRatio->setYOffset(tempMoveX);
+    gmMIDisplayAspectRatio->setLabel(ofToString(loadedMovie.gmMIDisplayAspectRatio));
+    gmMIDisplayAspectRatio->setYOffset(tempMoveX);
+    gmMIFrameRate_ModeString->setLabel(ofToString(loadedMovie.gmMIFrameRate_ModeString));
+    gmMIFrameRate_ModeString->setYOffset(tempMoveX);
+    gmMIColorSpace->setLabel(ofToString(loadedMovie.gmMIColorSpace));
+    gmMIColorSpace->setYOffset(tempMoveX);
+    gmMIChromaSubsampling->setLabel(ofToString(loadedMovie.gmMIChromaSubsampling));
+    gmMIChromaSubsampling->setYOffset(tempMoveX);
+    gmMIBitDepthString->setLabel(ofToString(loadedMovie.gmMIBitDepthString));
+    gmMIBitDepthString->setYOffset(tempMoveX);
+    gmMIInterlacementString->setLabel(ofToString(loadedMovie.gmMIInterlacementString));
+    gmMIInterlacementString->setYOffset(tempMoveX);
+    gmMIAFormat->setLabel(ofToString(loadedMovie.gmMIAFormat));
+    gmMIAFormat->setYOffset(tempMoveX);
+    gmMIAChannelsString->setLabel(ofToString(loadedMovie.gmMIAChannelsString));
+    gmMIAChannelsString->setYOffset(tempMoveX);
+    gmMIASamplingRate->setLabel(ofToString(loadedMovie.gmMIASamplingRate));
+    gmMIASamplingRate->setYOffset(tempMoveX);
     
 }
 
@@ -643,13 +742,13 @@ void testApp::update(){
     }
     
     
-    guiSettings1->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY());
+    guiSettings1->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY()+headerHeight);
     guiSettings1->setWidth(menuSettings.getSizeW());
-    guiSettings1->setHeight(menuSettings.getSizeH());
+    guiSettings1->setHeight(menuSettings.getSizeH()-headerHeight);
     
-    guiMovieInfo->setPosition(menuMovieInfo.getPositionX(), menuMovieInfo.getPositionY());
+    guiMovieInfo->setPosition(menuMovieInfo.getPositionX(), menuMovieInfo.getPositionY()+headerHeight);
     guiMovieInfo->setWidth(menuMovieInfo.getSizeW());
-    guiMovieInfo->setHeight(menuMovieInfo.getSizeH());
+    guiMovieInfo->setHeight(menuMovieInfo.getSizeH()-headerHeight);
     
     guiTimeline->setPosition((ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING) + menuWidth - menuWidth * tweenzorX1, ofGetHeight()-(footerHeight/2 + timeSliderHeight/2) * tweenzorY1);
     

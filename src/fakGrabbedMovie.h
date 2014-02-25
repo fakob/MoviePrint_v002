@@ -145,11 +145,12 @@ public:
         }
         createGrid(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder);
         
-//        updatingStill.resize(gmThumbWidth, gmThumbHeight);
+        updatingStill.resize(gmThumbWidth, gmThumbHeight);
         
-//        getMovieInformation(vfMovieName);
-//        
-//        gmSetTitleInfo = TRUE;
+        getMovieInformation(vfMovieName);
+//        getMovieInfo();
+
+        gmSetTitleInfo = TRUE;
         
         return isMovieLoaded;
     }
@@ -172,6 +173,8 @@ public:
     }
     
     void getMovieInformation(string _vfMovieName){
+        
+        gmMIFilePath = "FilePath : " + ofToString(gmMovie.getMoviePath());
         
         //Information about MediaInfo
         MediaInfo MI;
@@ -445,13 +448,38 @@ public:
         }
         return c;
     }
+
+    void getMovieInfo(){
+        
+        string pathName = gmMovie.getMoviePath();
+        pathName = gmLoadedFilePath.getFileName(pathName, TRUE);
+        gmInfCollected = pathName + "\n" +
+        gmMIFileName + "\n" +
+        gmMIFormat + "\n" +
+        gmMIFormatString + "\n" +
+        gmMIFileSizeString + "\n" +
+        gmMIDurationString1 + "\n" +
+        gmMIFrameCount + "\n" +
+        gmMIWidth + "\n" +
+        gmMIDisplayAspectRatioString + "\n" +
+        gmMIFrameRateString + "\n" +
+        gmMIVFormat + "\n" +
+        gmMIPixelAspectRatio + "\n" +
+
+        
+        "\nENDE"
+        ;
+        
+        ofLog(OF_LOG_VERBOSE, gmInfCollected);
+        
+    }
     
     void drawTitle(float _x, float _y, float _width, float _height, float _alpha, bool _isBeingPrinted, bool _isActive){
         float tempStringMargin = franchiseFontRightSize/10;
         
         if (gmSetTitleInfo) {
             string pathName = gmMovie.getMoviePath();
-            pathName = gmLoadedFilePath.getFileName(pathName, TRUE);
+            gmMIFilePath = gmLoadedFilePath.getFileName(pathName, TRUE);
             gmMovieName = wrapStringFontStashFranchise(pathName, _width , _height);
 //            gmSetTitleInfo = FALSE;
         }
@@ -1113,10 +1141,11 @@ public:
     int stringMargin;
     ofFilePath gmLoadedFilePath;
     bool gmSetTitleInfo;
+    string gmInfCollected;
     string gmInfCol1, gmInfCol2, gmInfCol3;
     string gmMIFileName, gmMIFileExtension, gmMIFormat, gmMIFormatString, gmMIFileSizeString, gmMIDurationString1, gmMIFrameCount, gmMIWidth, gmMIHeight, gmMIDisplayAspectRatioString, gmMIFrameRateString;
     string gmMIVFormat, gmMIFormatInfo, gmMIBitRate, gmMIPixelAspectRatio, gmMIDisplayAspectRatio, gmMIFrameRate_ModeString, gmMIColorSpace, gmMIChromaSubsampling, gmMIBitDepthString, gmMIInterlacementString;
-    string gmMIAFormat, gmMIAChannelsString, gmMIASamplingRate;
+    string gmMIAFormat, gmMIAChannelsString, gmMIASamplingRate, gmMIFilePath;
 
     // used for rounded corner mask
     ofShader shader;

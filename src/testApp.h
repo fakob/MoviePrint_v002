@@ -153,6 +153,31 @@ public:
     ofxUIDropDownList *ddl;
     ofxUIDropDownList *ddl2;
     ofxUITextArea *helpText;
+    ofxUITextArea *movieInfo1;
+    ofxUITextArea *gmMIFileName;
+    ofxUITextArea *gmMIFilePath;
+    ofxUILabel *gmMIFormat;
+    ofxUILabel *gmMIFormatString;
+    ofxUILabel *gmMIFileSizeString;
+    ofxUILabel *gmMIDurationString1;
+    ofxUILabel *gmMIFrameCount;
+    ofxUILabel *gmMIWidth;
+    ofxUILabel *gmMIDisplayAspectRatioString;
+    ofxUILabel *gmMIFrameRateString;
+    ofxUILabel *gmMIVFormat;
+    ofxUILabel *gmMIFormatInfo;
+    ofxUILabel *gmMIBitRate;
+    ofxUILabel *gmMIPixelAspectRatio;
+    ofxUILabel *gmMIDisplayAspectRatio;
+    ofxUILabel *gmMIFrameRate_ModeString;
+    ofxUILabel *gmMIColorSpace;
+    ofxUILabel *gmMIChromaSubsampling;
+    ofxUILabel *gmMIBitDepthString;
+    ofxUILabel *gmMIInterlacementString;
+    ofxUILabel *gmMIAFormat;
+    ofxUILabel *gmMIAChannelsString;
+    ofxUILabel *gmMIASamplingRate;
+    
 
     bool showPlaceHolder;
     bool showFBO;
