@@ -233,9 +233,9 @@ void testApp::setGUI2(){
 	gui2->addIntSlider("Rows", 1, 20, gridRows, length-xInit,dim);
    	gui2->addIntSlider("Number", 4, 200, gridNumber, length-xInit,dim);
    	gui2->addIntSlider("ThumbWidth", 0, 18, 1, length-xInit,dim);
-//    columnSlider = (ofxUIIntSlider *) gui2->getWidget("Columns");
-//    rowSlider = (ofxUIIntSlider *) gui2->getWidget("Rows");
-//    numberSlider = (ofxUIIntSlider *) gui2->getWidget("Number");
+    columnSlider = (ofxUIIntSlider *) gui2->getWidget("Columns");
+    rowSlider = (ofxUIIntSlider *) gui2->getWidget("Rows");
+    numberSlider = (ofxUIIntSlider *) gui2->getWidget("Number");
     thumbWidthSlider = (ofxUIIntSlider *) gui2->getWidget("ThumbWidth");
     thumbWidthSlider->setVisible(FALSE);
 
@@ -976,16 +976,16 @@ void testApp::keyReleased(int key){
     
     currentKey = -1;
     
-//    if (timeSlider->getState()) {
-//        
-//        if (key == OF_KEY_RIGHT || key == OF_KEY_LEFT || key == OF_KEY_UP || key == OF_KEY_DOWN) {
-//            uiSliderValueLow = timeSlider->getScaledValueLow();
-//            uiSliderValueHigh = timeSlider->getScaledValueHigh();
-//            updateAllStills();
-//    ofLog(OF_LOG_VERBOSE, "asdfadfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfaf" );
-//
-//        }
-//    }
+    if (timeSlider->getState()) {
+        
+        if (key == OF_KEY_RIGHT || key == OF_KEY_LEFT || key == OF_KEY_UP || key == OF_KEY_DOWN) {
+            uiSliderValueLow = timeSlider->getScaledValueLow();
+            uiSliderValueHigh = timeSlider->getScaledValueHigh();
+            updateAllStills();
+    ofLog(OF_LOG_VERBOSE, "asdfadfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfaf" );
+
+        }
+    }
     
     manipulateSlider = FALSE;
     loadedMovie.gmScrubMovie = FALSE;
@@ -1166,8 +1166,8 @@ void testApp::windowResized(int w, int h){
     gui->setPosition(ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, h -(footerHeight/2 + timeSliderHeight/2) * tweenzorY1);
     gui->setWidth(w);
     gui2->setHeight(h);
-//    timeSlider->setWidth(gridWidth);
-//    ofLog(OF_LOG_VERBOSE, "Timeslider Width:" + ofToString(timeSlider->getWidth()) );;
+    timeSlider->setWidth(gridWidth);
+    ofLog(OF_LOG_VERBOSE, "Timeslider Width:" + ofToString(timeSlider->getWidth()) );;
 
     windowResizedOnce++;
     }
