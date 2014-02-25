@@ -141,12 +141,16 @@ void testApp::setup(){
     scrollBarList.registerMouseEvents();
     scrollBarList.registerTouchEvents();
     
-    setGUI1();  
-    setGUI2();
-    gui2->loadSettings("guiSettings2.xml");
+    setGUITimeline();
+    setGUIMovieInfo();
+    setGUISettings1();
+    guiSettings1->loadSettings("guiSettings2.xml");
     
     menuSettings.setupMenu(0,0,0,0,headerHeight);
     menuSettings.registerMouseEvents();
+
+    menuMovieInfo.setupMenu(0,0,0,0,headerHeight);
+    menuMovieInfo.registerMouseEvents();
     
     moveInOutTimeline();
     
@@ -154,36 +158,36 @@ void testApp::setup(){
 }
 
 //--------------------------------------------------------------
-void testApp::setGUI1(){
+void testApp::setGUITimeline(){
     
     // setup gui
-    gui = new ofxUICanvas(ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, ofGetHeight()-(footerHeight/2) - timeSliderHeight/2, ofGetWidth(),footerHeight); //ofxUICanvas(float x, float y, float width, float height)
-    gui->setFont("Ubuntu-Light.ttf");
+    guiTimeline = new ofxUICanvas(ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, ofGetHeight()-(footerHeight/2) - timeSliderHeight/2, ofGetWidth(),footerHeight); //ofxUICanvas(float x, float y, float width, float height)
+    guiTimeline->setFont("Ubuntu-Light.ttf");
     drawPadding = FALSE;
-    gui->setDrawBack(FALSE);
+    guiTimeline->setDrawBack(FALSE);
     ofColor paddingColor = ofColor(255,0,0,200);
     ofColor backgroundColor = ofColor(100,100,100,200);
-    gui->setColorPadded(paddingColor);
-    gui->setColorBack(backgroundColor);
+    guiTimeline->setColorPadded(paddingColor);
+    guiTimeline->setColorBack(backgroundColor);
     
-	gui->addWidgetDown(new ofxUIRangeSlider("RSLIDER", 0.0, (float)totalFrames, 0.0, 100.0, gridWidth, timeSliderHeight));
-    timeSlider = (ofxUIRangeSlider *) gui->getWidget("RSLIDER");
+	guiTimeline->addWidgetDown(new ofxUIRangeSlider("RSLIDER", 0.0, (float)totalFrames, 0.0, 100.0, gridWidth, timeSliderHeight));
+    timeSlider = (ofxUIRangeSlider *) guiTimeline->getWidget("RSLIDER");
     timeSlider->setLabelPrecision(0);
     timeSlider->setLabelVisible(FALSE);
 //    timeSlider->setDrawPadding(FALSE);
 //    timeSlider->setDrawPaddingOutline(FALSE);
 //    timeSlider->setDrawOutlineHighLight(FALSE);
 //    timeSlider->setDrawOutline(FALSE);
-//    gui->setDrawPadding(FALSE);
-//    gui->setDrawPaddingOutline(FALSE);
-//    gui->setDrawOutlineHighLight(FALSE);
-//    gui->setDrawOutline(FALSE);
+//    guiTimeline->setDrawPadding(FALSE);
+//    guiTimeline->setDrawPaddingOutline(FALSE);
+//    guiTimeline->setDrawOutlineHighLight(FALSE);
+//    guiTimeline->setDrawOutline(FALSE);
     
-//    gui->setWidgetColor(OFX_UI_WIDGET_COLOR_BACK, ofColor(0,25));
-    gui->setWidgetColor(OFX_UI_WIDGET_COLOR_OUTLINE, ofColor(0,0,0,0));
-    gui->setWidgetColor(OFX_UI_WIDGET_COLOR_OUTLINE_HIGHLIGHT, ofColor(0,0,0,0));
-    gui->setWidgetColor(OFX_UI_WIDGET_COLOR_FILL, FAK_DARKORANGECOLOR);
-    gui->setWidgetColor(OFX_UI_WIDGET_COLOR_FILL_HIGHLIGHT, FAK_LIGHTERMIDDLEDARKORANGECOLOR);
+//    guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_BACK, ofColor(0,25));
+    guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_OUTLINE, ofColor(0,0,0,0));
+    guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_OUTLINE_HIGHLIGHT, ofColor(0,0,0,0));
+    guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_FILL, FAK_DARKORANGECOLOR);
+    guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_FILL_HIGHLIGHT, FAK_LIGHTERMIDDLEDARKORANGECOLOR);
     
 
 
@@ -192,14 +196,14 @@ void testApp::setGUI1(){
 
     timeSlider->setColorPadded(paddingColor);
 
-    ofAddListener(gui->newGUIEvent, this, &testApp::guiEvent);
-    //    gui->loadSettings("GUI/guiSettings.xml");
-    //    gui->disable();
+    ofAddListener(guiTimeline->newGUIEvent, this, &testApp::guiEvent);
+    //    guiTimeline->loadSettings("GUI/guiSettings.xml");
+    //    guiTimeline->disable();
 
 }
 
 //--------------------------------------------------------------
-void testApp::setGUI2(){
+void testApp::setGUISettings1(){
 	
 	float dim = 16;
 	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
@@ -214,35 +218,31 @@ void testApp::setGUI2(){
 	names.push_back("TimeCode");
 	names.push_back("off");
     
-	hideGUI2 = false;
-    
-    
-	
-	gui2 = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
-    gui2->setFont("Ubuntu-Light.ttf");
+    guiSettings1 = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
+    guiSettings1->setFont("Ubuntu-Light.ttf");
 
-    gui2->addLabel("SETTINGS", OFX_UI_FONT_LARGE);
-    gui2->addSpacer(length-xInit, 1);
-    gui2->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
+    guiSettings1->addLabel("SETTINGS", OFX_UI_FONT_LARGE);
+    guiSettings1->addSpacer(length-xInit, 1);
+    guiSettings1->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
 
-    gui2->addRadio("Grid-Number", names2, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
-    setFitManually = (ofxUIRadio *) gui2->getWidget("Grid-Number");
+    guiSettings1->addRadio("Grid-Number", names2, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
+    setFitManually = (ofxUIRadio *) guiSettings1->getWidget("Grid-Number");
     setFitManually->activateToggle("Set Columns and Rows");
     
-	gui2->addIntSlider("Columns", 4, 10, gridColumns, length-xInit,dim);
-	gui2->addIntSlider("Rows", 1, 20, gridRows, length-xInit,dim);
-   	gui2->addIntSlider("Number", 4, 200, gridNumber, length-xInit,dim);
-   	gui2->addIntSlider("ThumbWidth", 0, 18, 1, length-xInit,dim);
-    columnSlider = (ofxUIIntSlider *) gui2->getWidget("Columns");
-    rowSlider = (ofxUIIntSlider *) gui2->getWidget("Rows");
-    numberSlider = (ofxUIIntSlider *) gui2->getWidget("Number");
-    thumbWidthSlider = (ofxUIIntSlider *) gui2->getWidget("ThumbWidth");
+	guiSettings1->addIntSlider("Columns", 4, 10, gridColumns, length-xInit,dim);
+	guiSettings1->addIntSlider("Rows", 1, 20, gridRows, length-xInit,dim);
+   	guiSettings1->addIntSlider("Number", 4, 200, gridNumber, length-xInit,dim);
+   	guiSettings1->addIntSlider("ThumbWidth", 0, 18, 1, length-xInit,dim);
+    columnSlider = (ofxUIIntSlider *) guiSettings1->getWidget("Columns");
+    rowSlider = (ofxUIIntSlider *) guiSettings1->getWidget("Rows");
+    numberSlider = (ofxUIIntSlider *) guiSettings1->getWidget("Number");
+    thumbWidthSlider = (ofxUIIntSlider *) guiSettings1->getWidget("ThumbWidth");
     thumbWidthSlider->setVisible(FALSE);
 
-    gui2->addSpacer(length-xInit, 1);
-    gui2->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
-    ofxUIRadio *setFrameDisplay = gui2->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
-//    setFrameDisplay = (ofxUIRadio *) gui2->getWidget("RADIO HORIZONTAL");
+    guiSettings1->addSpacer(length-xInit, 1);
+    guiSettings1->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
+    ofxUIRadio *setFrameDisplay = guiSettings1->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
+//    setFrameDisplay = (ofxUIRadio *) guiSettings1->getWidget("RADIO HORIZONTAL");
     setFrameDisplay->activateToggle("TimeCode");
     
     
@@ -261,25 +261,25 @@ void testApp::setGUI2(){
     ddl2 = new ofxUIDropDownList(length-xInit, "MoviePrint Width", names4, OFX_UI_FONT_MEDIUM);
     ddl2->setAllowMultiple(FALSE);
     ddl2->setAutoClose(true);
-    gui2->addSpacer(length-xInit, 1);
-    gui2->addWidgetDown(ddl2);
+    guiSettings1->addSpacer(length-xInit, 1);
+    guiSettings1->addWidgetDown(ddl2);
 
     
     
-    ofLog(OF_LOG_VERBOSE, "getColorBack" + ofToString(gui2->getColorBack()));
-    ofLog(OF_LOG_VERBOSE, "getDrawBack" + ofToString(gui2->getDrawBack()));
-    ofLog(OF_LOG_VERBOSE, "getColorFill" + ofToString(gui2->getColorFill()));
-    ofLog(OF_LOG_VERBOSE, "getDrawFill" + ofToString(gui2->getDrawFill()));
-    ofLog(OF_LOG_VERBOSE, "getColorFillHighlight" + ofToString(gui2->getColorFillHighlight()));
-    ofLog(OF_LOG_VERBOSE, "getDrawFillHighLight" + ofToString(gui2->getDrawFillHighLight()));
-    ofLog(OF_LOG_VERBOSE, "getColorOutline" + ofToString(gui2->getColorOutline()));
-    ofLog(OF_LOG_VERBOSE, "getDrawOutline" + ofToString(gui2->getDrawOutline()));
-    ofLog(OF_LOG_VERBOSE, "getColorOutlineHighlight" + ofToString(gui2->getColorOutlineHighlight()));
-    ofLog(OF_LOG_VERBOSE, "getDrawOutlineHighLight" + ofToString(gui2->getDrawOutlineHighLight()));
-    ofLog(OF_LOG_VERBOSE, "getColorPadded" + ofToString(gui2->getColorPadded()));
-    ofLog(OF_LOG_VERBOSE, "getDrawPadding" + ofToString(gui2->getDrawPadding()));
-    ofLog(OF_LOG_VERBOSE, "getColorPaddedOutline" + ofToString(gui2->getColorPaddedOutline()));
-    ofLog(OF_LOG_VERBOSE, "getDrawPaddingOutline" + ofToString(gui2->getDrawPaddingOutline()));
+    ofLog(OF_LOG_VERBOSE, "getColorBack" + ofToString(guiSettings1->getColorBack()));
+    ofLog(OF_LOG_VERBOSE, "getDrawBack" + ofToString(guiSettings1->getDrawBack()));
+    ofLog(OF_LOG_VERBOSE, "getColorFill" + ofToString(guiSettings1->getColorFill()));
+    ofLog(OF_LOG_VERBOSE, "getDrawFill" + ofToString(guiSettings1->getDrawFill()));
+    ofLog(OF_LOG_VERBOSE, "getColorFillHighlight" + ofToString(guiSettings1->getColorFillHighlight()));
+    ofLog(OF_LOG_VERBOSE, "getDrawFillHighLight" + ofToString(guiSettings1->getDrawFillHighLight()));
+    ofLog(OF_LOG_VERBOSE, "getColorOutline" + ofToString(guiSettings1->getColorOutline()));
+    ofLog(OF_LOG_VERBOSE, "getDrawOutline" + ofToString(guiSettings1->getDrawOutline()));
+    ofLog(OF_LOG_VERBOSE, "getColorOutlineHighlight" + ofToString(guiSettings1->getColorOutlineHighlight()));
+    ofLog(OF_LOG_VERBOSE, "getDrawOutlineHighLight" + ofToString(guiSettings1->getDrawOutlineHighLight()));
+    ofLog(OF_LOG_VERBOSE, "getColorPadded" + ofToString(guiSettings1->getColorPadded()));
+    ofLog(OF_LOG_VERBOSE, "getDrawPadding" + ofToString(guiSettings1->getDrawPadding()));
+    ofLog(OF_LOG_VERBOSE, "getColorPaddedOutline" + ofToString(guiSettings1->getColorPaddedOutline()));
+    ofLog(OF_LOG_VERBOSE, "getDrawPaddingOutline" + ofToString(guiSettings1->getDrawPaddingOutline()));
     
     ofxUIColor cb = ofxUIColor(FAK_LIGHTERMIDDLEDARKORANGECOLOR); // OFX_UI_COLOR_BACK
     ofxUIColor co = ofxUIColor( 255, 255, 255, 200); // OFX_UI_COLOR_OUTLINE
@@ -288,23 +288,158 @@ void testApp::setGUI2(){
     ofxUIColor cfh = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_FILL_HIGHLIGHT
     ofxUIColor cp = ofxUIColor( 255, 255, 255, 100 ); // OFX_UI_COLOR_PADDED
     ofxUIColor cpo = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_PADDED_OUTLINE
-//    gui2->setUIWidgetColorsBack(cb); //
-//    gui2->setUIWidgetColorsFill(cf,cfh); //
+//    guiSettings1->setUIWidgetColorsBack(cb); //
+//    guiSettings1->setUIWidgetColorsFill(cf,cfh); //
 
-//    gui2->setTheme(OFX_UI_THEME_TEALLIME);
+//    guiSettings1->setTheme(OFX_UI_THEME_TEALLIME);
     
 //    ofColor tempColor = ofColor(0,0,0,255);
-    gui2->setColorBack(FAK_ORANGECOLOR);
+    guiSettings1->setColorBack(FAK_ORANGECOLOR);
 
-	ofAddListener(gui2->newGUIEvent,this,&testApp::guiEvent);
+	ofAddListener(guiSettings1->newGUIEvent,this,&testApp::guiEvent);
 }
 
 //--------------------------------------------------------------
-void testApp::setGUI3(){
+void testApp::setGUIMovieInfo(){
+	
+	float dim = 16;
+	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
+    float length = menuWidth-xInit;
+    
+    vector<string> names2;
+	names2.push_back("Set Columns and Rows");
+	names2.push_back("Set Number of Frames");
+    
+    vector<string> names;
+	names.push_back("Frames");
+	names.push_back("TimeCode");
+	names.push_back("off");
+    
+    guiMovieInfo = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
+    guiMovieInfo->setFont("Ubuntu-Light.ttf");
+    
+    guiMovieInfo->addLabel("MOVIE INFO", OFX_UI_FONT_LARGE);
+
+    guiMovieInfo->addWidgetDown(new ofxUILabel("HELP", OFX_UI_FONT_LARGE));
+    guiMovieInfo->addSpacer(length-xInit, 1);
+    guiMovieInfo->addWidgetDown(new ofxUILabel("Drop in one or more movies", OFX_UI_FONT_SMALL));
+    //    guiMovieInfo->addSpacer(10, 1);
+    guiMovieInfo->addWidgetDown(new ofxUILabel("Set the desired In- and Outpoints", OFX_UI_FONT_SMALL));
+    //    guiMovieInfo->addSpacer(10, 1);
+    guiMovieInfo->addWidgetDown(new ofxUILabel("Press P to make a MoviePrint", OFX_UI_FONT_SMALL));
+    //    guiMovieInfo->addSpacer(10, 1);
+    guiMovieInfo->addWidgetDown(new ofxUILabel("Press Esc to quit MoviePrint", OFX_UI_FONT_SMALL));
+    guiMovieInfo->addSpacer(length-xInit, 1);
+
+    
+    
+    ofLog(OF_LOG_VERBOSE, "getColorBack" + ofToString(guiMovieInfo->getColorBack()));
+    ofLog(OF_LOG_VERBOSE, "getDrawBack" + ofToString(guiMovieInfo->getDrawBack()));
+    ofLog(OF_LOG_VERBOSE, "getColorFill" + ofToString(guiMovieInfo->getColorFill()));
+    ofLog(OF_LOG_VERBOSE, "getDrawFill" + ofToString(guiMovieInfo->getDrawFill()));
+    ofLog(OF_LOG_VERBOSE, "getColorFillHighlight" + ofToString(guiMovieInfo->getColorFillHighlight()));
+    ofLog(OF_LOG_VERBOSE, "getDrawFillHighLight" + ofToString(guiMovieInfo->getDrawFillHighLight()));
+    ofLog(OF_LOG_VERBOSE, "getColorOutline" + ofToString(guiMovieInfo->getColorOutline()));
+    ofLog(OF_LOG_VERBOSE, "getDrawOutline" + ofToString(guiMovieInfo->getDrawOutline()));
+    ofLog(OF_LOG_VERBOSE, "getColorOutlineHighlight" + ofToString(guiMovieInfo->getColorOutlineHighlight()));
+    ofLog(OF_LOG_VERBOSE, "getDrawOutlineHighLight" + ofToString(guiMovieInfo->getDrawOutlineHighLight()));
+    ofLog(OF_LOG_VERBOSE, "getColorPadded" + ofToString(guiMovieInfo->getColorPadded()));
+    ofLog(OF_LOG_VERBOSE, "getDrawPadding" + ofToString(guiMovieInfo->getDrawPadding()));
+    ofLog(OF_LOG_VERBOSE, "getColorPaddedOutline" + ofToString(guiMovieInfo->getColorPaddedOutline()));
+    ofLog(OF_LOG_VERBOSE, "getDrawPaddingOutline" + ofToString(guiMovieInfo->getDrawPaddingOutline()));
+    
+    ofxUIColor cb = ofxUIColor(FAK_LIGHTERMIDDLEDARKORANGECOLOR); // OFX_UI_COLOR_BACK
+    ofxUIColor co = ofxUIColor( 255, 255, 255, 200); // OFX_UI_COLOR_OUTLINE
+    ofxUIColor coh = ofxUIColor( 255, 255, 255, 255 ); // OFX_UI_COLOR_OUTLINE_HIGHLIGHT
+    ofxUIColor cf = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_FILL
+    ofxUIColor cfh = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_FILL_HIGHLIGHT
+    ofxUIColor cp = ofxUIColor( 255, 255, 255, 100 ); // OFX_UI_COLOR_PADDED
+    ofxUIColor cpo = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_PADDED_OUTLINE
+
+    guiMovieInfo->setColorBack(FAK_ORANGECOLOR);
 
 }
 
+//--------------------------------------------------------------
+void testApp::setGUIHelp1(){
+	
+	float dim = 16;
+	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
+    float length = menuWidth-xInit;
 
+    guiHelp1 = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
+    guiHelp1->setFont("Ubuntu-Light.ttf");
+    
+    guiHelp1->addLabel("MOVIE INFO", OFX_UI_FONT_LARGE);
+    
+ 	guiHelp1->addWidgetDown(new ofxUILabel("HELP", OFX_UI_FONT_LARGE));
+    guiHelp1->addSpacer(length-xInit, 1);
+    guiHelp1->addWidgetDown(new ofxUILabel("Drop in one or more movies", OFX_UI_FONT_SMALL));
+    //    guiHelp1->addSpacer(10, 1);
+    guiHelp1->addWidgetDown(new ofxUILabel("Set the desired In- and Outpoints", OFX_UI_FONT_SMALL));
+    //    guiHelp1->addSpacer(10, 1);
+    guiHelp1->addWidgetDown(new ofxUILabel("Press P to make a MoviePrint", OFX_UI_FONT_SMALL));
+    //    guiHelp1->addSpacer(10, 1);
+    guiHelp1->addWidgetDown(new ofxUILabel("Press Esc to quit MoviePrint", OFX_UI_FONT_SMALL));
+    guiHelp1->addSpacer(length-xInit, 1);
+    guiHelp1->addWidgetDown(new ofxUILabel("Prints are saved as PNGs in a folder", OFX_UI_FONT_SMALL));
+    guiHelp1->addWidgetDown(new ofxUILabel("named MoviePrints on the same level", OFX_UI_FONT_SMALL));
+    guiHelp1->addSpacer(10, 1);
+        guiHelp1->addWidgetDown(new ofxUILabel("Hovering over a Still one can", OFX_UI_FONT_SMALL));
+    guiHelp1->addWidgetDown(new ofxUILabel("-jump 1/10/100 (Shift/Cmd) frames", OFX_UI_FONT_SMALL));
+    guiHelp1->addWidgetDown(new ofxUILabel(" forward or backward", OFX_UI_FONT_SMALL));
+    guiHelp1->addWidgetDown(new ofxUILabel("-set this Still as In- or Outpoint", OFX_UI_FONT_SMALL));
+    guiHelp1->addWidgetDown(new ofxUILabel("-scrub the Still using the mouse", OFX_UI_FONT_SMALL));
+    guiHelp1->addSpacer(10, 1);
+    guiHelp1->addWidgetDown(new ofxUILabel("Set In- and Outpoints using the", OFX_UI_FONT_SMALL));
+    guiHelp1->addWidgetDown(new ofxUILabel("timeline on the bottom", OFX_UI_FONT_SMALL));
+    guiHelp1->addSpacer(10, 1);
+    guiHelp1->addWidgetDown(new ofxUILabel("With Multiple movies", OFX_UI_FONT_SMALL));
+    //    guiHelp1->addSpacer(10, 1);
+    guiHelp1->addWidgetDown(new ofxUILabel("Press P to make MoviePrints of all", OFX_UI_FONT_SMALL));
+    //    guiHelp1->addSpacer(10, 1);
+    guiHelp1->addWidgetDown(new ofxUILabel("Press L to switch to ListView", OFX_UI_FONT_SMALL));
+    guiHelp1->addSpacer(length-xInit, 1);
+    guiHelp1->addWidgetDown(new ofxUILabel("Press H to view Settings and Help", OFX_UI_FONT_SMALL));
+    guiHelp1->addSpacer(10, 1);
+    guiHelp1->addWidgetDown(new ofxUILabel("Choose between >Set rows manually<", OFX_UI_FONT_SMALL));
+    guiHelp1->addWidgetDown(new ofxUILabel("and >Fit to Screen<", OFX_UI_FONT_SMALL));
+    //    guiHelp1->addSpacer(10, 1);
+    guiHelp1->addWidgetDown(new ofxUILabel("Set >Columns< and >Rows<", OFX_UI_FONT_SMALL));
+    //    guiHelp1->addSpacer(10, 1);
+    guiHelp1->addWidgetDown(new ofxUILabel("Show >Frames< or >TimeCode<", OFX_UI_FONT_SMALL));
+    //    guiHelp1->addSpacer(10, 1);
+    guiHelp1->addWidgetDown(new ofxUILabel("Choose >MoviePrint width<", OFX_UI_FONT_SMALL));
+
+    
+    
+    
+    ofLog(OF_LOG_VERBOSE, "getColorBack" + ofToString(guiMovieInfo->getColorBack()));
+    ofLog(OF_LOG_VERBOSE, "getDrawBack" + ofToString(guiMovieInfo->getDrawBack()));
+    ofLog(OF_LOG_VERBOSE, "getColorFill" + ofToString(guiMovieInfo->getColorFill()));
+    ofLog(OF_LOG_VERBOSE, "getDrawFill" + ofToString(guiMovieInfo->getDrawFill()));
+    ofLog(OF_LOG_VERBOSE, "getColorFillHighlight" + ofToString(guiMovieInfo->getColorFillHighlight()));
+    ofLog(OF_LOG_VERBOSE, "getDrawFillHighLight" + ofToString(guiMovieInfo->getDrawFillHighLight()));
+    ofLog(OF_LOG_VERBOSE, "getColorOutline" + ofToString(guiMovieInfo->getColorOutline()));
+    ofLog(OF_LOG_VERBOSE, "getDrawOutline" + ofToString(guiMovieInfo->getDrawOutline()));
+    ofLog(OF_LOG_VERBOSE, "getColorOutlineHighlight" + ofToString(guiMovieInfo->getColorOutlineHighlight()));
+    ofLog(OF_LOG_VERBOSE, "getDrawOutlineHighLight" + ofToString(guiMovieInfo->getDrawOutlineHighLight()));
+    ofLog(OF_LOG_VERBOSE, "getColorPadded" + ofToString(guiMovieInfo->getColorPadded()));
+    ofLog(OF_LOG_VERBOSE, "getDrawPadding" + ofToString(guiMovieInfo->getDrawPadding()));
+    ofLog(OF_LOG_VERBOSE, "getColorPaddedOutline" + ofToString(guiMovieInfo->getColorPaddedOutline()));
+    ofLog(OF_LOG_VERBOSE, "getDrawPaddingOutline" + ofToString(guiMovieInfo->getDrawPaddingOutline()));
+    
+    ofxUIColor cb = ofxUIColor(FAK_LIGHTERMIDDLEDARKORANGECOLOR); // OFX_UI_COLOR_BACK
+    ofxUIColor co = ofxUIColor( 255, 255, 255, 200); // OFX_UI_COLOR_OUTLINE
+    ofxUIColor coh = ofxUIColor( 255, 255, 255, 255 ); // OFX_UI_COLOR_OUTLINE_HIGHLIGHT
+    ofxUIColor cf = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_FILL
+    ofxUIColor cfh = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_FILL_HIGHLIGHT
+    ofxUIColor cp = ofxUIColor( 255, 255, 255, 100 ); // OFX_UI_COLOR_PADDED
+    ofxUIColor cpo = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_PADDED_OUTLINE
+    
+    guiMovieInfo->setColorBack(FAK_ORANGECOLOR);
+    
+}
 
 //--------------------------------------------------------------
 void testApp::calculateNewGrid(int _windowWidth, int _windowHeight){
@@ -431,7 +566,7 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
     ofLog(OF_LOG_VERBOSE, "Finished Loading Movie--------------------------------------------");
     
     if (!loadedMovie.isMovieLoaded) {
-        gui->setVisible(FALSE);
+        guiTimeline->setVisible(FALSE);
         scrollBar.unregisterMouseEvents();
         loadedMovie.disableMouseEvents();
     }
@@ -507,14 +642,16 @@ void testApp::update(){
         loadedMovie.gmMovieScrub.update();
     }
     
-//    gui2->setPosition(-menuWidth * tweenzorX1, 0);
     
-    gui2->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY());
-    gui2->setWidth(menuSettings.getSizeW());
-    gui2->setHeight(menuSettings.getSizeH());
+    guiSettings1->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY());
+    guiSettings1->setWidth(menuSettings.getSizeW());
+    guiSettings1->setHeight(menuSettings.getSizeH());
     
+    guiMovieInfo->setPosition(menuMovieInfo.getPositionX(), menuMovieInfo.getPositionY());
+    guiMovieInfo->setWidth(menuMovieInfo.getSizeW());
+    guiMovieInfo->setHeight(menuMovieInfo.getSizeH());
     
-    gui->setPosition((ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING) + menuWidth - menuWidth * tweenzorX1, ofGetHeight()-(footerHeight/2 + timeSliderHeight/2) * tweenzorY1);
+    guiTimeline->setPosition((ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING) + menuWidth - menuWidth * tweenzorX1, ofGetHeight()-(footerHeight/2 + timeSliderHeight/2) * tweenzorY1);
     
     if (loadedMovie.isMovieLoaded) { // if no movie is loaded or we are in dev mode then only draw rects
         
@@ -626,7 +763,7 @@ void testApp::update(){
     }
     
     if (showDroppedList) {
-        gui->setVisible(FALSE);
+        guiTimeline->setVisible(FALSE);
         loadedMovie.disableMouseEvents();
     }
     
@@ -758,7 +895,7 @@ void testApp::draw(){
             
             if (!loadedMovie.isMovieLoaded) { // if no movie is loaded
                 if (!showDroppedList) {
-                    gui->setVisible(FALSE);
+                    guiTimeline->setVisible(FALSE);
                     drawStartScreen();
                 }
             } else if (devTurnOffMovieSwitch){// if we are in dev mode then only draw rects
@@ -879,7 +1016,7 @@ void testApp::keyPressed(int key){
             break;
     }
     
-    if(gui2->hasKeyboardFocus())
+    if(guiSettings1->hasKeyboardFocus())
     {
         return;
     }
@@ -1163,9 +1300,9 @@ void testApp::windowResized(int w, int h){
         scrollListAmountRel = scrollBarList.getRelativePos();
 //    }
     
-    gui->setPosition(ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, h -(footerHeight/2 + timeSliderHeight/2) * tweenzorY1);
-    gui->setWidth(w);
-    gui2->setHeight(h);
+    guiTimeline->setPosition(ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, h -(footerHeight/2 + timeSliderHeight/2) * tweenzorY1);
+    guiTimeline->setWidth(w);
+    guiSettings1->setHeight(h);
     timeSlider->setWidth(gridWidth);
     ofLog(OF_LOG_VERBOSE, "Timeslider Width:" + ofToString(timeSlider->getWidth()) );;
 
@@ -1220,11 +1357,12 @@ void testApp::exit(){
     
     loadedMovie.stop(false);
     
-//    gui->saveSettings("GUI/guiSettings.xml");
-    delete gui;
+//    guiTimeline->saveSettings("GUI/guiSettings.xml");
+    delete guiTimeline;
+    delete guiMovieInfo;
     
-    gui2->saveSettings("guiSettings2.xml");
-	delete gui2;
+    guiSettings1->saveSettings("guiSettings2.xml");
+	delete guiSettings1;
 
 }
 
@@ -1447,13 +1585,18 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPNG){
     
     layoutHeaderImage.draw(0, 0, ofGetWindowWidth() * _scaleFactor, layoutHeaderImage.getHeight() * _scaleFactor);
 
-    float tempX = (leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*2) * _scaleFactor;
     float tempY = 0;
+    int tempXPos = 1;
     
-    menuSettings.setPosition(tempX, tempY);
+    menuSettings.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
     menuSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*5);
     menuSettings.drawMenu();
 
+    tempXPos = 0;
+    menuMovieInfo.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*5);
+    menuMovieInfo.drawMenu();
+    
     ofSetColor(255);
     
 //    if (!_hideInPNG) {
@@ -1938,7 +2081,7 @@ void testApp::moveToMovie(){
     loadedMovie.enableMouseEvents();
     scrollBarList.unregisterMouseEvents();
     scrollBar.registerMouseEvents();
-    gui->setVisible(TRUE);
+    guiTimeline->setVisible(TRUE);
     printListNotImage = FALSE;
     
     updateInOut = FALSE;
@@ -1953,7 +2096,7 @@ void testApp::moveToList(){
     scrollBarList.registerMouseEvents();
     loadedMovie.stop(TRUE);
     loadedMovie.disableMouseEvents();
-    gui->setVisible(FALSE);
+    guiTimeline->setVisible(FALSE);
     droppedList.registerEvents();
     printListNotImage = TRUE;
 }

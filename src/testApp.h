@@ -54,9 +54,10 @@ public:
     void moveToMovie();
     void moveToList();
     void scrollEvent(ofVec2f & e);
-    void setGUI1();
-    void setGUI2();
-    void setGUI3();
+    void setGUITimeline();
+    void setGUIMovieInfo();
+    void setGUISettings1();
+    void setGUIHelp1();
     void resetItemsToPrint();
 
     void updateTimeSlider(bool _wholeRange);
@@ -135,7 +136,11 @@ public:
     int totalFrames;
     
     // UI Design
-    ofxUICanvas *gui;
+    ofxUICanvas *guiTimeline;
+    ofxUICanvas *guiMovieInfo;
+    ofxUICanvas *guiSettings1;
+    ofxUICanvas *guiHelp1;
+    
     ofxUIRangeSlider *timeSlider;
     ofxUIIntSlider *rowSlider;
     ofxUIIntSlider *columnSlider;
@@ -145,14 +150,9 @@ public:
     ofxUIButton *setOutPointButton;
     ofxUIRadio *setFrameDisplay;
     ofxUIRadio *setFitManually;
-    ofxUICanvas *gui2;
-    ofxUICanvas *gui3;
     ofxUIDropDownList *ddl;
     ofxUIDropDownList *ddl2;
     ofxUITextArea *helpText;
-	bool hideGUI2;
-    int gui2Columns;
-    int gui2Rows;
 
     bool showPlaceHolder;
     bool showFBO;
@@ -181,6 +181,7 @@ public:
     
     // Menu
     fakMenu menuSettings;
+    fakMenu menuMovieInfo;
     float menuTween1;
     
     // Printing
