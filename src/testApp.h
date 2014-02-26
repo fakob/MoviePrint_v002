@@ -210,6 +210,7 @@ public:
     fakMenu menuMoviePrintPreview;
     fakMenu menuMoviePrintSettings;
     fakMenu menuHelp;
+    fakMenu menuTimeline;
     
     // Printing
     float printScale;

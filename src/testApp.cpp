@@ -12,6 +12,17 @@
 #define FAK_MIDDLEGRAY ofColor(195, 195, 195, 255)
 #define FAK_TRANSPARENT ofColor(0,0,0,0)
 
+#define FAK_ORANGE1 ofColor(255, 80, 6, 255)
+#define FAK_ORANGE2 ofColor(255, 183, 153, 255)
+#define FAK_ORANGE3 ofColor(255, 147, 101, 255)
+#define FAK_ORANGE4 ofColor(255, 168, 131, 255)
+#define FAK_ORANGE5 ofColor(255, 211, 193, 255)
+
+#define FAK_WHITE ofColor(255, 255, 255, 255)
+#define FAK_BLACK ofColor(0, 0, 0, 255)
+#define FAK_SHADOW ofColor(0, 0, 0, 32)
+#define FAK_GRAY ofColor(59, 59, 59, 255)
+
 //--------------------------------------------------------------
 void testApp::setup(){
 
@@ -51,12 +62,12 @@ void testApp::setup(){
     topMargin = 5;
     bottomMargin = 5;
     headerHeight = 40;
-    footerHeight = 50;
+    footerHeight = 40;
     gridMargin = 5;
     gridMarginRatio = gridMargin/256.0;
     manualGridMargin = FALSE;
     loaderBarHeight = 20;
-    timeSliderHeight = 24;
+    timeSliderHeight = 10;
     gridColumns = 4;
     gridNumber = 4;
     menuWidth = 255;
@@ -99,7 +110,6 @@ void testApp::setup(){
     Tweenzor::init();
     showMenu = FALSE;
     Tweenzor::add(&tweenzorX1, 0.f, 1.f, 0.f, 0.5f, EASE_IN_OUT_EXPO);
-    Tweenzor::add(&tweenzorY1, 0.f, 1.f, 0.f, 0.5f, EASE_IN_OUT_EXPO);
 
     startImage.loadImage("MoviePrint_StartBildschirm_v001_00000.png");
     backgroundImage.loadImage("MoviePrint_Background_v001_00000.jpg");
@@ -145,20 +155,23 @@ void testApp::setup(){
     setGUISettings1();
     guiSettings1->loadSettings("guiSettings2.xml");
 
-    menuMovieInfo.setupMenu(1,0,0,0,0,headerHeight, true);
+    menuMovieInfo.setupMenu(1,0,0,0,0,headerHeight, true, true);
     menuMovieInfo.registerMouseEvents();
     
-    menuSettings.setupMenu(2,0,0,0,0,headerHeight, true);
+    menuSettings.setupMenu(2,0,0,0,0,headerHeight, true, true);
     menuSettings.registerMouseEvents();
     
-    menuMoviePrintPreview.setupMenu(3,0,0,0,0,headerHeight, true);
+    menuMoviePrintPreview.setupMenu(3,0,0,0,0,headerHeight, true, true);
     menuMoviePrintPreview.registerMouseEvents();
     
-    menuMoviePrintSettings.setupMenu(4,0,0,0,0,headerHeight, true);
+    menuMoviePrintSettings.setupMenu(4,0,0,0,0,headerHeight, true, true);
     menuMoviePrintSettings.registerMouseEvents();
     
-    menuHelp.setupMenu(5,0,0,0,0,headerHeight, true);
+    menuHelp.setupMenu(5,0,0,0,0,headerHeight, true, true);
     menuHelp.registerMouseEvents();
+    
+    menuTimeline.setupMenu(0,0,0,0,0,footerHeight/2, true, false);
+    menuTimeline.registerMouseEvents();
     
     moveInOutTimeline();
     
@@ -173,10 +186,9 @@ void testApp::setGUITimeline(){
     guiTimeline->setFont("Ubuntu-Light.ttf");
     drawPadding = FALSE;
     guiTimeline->setDrawBack(FALSE);
-    ofColor paddingColor = ofColor(255,0,0,200);
-    ofColor backgroundColor = ofColor(100,100,100,200);
-    guiTimeline->setColorPadded(paddingColor);
-    guiTimeline->setColorBack(backgroundColor);
+//    ofColor paddingColor = ofColor(FAK_ORANGE3);
+//    ofColor backgroundColor = ofColor(FAK_ORANGE3);
+//    guiTimeline->setColorBack(FAK_GRAY);
     
 	guiTimeline->addWidgetDown(new ofxUIRangeSlider("RSLIDER", 0.0, (float)totalFrames, 0.0, 100.0, gridWidth, timeSliderHeight));
     timeSlider = (ofxUIRangeSlider *) guiTimeline->getWidget("RSLIDER");
@@ -194,19 +206,19 @@ void testApp::setGUITimeline(){
 //    guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_BACK, ofColor(0,25));
     guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_OUTLINE, ofColor(0,0,0,0));
     guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_OUTLINE_HIGHLIGHT, ofColor(0,0,0,0));
-    guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_FILL, FAK_DARKORANGECOLOR);
-    guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_FILL_HIGHLIGHT, FAK_LIGHTERMIDDLEDARKORANGECOLOR);
+    guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_FILL, FAK_ORANGE1);
+    guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_FILL_HIGHLIGHT, FAK_ORANGE1);
     
 
 
 //    ofColor tempColor (30, 30, 30, 255);
-//    timeSlider->setColorBack(tempColor);
+    timeSlider->setColorBack(FAK_ORANGE3);
 
-    timeSlider->setColorPadded(paddingColor);
+    timeSlider->setColorPadded(FAK_ORANGE3);
 
     ofAddListener(guiTimeline->newGUIEvent, this, &testApp::guiEvent);
     //    guiTimeline->loadSettings("GUI/guiSettings.xml");
-    //    guiTimeline->disable();
+//    guiTimeline->disable();
 
 }
 
@@ -758,7 +770,7 @@ void testApp::update(){
     guiMovieInfo->setWidth(menuMovieInfo.getSizeW());
     guiMovieInfo->setHeight(menuMovieInfo.getSizeH()-headerHeight);
     
-    guiTimeline->setPosition((ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING) + menuWidth - menuWidth * tweenzorX1, ofGetHeight()-(footerHeight/2 + timeSliderHeight/2) * tweenzorY1);
+    guiTimeline->setPosition((ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING) + menuWidth - menuWidth * tweenzorX1, ofGetHeight() - footerHeight/2 +1 - (footerHeight/4) * menuTimeline.getRelSizeH());
     
     if (loadedMovie.isMovieLoaded) { // if no movie is loaded or we are in dev mode then only draw rects
         
@@ -1407,7 +1419,7 @@ void testApp::windowResized(int w, int h){
         scrollListAmountRel = scrollBarList.getRelativePos();
 //    }
     
-    guiTimeline->setPosition(ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, h -(footerHeight/2 + timeSliderHeight/2) * tweenzorY1);
+    guiTimeline->setPosition(ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, h -(footerHeight/2 + timeSliderHeight/2) * menuTimeline.getRelSizeH());
     guiTimeline->setWidth(w);
     guiSettings1->setHeight(h);
     timeSlider->setWidth(gridWidth);
@@ -1718,6 +1730,10 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPNG){
     menuHelp.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
     menuHelp.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*5);
     menuHelp.drawMenu();
+
+    menuTimeline.setPosition(0, ofGetWindowHeight());
+    menuTimeline.setSize(ofGetWindowWidth(), footerHeight/2);
+    menuTimeline.drawMenu();
     
     ofSetColor(255);
     
@@ -1871,9 +1887,7 @@ void testApp::moveInOutTimeline(){
         _end = 0.f;
         _begin = 1.f;
     }
-    Tweenzor::add( &tweenzorY1, _begin, _end, 0.f, 0.5f , EASE_IN_OUT_EXPO);
-    //            Tweenzor::addCompleteListener( Tweenzor::getTween(&tweenzorX1), this, &testApp::onCompleteTweenzor);
-    
+   
     if (showTimeline){
         loadedMovie.setAllLimitsLower(ofGetHeight() - footerHeight);
         droppedList.setAllLimitsLower(ofGetHeight() - footerHeight);

@@ -28,6 +28,7 @@
 #define FAK_WHITE ofColor(255, 255, 255, 255)
 #define FAK_BLACK ofColor(0, 0, 0, 255)
 #define FAK_SHADOW ofColor(0, 0, 0, 32)
+#define FAK_GRAY ofColor(59, 59, 59, 255)
 
 
 #define FAK_GREENCOLOR ofColor(117, 130, 16, 255)
@@ -44,19 +45,20 @@ public:
     
     // functions
     
-    void setupMenu(int _ID, float _mMenuX, float _mMenuY, float _mMenuWidth, float _mMenuHeight, float _mMenuRollOverHeight, bool _mButtonActive){
+    void setupMenu(int _ID, float _mMenuX, float _mMenuY, float _mMenuWidth, float _mMenuHeight, float _mMenuRollOverHeight, bool _mButtonActive, bool _mTopMenu){
         mMenuX = _mMenuX;
         mMenuY = _mMenuY;
         mMenuWidth = _mMenuWidth;
         mMenuHeight = _mMenuHeight;
         mMenuRollOverHeight = _mMenuRollOverHeight;
-        tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,1000,0);
+        tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),ofRandom(0, 300));
         mMenuOffsetX = 2;
         mMenuOffsetY = 28;
         mShadowMargin = 1.5;
         mMenuStripeHeight = 8;
         mInsideMenuHead = FALSE;
         mButtonActive = _mButtonActive;
+        mTopMenu = _mTopMenu;
         
         
         switch (_ID) {
@@ -81,6 +83,7 @@ public:
                 mBackgroundColor = FAK_ORANGE5;
                 break;
             default:
+                mBackgroundColor = FAK_GRAY;
                 break;
         }
         
@@ -89,16 +92,28 @@ public:
     bool insideMenuHead(float _x, float _y ){
         float minX = mMenuX;
         float maxX = mMenuX + mMenuWidth;
-        float minY = mMenuY;
-        float maxY = mMenuY + mMenuRollOverHeight;
+        float minY, maxY;
+        if (mTopMenu) {
+            minY = mMenuY;
+            maxY = mMenuY + mMenuRollOverHeight;
+        } else {
+            minY = mMenuY - mMenuRollOverHeight;
+            maxY = mMenuY;
+        }
         return _x >= minX && _x < maxX && _y >= minY && _y < maxY;
     }
 
     bool insideMenu(float _x, float _y ){
         float minX = mMenuX;
         float maxX = mMenuX + mMenuWidth;
-        float minY = mMenuY;
-        float maxY = mMenuY + mMenuHeight;
+        float minY, maxY;
+        if (mTopMenu) {
+            minY = mMenuY;
+            maxY = mMenuY + mMenuHeight;
+        } else {
+            minY = mMenuY - mMenuHeight - mMenuRollOverHeight;
+            maxY = mMenuY;
+        }
         return _x >= minX && _x < maxX && _y >= minY && _y < maxY;
     }
     
@@ -164,24 +179,29 @@ public:
         return mMenuRollOverHeight + (mMenuHeight - mMenuRollOverHeight) * tweenMenuInOut.update();
     }
     
+	float getRelSizeH(){
+        return tweenMenuInOut.update();
+    }
+    
     void updateMenu(){
 
     }
     
     void drawMenu(){
-        
         ofPushStyle();
-        ofEnableAlphaBlending();
-        ofSetColor(FAK_WHITE);
-        mMenuImage.draw(mMenuX - mMenuOffsetX, mMenuY, mMenuImage.getWidth(), mMenuImage.getHeight());
-        
-        ofPushStyle();
-        ofSetColor(FAK_SHADOW);
-//        ofRectRounded(mMenuX - mShadowMargin*0.3 + mMenuOffsetX, mMenuY + mMenuOffsetY, mMenuWidth - mMenuOffsetX + mShadowMargin*2, mMenuStripeHeight + mMenuHeight * tweenMenuInOut.update(),4.0 * tweenMenuInOut.update());
-        ofSetColor(mBackgroundColor);
-        ofRectRounded(mMenuX, mMenuY + mMenuOffsetY, mMenuWidth, mMenuStripeHeight + mMenuHeight * tweenMenuInOut.update(), 4.0 * tweenMenuInOut.update());
-        ofPopStyle();
-
+        if (mTopMenu) {
+            ofEnableAlphaBlending();
+            ofSetColor(FAK_WHITE);
+            mMenuImage.draw(mMenuX - mMenuOffsetX, mMenuY, mMenuImage.getWidth(), mMenuImage.getHeight());
+//            ofSetColor(FAK_SHADOW);
+//            ofRectRounded(mMenuX - mShadowMargin*0.3 + mMenuOffsetX, mMenuY + mMenuOffsetY, mMenuWidth - mMenuOffsetX + mShadowMargin*2, mMenuStripeHeight + mMenuHeight * tweenMenuInOut.update(),4.0 * tweenMenuInOut.update());
+            ofSetColor(mBackgroundColor);
+            ofRectRounded(mMenuX, mMenuY + mMenuOffsetY, mMenuWidth, mMenuStripeHeight + mMenuHeight * tweenMenuInOut.update(), 4.0 * tweenMenuInOut.update());
+        } else {
+            ofEnableAlphaBlending();
+            ofSetColor(mBackgroundColor);
+            ofRect(mMenuX, mMenuY - (mMenuRollOverHeight + mMenuHeight * tweenMenuInOut.update()), mMenuWidth, mMenuRollOverHeight + mMenuHeight * tweenMenuInOut.update());
+        }
         ofPopStyle();
     }
     
@@ -191,6 +211,7 @@ public:
     
     bool mInsideMenuHead;
     bool mButtonActive;
+    bool mTopMenu;
     
     float mMenuX;
     float mMenuY;
