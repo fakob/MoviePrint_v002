@@ -10,7 +10,7 @@
 #define FAK_GREENCOLOR ofColor(117, 130, 16, 255)
 #define FAK_LIGHTGRAY ofColor(205, 205, 205, 255)
 #define FAK_MIDDLEGRAY ofColor(195, 195, 195, 255)
-
+#define FAK_TRANSPARENT ofColor(0,0,0,0)
 
 //--------------------------------------------------------------
 void testApp::setup(){
@@ -146,10 +146,10 @@ void testApp::setup(){
     setGUISettings1();
     guiSettings1->loadSettings("guiSettings2.xml");
     
-    menuSettings.setupMenu(0,0,0,0,headerHeight);
+    menuSettings.setupMenu(4,0,0,0,0,headerHeight, true);
     menuSettings.registerMouseEvents();
 
-    menuMovieInfo.setupMenu(0,0,0,0,headerHeight);
+    menuMovieInfo.setupMenu(1,0,0,0,0,headerHeight, true);
     menuMovieInfo.registerMouseEvents();
     
     moveInOutTimeline();
@@ -294,7 +294,7 @@ void testApp::setGUISettings1(){
 //    guiSettings1->setTheme(OFX_UI_THEME_TEALLIME);
     
 //    ofColor tempColor = ofColor(0,0,0,255);
-    guiSettings1->setColorBack(FAK_ORANGECOLOR);
+    guiSettings1->setColorBack(FAK_TRANSPARENT);
 
 	ofAddListener(guiSettings1->newGUIEvent,this,&testApp::guiEvent);
 }
@@ -406,8 +406,8 @@ void testApp::setGUIMovieInfo(){
     ofxUIColor cfh = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_FILL_HIGHLIGHT
     ofxUIColor cp = ofxUIColor( 255, 255, 255, 100 ); // OFX_UI_COLOR_PADDED
     ofxUIColor cpo = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_PADDED_OUTLINE
-
-    guiMovieInfo->setColorBack(FAK_ORANGECOLOR);
+    
+    guiMovieInfo->setColorBack(FAK_TRANSPARENT);
 
 }
 
