@@ -205,9 +205,11 @@ public:
     float scrubWindowW, scrubWindowH;
     
     // Menu
-    fakMenu menuSettings;
     fakMenu menuMovieInfo;
-    float menuTween1;
+    fakMenu menuSettings;
+    fakMenu menuMoviePrintPreview;
+    fakMenu menuMoviePrintSettings;
+    fakMenu menuHelp;
     
     // Printing
     float printScale;

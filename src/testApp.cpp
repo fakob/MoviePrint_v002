@@ -100,7 +100,6 @@ void testApp::setup(){
     showMenu = FALSE;
     Tweenzor::add(&tweenzorX1, 0.f, 1.f, 0.f, 0.5f, EASE_IN_OUT_EXPO);
     Tweenzor::add(&tweenzorY1, 0.f, 1.f, 0.f, 0.5f, EASE_IN_OUT_EXPO);
-    Tweenzor::add(&menuTween1, 0.f, 1.f, 0.f, 0.5f, EASE_IN_OUT_EXPO);
 
     startImage.loadImage("MoviePrint_StartBildschirm_v001_00000.png");
     backgroundImage.loadImage("MoviePrint_Background_v001_00000.jpg");
@@ -145,12 +144,21 @@ void testApp::setup(){
     setGUIMovieInfo();
     setGUISettings1();
     guiSettings1->loadSettings("guiSettings2.xml");
-    
-    menuSettings.setupMenu(4,0,0,0,0,headerHeight, true);
-    menuSettings.registerMouseEvents();
 
     menuMovieInfo.setupMenu(1,0,0,0,0,headerHeight, true);
     menuMovieInfo.registerMouseEvents();
+    
+    menuSettings.setupMenu(2,0,0,0,0,headerHeight, true);
+    menuSettings.registerMouseEvents();
+    
+    menuMoviePrintPreview.setupMenu(3,0,0,0,0,headerHeight, true);
+    menuMoviePrintPreview.registerMouseEvents();
+    
+    menuMoviePrintSettings.setupMenu(4,0,0,0,0,headerHeight, true);
+    menuMoviePrintSettings.registerMouseEvents();
+    
+    menuHelp.setupMenu(5,0,0,0,0,headerHeight, true);
+    menuHelp.registerMouseEvents();
     
     moveInOutTimeline();
     
@@ -1685,16 +1693,31 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPNG){
     layoutHeaderImage.draw(0, 0, ofGetWindowWidth() * _scaleFactor, layoutHeaderImage.getHeight() * _scaleFactor);
 
     float tempY = 0;
-    int tempXPos = 1;
-    
-    menuSettings.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*5);
-    menuSettings.drawMenu();
+    int tempXPos = 0;
 
-    tempXPos = 0;
     menuMovieInfo.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*5);
     menuMovieInfo.drawMenu();
+
+    tempXPos = 1;
+    menuSettings.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*5);
+    menuSettings.drawMenu();
+    
+    tempXPos = 2;
+    menuMoviePrintPreview.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuMoviePrintPreview.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*5);
+    menuMoviePrintPreview.drawMenu();
+    
+    tempXPos = 3;
+    menuMoviePrintSettings.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*5);
+    menuMoviePrintSettings.drawMenu();
+    
+    tempXPos = 4;
+    menuHelp.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuHelp.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*5);
+    menuHelp.drawMenu();
     
     ofSetColor(255);
     
