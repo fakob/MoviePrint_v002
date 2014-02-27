@@ -285,36 +285,6 @@ void testApp::setGUISettings1(){
     guiSettings1->addSpacer(length-xInit, 1);
     guiSettings1->addWidgetDown(ddl2);
 
-    
-    
-    ofLog(OF_LOG_VERBOSE, "getColorBack" + ofToString(guiSettings1->getColorBack()));
-    ofLog(OF_LOG_VERBOSE, "getDrawBack" + ofToString(guiSettings1->getDrawBack()));
-    ofLog(OF_LOG_VERBOSE, "getColorFill" + ofToString(guiSettings1->getColorFill()));
-    ofLog(OF_LOG_VERBOSE, "getDrawFill" + ofToString(guiSettings1->getDrawFill()));
-    ofLog(OF_LOG_VERBOSE, "getColorFillHighlight" + ofToString(guiSettings1->getColorFillHighlight()));
-    ofLog(OF_LOG_VERBOSE, "getDrawFillHighLight" + ofToString(guiSettings1->getDrawFillHighLight()));
-    ofLog(OF_LOG_VERBOSE, "getColorOutline" + ofToString(guiSettings1->getColorOutline()));
-    ofLog(OF_LOG_VERBOSE, "getDrawOutline" + ofToString(guiSettings1->getDrawOutline()));
-    ofLog(OF_LOG_VERBOSE, "getColorOutlineHighlight" + ofToString(guiSettings1->getColorOutlineHighlight()));
-    ofLog(OF_LOG_VERBOSE, "getDrawOutlineHighLight" + ofToString(guiSettings1->getDrawOutlineHighLight()));
-    ofLog(OF_LOG_VERBOSE, "getColorPadded" + ofToString(guiSettings1->getColorPadded()));
-    ofLog(OF_LOG_VERBOSE, "getDrawPadding" + ofToString(guiSettings1->getDrawPadding()));
-    ofLog(OF_LOG_VERBOSE, "getColorPaddedOutline" + ofToString(guiSettings1->getColorPaddedOutline()));
-    ofLog(OF_LOG_VERBOSE, "getDrawPaddingOutline" + ofToString(guiSettings1->getDrawPaddingOutline()));
-    
-    ofxUIColor cb = ofxUIColor(FAK_LIGHTERMIDDLEDARKORANGECOLOR); // OFX_UI_COLOR_BACK
-    ofxUIColor co = ofxUIColor( 255, 255, 255, 200); // OFX_UI_COLOR_OUTLINE
-    ofxUIColor coh = ofxUIColor( 255, 255, 255, 255 ); // OFX_UI_COLOR_OUTLINE_HIGHLIGHT
-    ofxUIColor cf = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_FILL
-    ofxUIColor cfh = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_FILL_HIGHLIGHT
-    ofxUIColor cp = ofxUIColor( 255, 255, 255, 100 ); // OFX_UI_COLOR_PADDED
-    ofxUIColor cpo = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_PADDED_OUTLINE
-//    guiSettings1->setUIWidgetColorsBack(cb); //
-//    guiSettings1->setUIWidgetColorsFill(cf,cfh); //
-
-//    guiSettings1->setTheme(OFX_UI_THEME_TEALLIME);
-    
-//    ofColor tempColor = ofColor(0,0,0,255);
     guiSettings1->setColorBack(FAK_TRANSPARENT);
 
 	ofAddListener(guiSettings1->newGUIEvent,this,&testApp::guiEvent);
@@ -1376,18 +1346,7 @@ void testApp::mouseReleased(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::mouseScrolled(double x, double y){
-//    scrollValueY = fmin(ofGetWindowHeight()-30,fmax(0.0,scrollValueY + y));
-//    ofLog(OF_LOG_VERBOSE, "scrollAmount x:y " + ofToString(x) + ":" + ofToString(y) );
-//    scrollBar.scrollUpdate(x, y, gridHeight*2);
-//    scrollAmountRel = scrollBar.getRelativePos();
-//    ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
-//    if (!updateScrub) {
-//        if (showDroppedList) {
-//            scrollList = TRUE;
-//        } else {
-//            scrollGrid = TRUE;
-//        }
-//    }
+
 }
 
 //--------------------------------------------------------------
@@ -1411,8 +1370,8 @@ void testApp::windowResized(int w, int h){
             }
             loadedMovie.setAllLimitsLower(ofGetHeight());
             droppedList.setAllLimitsLower(ofGetHeight());
-            loadedMovie.setAllLimitsRight(ofGetWidth() - rightMargin);
-            droppedList.setAllLimitsRight(ofGetWidth() - rightMargin);
+            loadedMovie.setAllLimitsRight(ofGetWidth() - scrollBarWidth);
+            droppedList.setAllLimitsRight(ofGetWidth() - scrollBarWidth);
         }
 //    if (showDroppedList) {
         scrollBarList.updateScrollBar(w, h, headerHeight, 0, droppedList.getListHeight());
