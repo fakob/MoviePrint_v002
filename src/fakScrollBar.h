@@ -21,21 +21,20 @@ public:
     
     // Functions
     
-    void setup(int _sbID, int _sbScrollAreaX, int _sbScrollAreaY, int _sbScrollAreaWidth, int _sbScrollAreaHeight, float _sbScrollBarX, float _sbScrollBarY, int _sbScrollBarWidth, float _sbLoose, float _scrollMultiplier){
+    void setup(int _sbID, int _windowWidth, int _windowHeight, int _headerHeight, int _footerHeight, int _sbScrollAreaWidth, float _sbLoose, float _scrollMultiplier, int _sbScrollBarMargin){
         sbFirstClick = false;
         sbFirstClickMouseY = 0;
-        sbScrollBarWidth = _sbScrollBarWidth;
-        sbScrollBarHeight = _sbScrollAreaHeight/2;
+        sbScrollAreaX = _windowWidth -  _sbScrollAreaWidth;
+        sbScrollAreaY = _headerHeight;
         sbScrollAreaWidth = _sbScrollAreaWidth;
-        sbScrollAreaHeight = _sbScrollAreaHeight;
-        sbScrollBarX = _sbScrollBarX;
-        sbScrollBarY = _sbScrollBarY;
-        sbScrollAreaX = _sbScrollAreaX;
-        sbScrollAreaY = _sbScrollAreaY;
+        sbScrollAreaHeight = _windowHeight - _headerHeight - _footerHeight;
+        sbScrollBarWidth = _sbScrollAreaWidth - _sbScrollBarMargin*2;
+        sbScrollBarHeight = sbScrollAreaHeight/2;
+        sbScrollBarX = _windowWidth -  _sbScrollAreaWidth + _sbScrollBarMargin;
         sbScrollBarY = sbScrollAreaY + sbScrollAreaHeight/2 - sbScrollBarHeight/2;
         sbScrollBarYNew = sbScrollBarY;
-        sbScrollBarYMin = _sbScrollAreaY;
-        sbScrollBarYMax = _sbScrollAreaY + sbScrollAreaHeight - sbScrollBarHeight;
+        sbScrollBarYMin = sbScrollAreaY;
+        sbScrollBarYMax = sbScrollAreaY + sbScrollAreaHeight - sbScrollBarHeight;
         sbDecelarationConstant = _sbLoose;
         setToTop();
         sbScrollBarDrag = false;
@@ -44,6 +43,7 @@ public:
         sbCalculateScrollInertia = false;
         scrollMultiplier = _scrollMultiplier;
         sbFirstNoTouchMouseEvent = true;
+        sbScrollBarMargin = _sbScrollBarMargin;
         
         // should not be lower then 1000ms as the magic mouse sends still after having stopped scrolling
         // as the magic mouse sends shaky values it is difficult to control it
@@ -69,9 +69,10 @@ public:
         sbScrollBarYMax = sbScrollAreaY + sbScrollAreaHeight - sbScrollBarHeight;
     }
     
-    void updateScrollBar(int _newWindowWidth, int _newWindowHeight, int _newScrollHeight, int _headerHeight, int _footerHeight){
+    void updateScrollBar(int _newWindowWidth, int _newWindowHeight, int _headerHeight, int _footerHeight, int _newScrollHeight){
         unregisterMouseEvents();
-        setup(0, _newWindowWidth-sbScrollBarWidth, _headerHeight, sbScrollBarWidth, _newWindowHeight-_headerHeight-_footerHeight, _newWindowWidth-sbScrollBarWidth, _newWindowHeight/2, sbScrollBarWidth, 16, scrollMultiplier);
+//        setup(0, _newWindowWidth-sbScrollBarWidth - sbScrollBarMargin*2, _headerHeight, sbScrollBarWidth, _newWindowHeight-_headerHeight-_footerHeight, _newWindowWidth-sbScrollBarWidth, _newWindowHeight/2, sbScrollBarWidth, sbDecelarationConstant, scrollMultiplier, sbScrollBarMargin);
+        setup(0, _newWindowWidth, _newWindowHeight, _headerHeight, _footerHeight, sbScrollAreaWidth, sbDecelarationConstant, scrollMultiplier, sbScrollBarMargin);
         setScrollHeight((float)_newScrollHeight);
         if (sbActive) {
             registerMouseEvents();
@@ -280,6 +281,8 @@ public:
         if (sbActive) {
             ofPushStyle();
             ofEnableAlphaBlending();
+            ofSetColor(255, 255, 255, 15);
+            ofRect(sbScrollAreaX, sbScrollAreaY, sbScrollAreaWidth, sbScrollAreaHeight);
             ofSetColor(238, 71, 0, 127);
             ofRectRounded(sbScrollBarX, sbScrollBarY, sbScrollBarWidth, sbScrollBarHeight, sbScrollBarWidth);
             ofPopStyle();
@@ -298,6 +301,7 @@ public:
     int sbScrollBarHeight; //drawn height of ScrollBar
     float sbScrollBarYMin;
     float sbScrollBarYMax;
+    int sbScrollBarMargin;
     bool sbActive;
     
     int sbScrollAreaWidth;

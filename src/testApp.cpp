@@ -99,7 +99,8 @@ void testApp::setup(){
 
     thumbWidth = 80;
     thumbHeight = 45;
-    scrollBarWidth = 15;
+    scrollBarWidth = 12;
+    scrollBarMargin = 2;
     scrollAmountRel = 0;
     scrollListAmountRel = 0;
         
@@ -138,14 +139,14 @@ void testApp::setup(){
     updateDropped = FALSE;
     
     scrollMultiplier = 50.0;
-    
-    scrollBar.setup(0, ofGetWidth()-scrollBarWidth, headerHeight, scrollBarWidth, ofGetHeight()-headerHeight, ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 1.5, scrollMultiplier);
+    scrollBar.setup(0, ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, scrollBarWidth, 1.5, scrollMultiplier, scrollBarMargin);
+
     scrollBar.setScrollHeight((float)gridHeight);
     scrollBar.registerMouseEvents();
     scrollBar.registerTouchEvents();
     ofAddListener(scrollBar.sbScrollingGoingOn, this, &testApp::scrollEvent);
 
-    scrollBarList.setup(0, ofGetWidth()-scrollBarWidth, headerHeight, scrollBarWidth, ofGetHeight()-headerHeight, ofGetWidth()-scrollBarWidth, ofGetHeight()/2, scrollBarWidth, 1.5, scrollMultiplier);
+    scrollBarList.setup(0, ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, scrollBarWidth, 1.5, scrollMultiplier, scrollBarMargin);
     scrollBarList.setScrollHeight(0.5);
     scrollBarList.registerMouseEvents();
     scrollBarList.registerTouchEvents();
@@ -568,7 +569,7 @@ void testApp::calculateNewGrid(int _windowWidth, int _windowHeight){
     loadedMovie.gmThumbWidth = thumbWidth;
     loadedMovie.gmThumbHeight = thumbHeight;
     
-    scrollBar.updateScrollBar(_windowWidth, _windowHeight, gridHeight, headerHeight + topMargin, footerHeight/2 + bottomMargin);
+    scrollBar.updateScrollBar(_windowWidth, _windowHeight, headerHeight + topMargin, footerHeight/2 + bottomMargin, gridHeight);
     scrollBar.setToTop();
     scrollAmountRel = scrollBar.getRelativePos();
     
@@ -625,7 +626,7 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
         ofxNotify() << "Movie could not be loaded";
         ofxNotify() << "Movie could not be loaded";
     }
-    scrollBar.updateScrollBar(ofGetWidth(), ofGetHeight(), gridHeight, headerHeight + topMargin, footerHeight/2 + bottomMargin);
+    scrollBar.updateScrollBar(ofGetWidth(), ofGetHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, gridHeight);
     scrollBar.setToTop();
     scrollAmountRel = scrollBar.getRelativePos();
     
@@ -1414,7 +1415,7 @@ void testApp::windowResized(int w, int h){
             droppedList.setAllLimitsRight(ofGetWidth() - rightMargin);
         }
 //    if (showDroppedList) {
-        scrollBarList.updateScrollBar(w, h, droppedList.getListHeight(), headerHeight, 0);
+        scrollBarList.updateScrollBar(w, h, headerHeight, 0, droppedList.getListHeight());
         scrollBarList.setToTop();
         scrollListAmountRel = scrollBarList.getRelativePos();
 //    }
@@ -1455,7 +1456,7 @@ void testApp::dragEvent(ofDragInfo dragInfo){
             }
             
             droppedList.setup(droppedFiles);
-            scrollBarList.updateScrollBar(ofGetWidth(), ofGetHeight(), droppedList.getListHeight(), headerHeight, 0);
+            scrollBarList.updateScrollBar(ofGetWidth(), ofGetHeight(), headerHeight, 0, droppedList.getListHeight());
             scrollBarList.setToTop();
             scrollListAmountRel = scrollBarList.getRelativePos();
 

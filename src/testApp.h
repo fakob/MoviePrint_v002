@@ -189,6 +189,7 @@ public:
     int footerHeight;
     int gridMargin;
     int scrollBarWidth;
+    int scrollBarMargin;
     int loaderBarHeight;
     int timeSliderHeight;
     int gridColumns;
