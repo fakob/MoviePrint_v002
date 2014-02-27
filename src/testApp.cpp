@@ -568,7 +568,7 @@ void testApp::calculateNewGrid(int _windowWidth, int _windowHeight){
     loadedMovie.gmThumbWidth = thumbWidth;
     loadedMovie.gmThumbHeight = thumbHeight;
     
-    scrollBar.updateScrollBar(_windowWidth, _windowHeight, gridHeight, headerHeight, 0);
+    scrollBar.updateScrollBar(_windowWidth, _windowHeight, gridHeight, headerHeight + topMargin, footerHeight/2 + bottomMargin);
     scrollBar.setToTop();
     scrollAmountRel = scrollBar.getRelativePos();
     
@@ -625,7 +625,7 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
         ofxNotify() << "Movie could not be loaded";
         ofxNotify() << "Movie could not be loaded";
     }
-    scrollBar.updateScrollBar(ofGetWidth(), ofGetHeight(), gridHeight, headerHeight, 0);
+    scrollBar.updateScrollBar(ofGetWidth(), ofGetHeight(), gridHeight, headerHeight + topMargin, footerHeight/2 + bottomMargin);
     scrollBar.setToTop();
     scrollAmountRel = scrollBar.getRelativePos();
     
