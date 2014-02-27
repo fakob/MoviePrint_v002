@@ -110,6 +110,7 @@ void testApp::setup(){
     
     Tweenzor::init();
     showMenu = FALSE;
+    showTopMenu = false;
     Tweenzor::add(&tweenzorX1, 0.f, 1.f, 0.f, 0.5f, EASE_IN_OUT_EXPO);
 
     startImage.loadImage("MoviePrint_StartBildschirm_v001_00000.png");
@@ -139,14 +140,14 @@ void testApp::setup(){
     updateDropped = FALSE;
     
     scrollMultiplier = 50.0;
-    scrollBar.setup(0, ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, scrollBarWidth, 1.5, scrollMultiplier, scrollBarMargin);
+    scrollBar.setup(0, ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, scrollBarWidth, 16, scrollMultiplier, scrollBarMargin);
 
     scrollBar.setScrollHeight((float)gridHeight);
     scrollBar.registerMouseEvents();
     scrollBar.registerTouchEvents();
     ofAddListener(scrollBar.sbScrollingGoingOn, this, &testApp::scrollEvent);
 
-    scrollBarList.setup(0, ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, scrollBarWidth, 1.5, scrollMultiplier, scrollBarMargin);
+    scrollBarList.setup(0, ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, scrollBarWidth, 16, scrollMultiplier, scrollBarMargin);
     scrollBarList.setScrollHeight(0.5);
     scrollBarList.registerMouseEvents();
     scrollBarList.registerTouchEvents();
@@ -732,6 +733,16 @@ void testApp::update(){
         loadedMovie.gmMovieScrub.update();
     }
     
+    // check if one of the topMenus is active and in this case turn of the mouseEvents for the thumbs
+    if (menuMovieInfo.getMenuActivated() || menuSettings.getMenuActivated() || menuMoviePrintPreview.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated()) {
+        if (loadedMovie.getMouseEventsEnabled()) {
+            loadedMovie.disableMouseEvents();
+        }
+    } else {
+        if (!loadedMovie.getMouseEventsEnabled()) {
+            loadedMovie.enableMouseEvents();
+        }
+    }
     
     guiSettings1->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY()+headerHeight);
     guiSettings1->setWidth(menuSettings.getSizeW());

@@ -109,6 +109,7 @@ public:
     bool drawNotify;
     
     bool showMenu;
+    bool showTopMenu;
     
     bool setupFinished;
     bool manipulateSlider; // true when slider event

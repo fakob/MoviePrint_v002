@@ -57,7 +57,7 @@ public:
         mShadowMargin = 1.5;
         mMenuStripeHeight = 8;
         mInsideMenuHead = FALSE;
-        mButtonActive = _mButtonActive;
+        mMenuActive = _mButtonActive;
         mTopMenu = _mTopMenu;
         
         
@@ -118,7 +118,7 @@ public:
     }
     
     void mouseMoved(ofMouseEventArgs & args){
-        if (mButtonActive) {
+        if (mMenuActive) {
             if (mInsideMenuHead) {
                 if (!insideMenu(args.x, args.y)) {
                     mInsideMenuHead = false;
@@ -187,6 +187,10 @@ public:
 
     }
     
+    bool getMenuActivated(){
+        return mInsideMenuHead;
+    }
+    
     void drawMenu(){
         ofPushStyle();
         if (mTopMenu) {
@@ -210,7 +214,7 @@ public:
     // Properties
     
     bool mInsideMenuHead;
-    bool mButtonActive;
+    bool mMenuActive;
     bool mTopMenu;
     
     float mMenuX;

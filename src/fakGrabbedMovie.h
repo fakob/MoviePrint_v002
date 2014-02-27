@@ -61,7 +61,7 @@ public:
         
         gmThumbWidth = _gmThumbWidth;
         gmThumbHeight = _gmThumbHeight;
-
+        gmMouseEventsEnabled = false;
         
         string shaderProgram = "#version 120\n \
         #extension GL_ARB_texture_rectangle : enable\n \
@@ -265,18 +265,15 @@ public:
             }
             
 //          unregister All Mouse Events of the Stills (old gmNumberOfStills)
-            for(int i=0; i<gmNumberOfStills; i++)
-            {
-                grabbedStill[i].unregisterMouseEvents();
-            }
+            disableMouseEvents();
             
             setNumberOfStills(_numberOfStills);
             grabbedStill.clear();
             grabbedStill.resize(_numberOfStills);
             
+            enableMouseEvents();
             for(int i=0; i<gmNumberOfStills; i++)
             {
-                grabbedStill[i].registerMouseEvents();
                 ofAddListener(grabbedStill[i].gsClickedInside, this, &fakGrabbedMovie::scrubMovie);
                 ofAddListener(grabbedStill[i].gsMovedInside, this, &fakGrabbedMovie::rollOverMovie);
                 grabbedStill[i].gsID = i;
@@ -690,14 +687,20 @@ public:
     
     void disableMouseEvents(){
         if (isMovieLoaded) {
+            gmMouseEventsEnabled = false;
             for (int i=0; i<gmNumberOfStills; i++) {
                 grabbedStill[i].unregisterMouseEvents();
             }
         }
     }
     
+    bool getMouseEventsEnabled(){
+        return gmMouseEventsEnabled;
+    }
+    
     void enableMouseEvents(){
         if (isMovieLoaded) {
+            gmMouseEventsEnabled = true;
             for (int i=0; i<gmNumberOfStills; i++) {
                 grabbedStill[i].registerMouseEvents();
             }
@@ -1121,6 +1124,7 @@ public:
     int gmThumbWidth;
     int gmThumbHeight;
     bool gmShowFramesUI;
+    bool gmMouseEventsEnabled;
     
     ofImage setInPointImage;
     ofImage setOutPointImage;
