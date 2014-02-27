@@ -168,3 +168,5 @@ xcuserdata
 bin/MoviePrintDebug.app/Contents/Resources/guiSettings2.xml
 
 *.png
+
+*.xml

@@ -56,7 +56,8 @@ public:
     void scrollEvent(ofVec2f & e);
     void setGUITimeline();
     void setGUIMovieInfo();
-    void setGUISettings1();
+    void setGUISettings();
+    void setGUIMoviePrintSettings();
     void setGUIHelp1();
     void resetItemsToPrint();
 
@@ -140,6 +141,7 @@ public:
     ofxUICanvas *guiTimeline;
     ofxUICanvas *guiMovieInfo;
     ofxUICanvas *guiSettings1;
+    ofxUICanvas *guiMoviePrintSettings1;
     ofxUICanvas *guiHelp1;
     
     ofxUIRangeSlider *timeSlider;
@@ -221,6 +223,7 @@ public:
     ofFbo gmFboToSave;
     ofPixels gmPixToSave;
     bool hideInPNG;
+    bool saveSingleFrames;
 
     // draw List
     string loadedFile;

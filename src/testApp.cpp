@@ -79,6 +79,7 @@ void testApp::setup(){
     showPrintScreen = FALSE;
     finishedPrinting = TRUE;
     printFormat = OF_IMAGE_FORMAT_PNG;
+    saveSingleFrames = false;
     
     showLoadMovieScreen = FALSE;
     finishedLoadingMovie = TRUE;
@@ -154,8 +155,11 @@ void testApp::setup(){
     
     setGUITimeline();
     setGUIMovieInfo();
-    setGUISettings1();
-    guiSettings1->loadSettings("guiSettings2.xml");
+    setGUISettings();
+    guiSettings1->loadSettings("guiSettings1.xml");
+    setGUIMoviePrintSettings();
+    guiMoviePrintSettings1->loadSettings("guiMoviePrintSettings.xml");
+
 
     menuMovieInfo.setupMenu(1,0,0,0,0,headerHeight, true, true);
     menuMovieInfo.registerMouseEvents();
@@ -225,7 +229,7 @@ void testApp::setGUITimeline(){
 }
 
 //--------------------------------------------------------------
-void testApp::setGUISettings1(){
+void testApp::setGUISettings(){
 	
 	float dim = 16;
 	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
@@ -267,6 +271,46 @@ void testApp::setGUISettings1(){
 //    setFrameDisplay = (ofxUIRadio *) guiSettings1->getWidget("RADIO HORIZONTAL");
     setFrameDisplay->activateToggle("TimeCode");
     
+    guiSettings1->setColorBack(FAK_TRANSPARENT);
+
+	ofAddListener(guiSettings1->newGUIEvent,this,&testApp::guiEvent);
+}
+
+//--------------------------------------------------------------
+void testApp::setGUIMoviePrintSettings(){
+	
+	float dim = 16;
+	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
+    float length = menuWidth-xInit;
+    
+    vector<string> names;
+	names.push_back("Frames");
+	names.push_back("TimeCode");
+	names.push_back("off");
+    
+    guiMoviePrintSettings1 = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
+    guiMoviePrintSettings1->setFont("Ubuntu-Light.ttf");
+    
+    guiMoviePrintSettings1->addLabel("MOVIEPRINT SETTINGS", OFX_UI_FONT_LARGE);
+    guiMoviePrintSettings1->addSpacer(length-xInit, 1);
+    guiMoviePrintSettings1->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
+    
+	guiMoviePrintSettings1->addIntSlider("PrintColumns", 4, 10, gridColumns, length-xInit,dim);
+	guiMoviePrintSettings1->addIntSlider("PrintRows", 1, 20, gridRows, length-xInit,dim);
+   	guiMoviePrintSettings1->addIntSlider("PrintThumbWidth", 0, 18, 1, length-xInit,dim);
+   	guiMoviePrintSettings1->addIntSlider("PrintGapSizePercent", 0, 100, 1, length-xInit,dim);
+    guiMoviePrintSettings1->addButton("PrintSaveSingleFrames", saveSingleFrames);
+//    columnSlider = (ofxUIIntSlider *) guiMoviePrintSettings1->getWidget("Columns");
+//    rowSlider = (ofxUIIntSlider *) guiMoviePrintSettings1->getWidget("Rows");
+//    numberSlider = (ofxUIIntSlider *) guiMoviePrintSettings1->getWidget("Number");
+//    thumbWidthSlider = (ofxUIIntSlider *) guiMoviePrintSettings1->getWidget("ThumbWidth");
+//    thumbWidthSlider->setVisible(FALSE);
+    
+    guiMoviePrintSettings1->addSpacer(length-xInit, 1);
+    guiMoviePrintSettings1->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
+    ofxUIRadio *setFrameDisplay = guiMoviePrintSettings1->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
+    setFrameDisplay->activateToggle("TimeCode");
+    
     
     vector<string> names3;
     names3.push_back("png");
@@ -283,13 +327,14 @@ void testApp::setGUISettings1(){
     ddl2 = new ofxUIDropDownList(length-xInit, "MoviePrint Width", names4, OFX_UI_FONT_MEDIUM);
     ddl2->setAllowMultiple(FALSE);
     ddl2->setAutoClose(true);
-    guiSettings1->addSpacer(length-xInit, 1);
-    guiSettings1->addWidgetDown(ddl2);
-
-    guiSettings1->setColorBack(FAK_TRANSPARENT);
-
-	ofAddListener(guiSettings1->newGUIEvent,this,&testApp::guiEvent);
+    guiMoviePrintSettings1->addSpacer(length-xInit, 1);
+    guiMoviePrintSettings1->addWidgetDown(ddl2);
+    
+    guiMoviePrintSettings1->setColorBack(FAK_TRANSPARENT);
+    
+	ofAddListener(guiMoviePrintSettings1->newGUIEvent,this,&testApp::guiEvent);
 }
+
 
 //--------------------------------------------------------------
 void testApp::setGUIMovieInfo(){
@@ -744,13 +789,18 @@ void testApp::update(){
         }
     }
     
+    guiMovieInfo->setPosition(menuMovieInfo.getPositionX(), menuMovieInfo.getPositionY()+headerHeight);
+    guiMovieInfo->setWidth(menuMovieInfo.getSizeW());
+    guiMovieInfo->setHeight(menuMovieInfo.getSizeH()-headerHeight);
+
     guiSettings1->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY()+headerHeight);
     guiSettings1->setWidth(menuSettings.getSizeW());
     guiSettings1->setHeight(menuSettings.getSizeH()-headerHeight);
     
-    guiMovieInfo->setPosition(menuMovieInfo.getPositionX(), menuMovieInfo.getPositionY()+headerHeight);
-    guiMovieInfo->setWidth(menuMovieInfo.getSizeW());
-    guiMovieInfo->setHeight(menuMovieInfo.getSizeH()-headerHeight);
+    guiMoviePrintSettings1->setPosition(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY()+headerHeight);
+    guiMoviePrintSettings1->setWidth(menuMoviePrintSettings.getSizeW());
+    guiMoviePrintSettings1->setHeight(menuMoviePrintSettings.getSizeH()-headerHeight);
+    
     
     guiTimeline->setPosition((ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING) + menuWidth - menuWidth * tweenzorX1, ofGetHeight() - footerHeight/2 +1 - (footerHeight/4) * menuTimeline.getRelSizeH());
     
@@ -1447,12 +1497,15 @@ void testApp::exit(){
     
     loadedMovie.stop(false);
     
-//    guiTimeline->saveSettings("GUI/guiSettings.xml");
     delete guiTimeline;
     delete guiMovieInfo;
+    delete guiHelp1;
     
-    guiSettings1->saveSettings("guiSettings2.xml");
+    guiSettings1->saveSettings("guiSettings1.xml");
 	delete guiSettings1;
+    guiMoviePrintSettings1->saveSettings("guiMoviePrintSettings.xml");
+	delete guiMoviePrintSettings1;
+
 
 }
 
