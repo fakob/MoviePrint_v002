@@ -200,7 +200,7 @@ public:
 //            ofSetColor(FAK_SHADOW);
 //            ofRectRounded(mMenuX - mShadowMargin*0.3 + mMenuOffsetX, mMenuY + mMenuOffsetY, mMenuWidth - mMenuOffsetX + mShadowMargin*2, mMenuStripeHeight + mMenuHeight * tweenMenuInOut.update(),4.0 * tweenMenuInOut.update());
             ofSetColor(mBackgroundColor);
-            ofRectRounded(mMenuX, mMenuY + mMenuOffsetY, mMenuWidth, mMenuStripeHeight + mMenuHeight * tweenMenuInOut.update(), 4.0 * tweenMenuInOut.update());
+            ofRectRounded(mMenuX, mMenuY + mMenuOffsetY, mMenuWidth, mMenuStripeHeight + (mMenuHeight - mMenuOffsetY - mMenuStripeHeight) * tweenMenuInOut.update(), 4.0 * tweenMenuInOut.update());
         } else {
             ofEnableAlphaBlending();
             ofSetColor(mBackgroundColor);
@@ -224,7 +224,7 @@ public:
     float mMenuRollOverHeight;
     int mMenuOffsetX;
     int mMenuOffsetY;
-    int mMenuStripeHeight;
+    int mMenuStripeHeight; //stripe of menu which is already visible
     float mShadowMargin;
     ofImage mMenuImage;
     ofColor mBackgroundColor;
