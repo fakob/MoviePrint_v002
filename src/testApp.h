@@ -43,7 +43,8 @@ public:
     void calculateNewGrid(int _windowWidth, int _windowHeight);
     bool fequal(float _x, float _y, float _t);
     void drawUI(int _scaleFactor, bool _hideInPNG);
-    void drawMoviePrint(int _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _drawPlaceHolder);
+    void drawMoviePrint(float _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _drawPlaceHolder);
+    void drawMoviePrintPreview(float _scaleFactor, bool _drawPlaceHolder);
     void drawList(float _scrollAmountRel);
     void printImageToPNG(int _printSizeWidth);
     void printListToPNG();
@@ -57,7 +58,7 @@ public:
     void setGUITimeline();
     void setGUIMovieInfo();
     void setGUISettings();
-    void setGUIMoviePrintSettings();
+    void setGUISettingsMoviePrint();
     void setGUIHelp1();
     void resetItemsToPrint();
 
@@ -137,26 +138,17 @@ public:
     
     int totalFrames;
     
-    // UI Design
+    // ofxUI Design
     ofxUICanvas *guiTimeline;
     ofxUICanvas *guiMovieInfo;
     ofxUICanvas *guiSettings1;
-    ofxUICanvas *guiMoviePrintSettings1;
+    ofxUICanvas *guiSettingsMoviePrint;
     ofxUICanvas *guiHelp1;
     
+    // ofxUICanvas *guiTimeline
     ofxUIRangeSlider *timeSlider;
-    ofxUIIntSlider *rowSlider;
-    ofxUIIntSlider *columnSlider;
-    ofxUIIntSlider *numberSlider;
-    ofxUIIntSlider *thumbWidthSlider;
-    ofxUIButton *setInPointButton;
-    ofxUIButton *setOutPointButton;
-    ofxUIRadio *setFrameDisplay;
-    ofxUIRadio *setFitManually;
-    ofxUIDropDownList *ddl;
-    ofxUIDropDownList *ddl2;
-    ofxUITextArea *helpText;
-    ofxUITextArea *movieInfo1;
+    
+    // ofxUICanvas *guiMovieInfo
     ofxUITextArea *gmMIFileName;
     ofxUITextArea *gmMIFilePath;
     ofxUILabel *gmMIFormat;
@@ -181,7 +173,27 @@ public:
     ofxUILabel *gmMIAChannelsString;
     ofxUILabel *gmMIASamplingRate;
     
+    // ofxUICanvas *guiSettings1
+    ofxUIIntSlider *rowSlider;
+    ofxUIIntSlider *columnSlider;
+    ofxUIIntSlider *thumbWidthSlider;
+    ofxUIButton *setInPointButton;
+    ofxUIButton *setOutPointButton;
+    ofxUIRadio *setFrameDisplay;
+    ofxUIRadio *setFitManually;
+    
+    // ofxUICanvas *guiSettingsMoviePrint
+    ofxUIDropDownList *ddl;
+    ofxUIDropDownList *ddl2;
+    
+    // ofxUICanvas *guiSettings1
+    ofxUIIntSlider *numberSlider;
 
+    
+    // ofxUICanvas *guiHelp1
+    ofxUITextArea *helpText;
+
+    
     bool showPlaceHolder;
     bool showFBO;
     
@@ -220,10 +232,12 @@ public:
     float printScale;
     int printSizeWidth;
     ofImageFormat printFormat;
-    ofFbo gmFboToSave;
+    ofFbo fboToSave;
+    ofFbo fboToPreview;
     ofPixels gmPixToSave;
     bool hideInPNG;
     bool saveSingleFrames;
+    bool displayVideoAudioInfo;
 
     // draw List
     string loadedFile;

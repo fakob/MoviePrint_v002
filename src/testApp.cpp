@@ -80,6 +80,10 @@ void testApp::setup(){
     finishedPrinting = TRUE;
     printFormat = OF_IMAGE_FORMAT_PNG;
     saveSingleFrames = false;
+    fboToPreview.allocate(255, 255, GL_RGBA );
+    fboToPreview.begin();
+	ofClear(255,255,255, 0);
+    fboToPreview.end();
     
     showLoadMovieScreen = FALSE;
     finishedLoadingMovie = TRUE;
@@ -157,8 +161,8 @@ void testApp::setup(){
     setGUIMovieInfo();
     setGUISettings();
     guiSettings1->loadSettings("guiSettings1.xml");
-    setGUIMoviePrintSettings();
-    guiMoviePrintSettings1->loadSettings("guiMoviePrintSettings.xml");
+    setGUISettingsMoviePrint();
+    guiSettingsMoviePrint->loadSettings("guiMoviePrintSettings.xml");
 
 
     menuMovieInfo.setupMenu(1,0,0,0,0,headerHeight, true, true);
@@ -277,7 +281,7 @@ void testApp::setGUISettings(){
 }
 
 //--------------------------------------------------------------
-void testApp::setGUIMoviePrintSettings(){
+void testApp::setGUISettingsMoviePrint(){
 	
 	float dim = 16;
 	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
@@ -288,33 +292,36 @@ void testApp::setGUIMoviePrintSettings(){
 	names.push_back("TimeCode");
 	names.push_back("off");
     
-    guiMoviePrintSettings1 = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
-    guiMoviePrintSettings1->setFont("Ubuntu-Light.ttf");
+    guiSettingsMoviePrint = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
+    guiSettingsMoviePrint->setFont("Ubuntu-Light.ttf");
     
-    guiMoviePrintSettings1->addLabel("MOVIEPRINT SETTINGS", OFX_UI_FONT_LARGE);
-    guiMoviePrintSettings1->addSpacer(length-xInit, 1);
-    guiMoviePrintSettings1->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
+    guiSettingsMoviePrint->addLabel("MOVIEPRINT SETTINGS", OFX_UI_FONT_LARGE);
+    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
+    guiSettingsMoviePrint->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
     
-	guiMoviePrintSettings1->addIntSlider("PrintColumns", 4, 10, gridColumns, length-xInit,dim);
-	guiMoviePrintSettings1->addIntSlider("PrintRows", 1, 20, gridRows, length-xInit,dim);
-   	guiMoviePrintSettings1->addIntSlider("PrintThumbWidth", 0, 18, 1, length-xInit,dim);
-   	guiMoviePrintSettings1->addIntSlider("PrintGapSizePercent", 0, 100, 1, length-xInit,dim);
-    guiMoviePrintSettings1->addButton("PrintSaveSingleFrames", saveSingleFrames);
-//    columnSlider = (ofxUIIntSlider *) guiMoviePrintSettings1->getWidget("Columns");
-//    rowSlider = (ofxUIIntSlider *) guiMoviePrintSettings1->getWidget("Rows");
-//    numberSlider = (ofxUIIntSlider *) guiMoviePrintSettings1->getWidget("Number");
-//    thumbWidthSlider = (ofxUIIntSlider *) guiMoviePrintSettings1->getWidget("ThumbWidth");
+	guiSettingsMoviePrint->addIntSlider("PrintColumns", 4, 10, gridColumns, length-xInit,dim);
+	guiSettingsMoviePrint->addIntSlider("PrintRows", 1, 20, gridRows, length-xInit,dim);
+   	guiSettingsMoviePrint->addIntSlider("PrintThumbWidth", 0, 18, 1, length-xInit,dim);
+   	guiSettingsMoviePrint->addIntSlider("PrintGapSizePercent", 0, 100, 1, length-xInit,dim);
+    guiSettingsMoviePrint->addToggle("DisplayVideoAudioInfo", displayVideoAudioInfo);
+    guiSettingsMoviePrint->addToggle("PrintSaveSingleFrames", saveSingleFrames);
+    guiSettingsMoviePrint->addToggle("PrintSaveSingleFrames", saveSingleFrames);
+//    columnSlider = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("Columns");
+//    rowSlider = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("Rows");
+//    numberSlider = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("Number");
+//    thumbWidthSlider = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("ThumbWidth");
 //    thumbWidthSlider->setVisible(FALSE);
     
-    guiMoviePrintSettings1->addSpacer(length-xInit, 1);
-    guiMoviePrintSettings1->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
-    ofxUIRadio *setFrameDisplay = guiMoviePrintSettings1->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
+    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
+    guiSettingsMoviePrint->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
+    ofxUIRadio *setFrameDisplay = guiSettingsMoviePrint->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
     setFrameDisplay->activateToggle("TimeCode");
     
     
     vector<string> names3;
     names3.push_back("png");
     names3.push_back("jpg");
+    names3.push_back("gif");
     ddl = new ofxUIDropDownList(length-xInit, "Choose Output Format", names3, OFX_UI_FONT_MEDIUM);
     ddl->setAllowMultiple(FALSE);
     ddl->setAutoClose(true);
@@ -327,12 +334,13 @@ void testApp::setGUIMoviePrintSettings(){
     ddl2 = new ofxUIDropDownList(length-xInit, "MoviePrint Width", names4, OFX_UI_FONT_MEDIUM);
     ddl2->setAllowMultiple(FALSE);
     ddl2->setAutoClose(true);
-    guiMoviePrintSettings1->addSpacer(length-xInit, 1);
-    guiMoviePrintSettings1->addWidgetDown(ddl2);
+    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
+    guiSettingsMoviePrint->addWidgetDown(ddl2);
+    guiSettingsMoviePrint->addBaseDraws("IMAGE CAPTION", &fboToPreview, false);
     
-    guiMoviePrintSettings1->setColorBack(FAK_TRANSPARENT);
+    guiSettingsMoviePrint->setColorBack(FAK_TRANSPARENT);
     
-	ofAddListener(guiMoviePrintSettings1->newGUIEvent,this,&testApp::guiEvent);
+	ofAddListener(guiSettingsMoviePrint->newGUIEvent,this,&testApp::guiEvent);
 }
 
 
@@ -364,18 +372,11 @@ void testApp::setGUIMovieInfo(){
     string textString = "This widget is a text area widget. Use this when you need to display a paragraph of text. It takes care of formatting the text to fit the block.";
     guiMovieInfo->addSpacer();
     
-//    guiMovieInfo->addTextArea("movieInfo1", textString, OFX_UI_FONT_SMALL);
-//    movieInfo1 = (ofxUITextArea *) guiMovieInfo->getWidget("movieInfo1");
-//    guiMovieInfo->addWidgetDown(new ofxUITextArea("gmMIFileName", textString, OFX_UI_FONT_SMALL));
     guiMovieInfo->addTextArea("gmMIFileName", "gmMIFileName", OFX_UI_FONT_SMALL);
     gmMIFileName = (ofxUITextArea *) guiMovieInfo->getWidget("gmMIFileName");
-//    guiMovieInfo->addLabel("", OFX_UI_FONT_SMALL);
-//    guiMovieInfo->addLabel("", OFX_UI_FONT_SMALL);
 
     guiMovieInfo->addTextArea("gmMIFilePath", "gmMIFilePath", OFX_UI_FONT_SMALL);
     gmMIFilePath = (ofxUITextArea *) guiMovieInfo->getWidget("gmMIFilePath");
-//    guiMovieInfo->addLabel("", OFX_UI_FONT_SMALL);
-//    guiMovieInfo->addLabel("", OFX_UI_FONT_SMALL);
     
     guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIFormat", "gmMIFormat", OFX_UI_FONT_SMALL));
     gmMIFormat = (ofxUILabel *) guiMovieInfo->getWidget("gmMIFormat");
@@ -798,9 +799,14 @@ void testApp::update(){
     guiSettings1->setWidth(menuSettings.getSizeW());
     guiSettings1->setHeight(menuSettings.getSizeH()-headerHeight);
     
-    guiMoviePrintSettings1->setPosition(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY()+headerHeight);
-    guiMoviePrintSettings1->setWidth(menuMoviePrintSettings.getSizeW());
-    guiMoviePrintSettings1->setHeight(menuMoviePrintSettings.getSizeH()-headerHeight);
+    fboToPreview.begin();
+//    startImage.draw(0, 0, 255,255);
+    ofClear(255,255,255, 0);
+    drawMoviePrintPreview(0.1, false);
+    fboToPreview.end();
+    guiSettingsMoviePrint->setPosition(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY()+headerHeight);
+    guiSettingsMoviePrint->setWidth(menuMoviePrintSettings.getSizeW());
+    guiSettingsMoviePrint->setHeight(menuMoviePrintSettings.getSizeH()-headerHeight);
     
     guiTimeline->setPosition((ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING) + menuWidth - menuWidth * tweenzorX1, ofGetHeight() - footerHeight/2 +1 - (footerHeight/4) * menuTimeline.getRelSizeH());
     
@@ -1024,7 +1030,7 @@ void testApp::draw(){
         
     } else if(showFBO){ // test
         
-        gmFboToSave.draw(100, 100);
+        fboToSave.draw(100, 100);
         
     } else if(showPlaceHolder){ // test
         
@@ -1504,8 +1510,8 @@ void testApp::exit(){
     
     guiSettings1->saveSettings("guiSettings1.xml");
 	delete guiSettings1;
-    guiMoviePrintSettings1->saveSettings("guiMoviePrintSettings.xml");
-	delete guiMoviePrintSettings1;
+    guiSettingsMoviePrint->saveSettings("guiMoviePrintSettings.xml");
+	delete guiSettingsMoviePrint;
 
 
 }
@@ -1722,8 +1728,22 @@ void testApp::scrollEvent(ofVec2f & e){
     }
 }
 
+//--------------------------------------------------------------
+void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
+    
+    float _scrollAmount = 0;
+    bool _isBeingPrinted = true;
+    int moviePrintGridColumns = 4;
+    float moviePrintGridMargin = 10;
+    
+    float tempX = (leftMargin + menuWidth - menuWidth * tweenzorX1) * _scaleFactor;
+    float tempY = _scrollAmount * _scaleFactor + topMargin + headerHeight;
+    loadedMovie.drawMoviePrintPreview(tempX, tempY, moviePrintGridColumns, moviePrintGridMargin, _scaleFactor, 1);
+//    void drawMoviePrintPreview(float _x, float _y, int _gridColumns, float _gridMargin, float _scaleFactor, float _alpha){
 
-
+    
+    
+}
 //--------------------------------------------------------------
 void testApp::drawUI(int _scaleFactor, bool _hideInPNG){
     
@@ -1775,7 +1795,7 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPNG){
 }
 
 //--------------------------------------------------------------
-void testApp::drawMoviePrint(int _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _showPlaceHolder){
+void testApp::drawMoviePrint(float _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _showPlaceHolder){
     
     float _scrollAmount = 0;
     if (scrollBar.sbActive) {
@@ -1950,12 +1970,12 @@ void testApp::printImageToPNG(int _printSizeWidth){
         printFormat = OF_IMAGE_FORMAT_PNG; // jpeg not yet working
         
         if (printFormat == OF_IMAGE_FORMAT_JPEG) {
-            gmFboToSave.allocate(outputWidth, outputHeight, GL_RGB);
+            fboToSave.allocate(outputWidth, outputHeight, GL_RGB);
             gmPixToSave.allocate(outputWidth, outputHeight, OF_IMAGE_FORMAT_JPEG);
             //            gmPixToSave.allocate(outputWidth, outputHeight, OF_PIXELS_RGB);
         }
         else {
-            gmFboToSave.allocate(outputWidth, outputHeight, GL_RGBA);
+            fboToSave.allocate(outputWidth, outputHeight, GL_RGBA);
             //        gmPixToSave.allocate(outputWidth,outputHeight,OF_IMAGE_COLOR);
             //            gmPixToSave.allocate(outputWidth, outputHeight, OF_IMAGE_FORMAT_PNG);
             gmPixToSave.allocate(outputWidth, outputHeight, OF_PIXELS_RGB);
@@ -1965,7 +1985,7 @@ void testApp::printImageToPNG(int _printSizeWidth){
         //        ofImageFormat tests;
         ofPushMatrix();
         ofPushStyle();
-        gmFboToSave.begin();
+        fboToSave.begin();
         //        gmPixToSave.clear();
         //        ofDisableAlphaBlending();
         //        ofClear(0,0,0,0); //add this
@@ -1973,14 +1993,14 @@ void testApp::printImageToPNG(int _printSizeWidth){
         ofSetColor(255, 255, 255, 255);
         //        drawUI(scaleFactor, TRUE);
         //        drawMoviePrint(scaleFactor, TRUE, TRUE, 0);
-        //        ofLog(OF_LOG_VERBOSE, "gmFboToSave:getDepthBuffer" + ofToString(gmFboToSave.getDepthBuffer()));
-        //        ofLog(OF_LOG_VERBOSE, "gmFboToSave:getDepthBuffer" + ofToString(gmFboToSave.);
+        //        ofLog(OF_LOG_VERBOSE, "fboToSave:getDepthBuffer" + ofToString(fboToSave.getDepthBuffer()));
+        //        ofLog(OF_LOG_VERBOSE, "fboToSave:getDepthBuffer" + ofToString(fboToSave.);
         //        ofLog(OF_LOG_VERBOSE, "gmPixToSave:getNumChannels" + ofToString(gmPixToSave.getNumChannels()));
         loadedMovie.drawGmMoviePrint(gridMargin, gridMargin, gridColumns, gridMargin, 0, _newScaleFactor, 1, TRUE, TRUE, superKeyPressed, shiftKeyPressed, showPlaceHolder);
         //        ofRect(100, 100, 300, 100);
-        gmFboToSave.end();
+        fboToSave.end();
         //        ofLog(OF_LOG_VERBOSE, "gmPixToSave:getImageType" + ofToString(gmPixToSave.getImageType()));
-        gmFboToSave.readToPixels(gmPixToSave);
+        fboToSave.readToPixels(gmPixToSave);
         
         // put some stuff in the pixels
         //        int i = 0;

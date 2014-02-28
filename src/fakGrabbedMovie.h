@@ -1017,6 +1017,27 @@ public:
         
     }
     
+    void drawMoviePrintPreview(float _x, float _y, int _gridColumns, float _gridMargin, float _scaleFactor, float _alpha){
+       
+        bool _superKeyPressed = false;
+        bool _shiftKeyPressed = false;
+        bool _drawPlaceHolder = false;
+        bool _isBeingPrinted = true;
+        
+        // draw all frames
+        ofPushStyle();
+        ofEnableAlphaBlending();
+        ofSetColor(255, 255, 255, 255); // draw stills
+        for(int i=0; i<gmNumberOfStills; i++)
+        {
+            float tempY = ((gmThumbHeight+_gridMargin)*(i/_gridColumns) + _y );
+            drawStill(i, (_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor, tempY * _scaleFactor, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _isBeingPrinted, _superKeyPressed, _shiftKeyPressed, _drawPlaceHolder);
+        }
+        
+        ofPopStyle();
+        
+    }
+    
     void drawStillUI(int i, float x, float y, float w, float h, float _alpha){
         
         if (isMovieLoaded) {
