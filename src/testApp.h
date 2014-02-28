@@ -2,7 +2,7 @@
 
 #include "ofMain.h"
 #include "fakGrabbedMovie.h"
-#include "fakGrabbedStill.h"
+#include "fakGrabbedMovieStill.h"
 #include "ofxUI.h"
 #include "ofxTweener.h"
 #include "fakMemory.h"

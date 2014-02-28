@@ -1453,7 +1453,7 @@ void testApp::windowResized(int w, int h){
     guiTimeline->setPosition(ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, h -(footerHeight/2 + timeSliderHeight/2) * menuTimeline.getRelSizeH());
     guiTimeline->setWidth(w);
     guiSettings1->setHeight(h);
-    uiRangeSliderTimeline->setWidth(ofGetWidth() - leftMargin - rightMargin);
+    uiRangeSliderTimeline->setWidth(gridWidth);
     ofLog(OF_LOG_VERBOSE, "Timeslider Width:" + ofToString(uiRangeSliderTimeline->getWidth()) );;
 
     windowResizedOnce++;
@@ -1609,14 +1609,14 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
 		ofLog(OF_LOG_VERBOSE, "Columns " + ofToString(slider->getScaledValue()));
 		printGridColumns = (int)slider->getScaledValue();
-        calculateNewDisplayGrid(ofGetWidth(), ofGetHeight());
+        calculateNewGrid(ofGetWidth(), ofGetHeight());
 	}
 	else if(name == "PrintRows")
 	{
 		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
 		ofLog(OF_LOG_VERBOSE, "Rows " + ofToString(slider->getScaledValue()));
 		printGridRows = (int)slider->getScaledValue();
-        calculateNewDisplayGrid(ofGetWidth(), ofGetHeight());
+        calculateNewGrid(ofGetWidth(), ofGetHeight());
 	}
 	else if(name == "PrintNumber")
 	{
@@ -1624,7 +1624,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofLog(OF_LOG_VERBOSE, "Number " + ofToString(slider->getScaledValue()));
         //        gridColumns = 4;
 		printNumberOfThumbs = (int)slider->getScaledValue();
-        calculateNewDisplayGrid(ofGetWidth(), ofGetHeight());
+        calculateNewGrid(ofGetWidth(), ofGetHeight());
 	}
     else if(name == "TEXT INPUT")
     {
