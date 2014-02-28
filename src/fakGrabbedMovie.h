@@ -10,7 +10,7 @@
 #define __fakBreakupVideo__fakGrabbedMovie__
 
 #include "ofMain.h"
-#include "fakGrabbedStill.h"
+#include "fakGrabbedMovieStill.h"
 #include "ofxFontStash.h"
 #include "boost/algorithm/string/split.hpp"
 #include "boost/algorithm/string/classification.hpp"
@@ -1115,7 +1115,7 @@ public:
     ofVideoPlayer gmMovie;
     ofVideoPlayer gmMovieScrub;
     
-    vector<fakGrabbedStill> grabbedStill;
+    vector<fakGrabbedMovieStill> grabbedStill;
     
     bool devTurnOffMovieSwitch = FALSE;
     bool isMovieLoaded = FALSE;

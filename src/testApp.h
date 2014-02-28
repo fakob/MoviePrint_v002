@@ -146,7 +146,7 @@ public:
     ofxUICanvas *guiHelp1;
     
     // ofxUICanvas *guiTimeline
-    ofxUIRangeSlider *timeSlider;
+    ofxUIRangeSlider *uiRangeSliderTimeline;
     
     // ofxUICanvas *guiMovieInfo
     ofxUITextArea *gmMIFileName;
@@ -174,20 +174,18 @@ public:
     ofxUILabel *gmMIASamplingRate;
     
     // ofxUICanvas *guiSettings1
-    ofxUIIntSlider *rowSlider;
-    ofxUIIntSlider *columnSlider;
-    ofxUIIntSlider *thumbWidthSlider;
-    ofxUIButton *setInPointButton;
-    ofxUIButton *setOutPointButton;
-    ofxUIRadio *setFrameDisplay;
-    ofxUIRadio *setFitManually;
-    
-    // ofxUICanvas *guiSettingsMoviePrint
-    ofxUIDropDownList *ddl;
-    ofxUIDropDownList *ddl2;
+    ofxUIIntSlider *uiSliderNumberOfThumbs;
     
     // ofxUICanvas *guiSettings1
-    ofxUIIntSlider *numberSlider;
+    ofxUIIntSlider *uiSliderRows;
+    ofxUIIntSlider *uiSliderColumns;
+    ofxUIIntSlider *uiSliderThumbWidth;
+    ofxUIRadio *uiRadioSetFrameDisplay;
+    ofxUIRadio *uiRadioSetFitManually;
+    
+    // ofxUICanvas *guiSettingsMoviePrint
+    ofxUIDropDownList *uiDropDownListPrintOutputFormat;
+    ofxUIDropDownList *uiDropDownlistPrintOutputWidth;
 
     
     // ofxUICanvas *guiHelp1
@@ -202,7 +200,8 @@ public:
     int leftMargin, topMargin, rightMargin, bottomMargin;
     int headerHeight;
     int footerHeight;
-    int gridMargin;
+    int displayGridMargin;
+    int printGridMargin;
     int scrollBarWidth;
     int scrollBarMargin;
     int loaderBarHeight;
@@ -216,8 +215,6 @@ public:
     int gridNumber;
     int numberOfStills;
     int menuWidth;
-    float gridMarginRatio;
-    bool manualGridMargin;
     float scrubWindowW, scrubWindowH;
     
     // Menu
@@ -235,9 +232,12 @@ public:
     ofFbo fboToSave;
     ofFbo fboToPreview;
     ofPixels gmPixToSave;
-    bool hideInPNG;
-    bool saveSingleFrames;
-    bool displayVideoAudioInfo;
+    bool printHideInPrint;
+    bool printSingleFrames;
+    bool printDisplayVideoAudioInfo;
+    int printGridColumns;
+    int printGridRows;
+    int printNumberOfThumbs;
 
     // draw List
     string loadedFile;
@@ -248,7 +248,9 @@ public:
     int itemToPrint;
     
     //Grid Setup
-    bool gridSetManually;
+    bool displayGridSetWithColumnsAndRows;
+    bool printGridSetWithColumnsAndRows;
+    
     
     // scroll Bars
     fakScrollBar scrollBar;

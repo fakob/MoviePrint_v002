@@ -63,13 +63,13 @@ void testApp::setup(){
     bottomMargin = 5;
     headerHeight = 40;
     footerHeight = 40;
-    gridMargin = 5;
-    gridMarginRatio = gridMargin/256.0;
-    manualGridMargin = FALSE;
+    displayGridMargin = 5;
     loaderBarHeight = 20;
     timeSliderHeight = 10;
     gridColumns = 4;
     gridNumber = 4;
+    gridNumber = 20;
+    printNumberOfThumbs = 20;
     menuWidth = 255;
     
     threadIsRunning = FALSE;
@@ -79,7 +79,7 @@ void testApp::setup(){
     showPrintScreen = FALSE;
     finishedPrinting = TRUE;
     printFormat = OF_IMAGE_FORMAT_PNG;
-    saveSingleFrames = false;
+    printSingleFrames = false;
     fboToPreview.allocate(255, 255, GL_RGBA );
     fboToPreview.begin();
 	ofClear(255,255,255, 0);
@@ -100,10 +100,11 @@ void testApp::setup(){
     showFBO = FALSE;
     
     gridRows = 6;
-    gridSetManually = TRUE;
-
-    thumbWidth = 80;
-    thumbHeight = 45;
+    displayGridSetWithColumnsAndRows = false;
+    printGridSetWithColumnsAndRows = true;
+    
+    thumbWidth = 256;
+    thumbHeight = 144;
     scrollBarWidth = 12;
     scrollBarMargin = 2;
     scrollAmountRel = 0;
@@ -201,13 +202,13 @@ void testApp::setGUITimeline(){
 //    guiTimeline->setColorBack(FAK_GRAY);
     
 	guiTimeline->addWidgetDown(new ofxUIRangeSlider("RSLIDER", 0.0, (float)totalFrames, 0.0, 100.0, gridWidth, timeSliderHeight));
-    timeSlider = (ofxUIRangeSlider *) guiTimeline->getWidget("RSLIDER");
-    timeSlider->setLabelPrecision(0);
-    timeSlider->setLabelVisible(FALSE);
-//    timeSlider->setDrawPadding(FALSE);
-//    timeSlider->setDrawPaddingOutline(FALSE);
-//    timeSlider->setDrawOutlineHighLight(FALSE);
-//    timeSlider->setDrawOutline(FALSE);
+    uiRangeSliderTimeline = (ofxUIRangeSlider *) guiTimeline->getWidget("RSLIDER");
+    uiRangeSliderTimeline->setLabelPrecision(0);
+    uiRangeSliderTimeline->setLabelVisible(FALSE);
+//    uiRangeSliderTimeline->setDrawPadding(FALSE);
+//    uiRangeSliderTimeline->setDrawPaddingOutline(FALSE);
+//    uiRangeSliderTimeline->setDrawOutlineHighLight(FALSE);
+//    uiRangeSliderTimeline->setDrawOutline(FALSE);
 //    guiTimeline->setDrawPadding(FALSE);
 //    guiTimeline->setDrawPaddingOutline(FALSE);
 //    guiTimeline->setDrawOutlineHighLight(FALSE);
@@ -222,9 +223,9 @@ void testApp::setGUITimeline(){
 
 
 //    ofColor tempColor (30, 30, 30, 255);
-    timeSlider->setColorBack(FAK_ORANGE3);
+    uiRangeSliderTimeline->setColorBack(FAK_ORANGE3);
 
-    timeSlider->setColorPadded(FAK_ORANGE3);
+    uiRangeSliderTimeline->setColorPadded(FAK_ORANGE3);
 
     ofAddListener(guiTimeline->newGUIEvent, this, &testApp::guiEvent);
     //    guiTimeline->loadSettings("GUI/guiSettings.xml");
@@ -239,9 +240,9 @@ void testApp::setGUISettings(){
 	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
     float length = menuWidth-xInit;
     
-    vector<string> names2;
-	names2.push_back("Set Columns and Rows");
-	names2.push_back("Set Number of Frames");
+//    vector<string> names2;
+//	names2.push_back("Set Columns and Rows");
+//	names2.push_back("Set Number of Frames");
     
     vector<string> names;
 	names.push_back("Frames");
@@ -255,25 +256,25 @@ void testApp::setGUISettings(){
     guiSettings1->addSpacer(length-xInit, 1);
     guiSettings1->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
 
-    guiSettings1->addRadio("Grid-Number", names2, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
-    setFitManually = (ofxUIRadio *) guiSettings1->getWidget("Grid-Number");
-    setFitManually->activateToggle("Set Columns and Rows");
-    
+//    guiSettings1->addRadio("Grid-Number", names2, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
+//    uiRadioSetFitManually = (ofxUIRadio *) guiSettings1->getWidget("Grid-Number");
+//    uiRadioSetFitManually->activateToggle("Set Columns and Rows");
+//    
 	guiSettings1->addIntSlider("Columns", 4, 10, gridColumns, length-xInit,dim);
-	guiSettings1->addIntSlider("Rows", 1, 20, gridRows, length-xInit,dim);
-   	guiSettings1->addIntSlider("Number", 4, 200, gridNumber, length-xInit,dim);
-   	guiSettings1->addIntSlider("ThumbWidth", 0, 18, 1, length-xInit,dim);
-    columnSlider = (ofxUIIntSlider *) guiSettings1->getWidget("Columns");
-    rowSlider = (ofxUIIntSlider *) guiSettings1->getWidget("Rows");
-    numberSlider = (ofxUIIntSlider *) guiSettings1->getWidget("Number");
-    thumbWidthSlider = (ofxUIIntSlider *) guiSettings1->getWidget("ThumbWidth");
-    thumbWidthSlider->setVisible(FALSE);
+//	guiSettings1->addIntSlider("Rows", 1, 20, gridRows, length-xInit,dim);
+//   	guiSettings1->addIntSlider("Number", 4, 200, gridNumber, length-xInit,dim);
+//   	guiSettings1->addIntSlider("ThumbWidth", 0, 18, 1, length-xInit,dim);
+    uiSliderColumns = (ofxUIIntSlider *) guiSettings1->getWidget("Columns");
+//    uiSliderRows = (ofxUIIntSlider *) guiSettings1->getWidget("Rows");
+//    uiSliderNumberOfThumbs = (ofxUIIntSlider *) guiSettings1->getWidget("Number");
+//    uiSliderThumbWidth = (ofxUIIntSlider *) guiSettings1->getWidget("ThumbWidth");
+//    uiSliderThumbWidth->setVisible(FALSE);
 
     guiSettings1->addSpacer(length-xInit, 1);
     guiSettings1->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
-    ofxUIRadio *setFrameDisplay = guiSettings1->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
-//    setFrameDisplay = (ofxUIRadio *) guiSettings1->getWidget("RADIO HORIZONTAL");
-    setFrameDisplay->activateToggle("TimeCode");
+    ofxUIRadio *uiRadioSetFrameDisplay = guiSettings1->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
+//    uiRadioSetFrameDisplay = (ofxUIRadio *) guiSettings1->getWidget("RADIO HORIZONTAL");
+    uiRadioSetFrameDisplay->activateToggle("TimeCode");
     
     guiSettings1->setColorBack(FAK_TRANSPARENT);
 
@@ -287,6 +288,10 @@ void testApp::setGUISettingsMoviePrint(){
 	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
     float length = menuWidth-xInit;
     
+    vector<string> names2;
+	names2.push_back("Set Columns and Rows");
+	names2.push_back("Set Number of Frames");
+    
     vector<string> names;
 	names.push_back("Frames");
 	names.push_back("TimeCode");
@@ -299,43 +304,45 @@ void testApp::setGUISettingsMoviePrint(){
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
     guiSettingsMoviePrint->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
     
-	guiSettingsMoviePrint->addIntSlider("PrintColumns", 4, 10, gridColumns, length-xInit,dim);
-	guiSettingsMoviePrint->addIntSlider("PrintRows", 1, 20, gridRows, length-xInit,dim);
-   	guiSettingsMoviePrint->addIntSlider("PrintThumbWidth", 0, 18, 1, length-xInit,dim);
-   	guiSettingsMoviePrint->addIntSlider("PrintGapSizePercent", 0, 100, 1, length-xInit,dim);
-    guiSettingsMoviePrint->addToggle("DisplayVideoAudioInfo", displayVideoAudioInfo);
-    guiSettingsMoviePrint->addToggle("PrintSaveSingleFrames", saveSingleFrames);
-    guiSettingsMoviePrint->addToggle("PrintSaveSingleFrames", saveSingleFrames);
-//    columnSlider = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("Columns");
-//    rowSlider = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("Rows");
-//    numberSlider = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("Number");
-//    thumbWidthSlider = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("ThumbWidth");
-//    thumbWidthSlider->setVisible(FALSE);
+    guiSettingsMoviePrint->addRadio("Grid-Number", names2, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
+    uiRadioSetFitManually = (ofxUIRadio *) guiSettingsMoviePrint->getWidget("Grid-Number");
+    uiRadioSetFitManually->activateToggle("Set Columns and Rows");
+    
+	guiSettingsMoviePrint->addIntSlider("PrintColumns", 4, 10, printGridColumns, length-xInit,dim);
+	guiSettingsMoviePrint->addIntSlider("PrintRows", 1, 20, printGridRows, length-xInit,dim);
+   	guiSettingsMoviePrint->addIntSlider("PrintNumber", 4, 200, printNumberOfThumbs, length-xInit,dim);
+    uiSliderColumns = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintColumns");
+    uiSliderRows = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintRows");
+    uiSliderNumberOfThumbs = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintNumber");
+
+    guiSettingsMoviePrint->addToggle("DisplayVideoAudioInfo", printDisplayVideoAudioInfo);
+    guiSettingsMoviePrint->addToggle("PrintSaveSingleFrames", printSingleFrames);
+    guiSettingsMoviePrint->addToggle("PrintSaveSingleFrames", printSingleFrames);
     
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
     guiSettingsMoviePrint->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
-    ofxUIRadio *setFrameDisplay = guiSettingsMoviePrint->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
-    setFrameDisplay->activateToggle("TimeCode");
+    ofxUIRadio *uiRadioSetFrameDisplay = guiSettingsMoviePrint->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
+    uiRadioSetFrameDisplay->activateToggle("TimeCode");
     
     
     vector<string> names3;
     names3.push_back("png");
     names3.push_back("jpg");
     names3.push_back("gif");
-    ddl = new ofxUIDropDownList(length-xInit, "Choose Output Format", names3, OFX_UI_FONT_MEDIUM);
-    ddl->setAllowMultiple(FALSE);
-    ddl->setAutoClose(true);
+    uiDropDownListPrintOutputFormat = new ofxUIDropDownList(length-xInit, "Choose Output Format", names3, OFX_UI_FONT_MEDIUM);
+    uiDropDownListPrintOutputFormat->setAllowMultiple(FALSE);
+    uiDropDownListPrintOutputFormat->setAutoClose(true);
     
     vector<string> names4;
     names4.push_back("1024px wide");
     names4.push_back("2048px wide");
     names4.push_back("3072px wide");
     names4.push_back("4096px wide");
-    ddl2 = new ofxUIDropDownList(length-xInit, "MoviePrint Width", names4, OFX_UI_FONT_MEDIUM);
-    ddl2->setAllowMultiple(FALSE);
-    ddl2->setAutoClose(true);
+    uiDropDownlistPrintOutputWidth = new ofxUIDropDownList(length-xInit, "MoviePrint Width", names4, OFX_UI_FONT_MEDIUM);
+    uiDropDownlistPrintOutputWidth->setAllowMultiple(FALSE);
+    uiDropDownlistPrintOutputWidth->setAutoClose(true);
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
-    guiSettingsMoviePrint->addWidgetDown(ddl2);
+    guiSettingsMoviePrint->addWidgetDown(uiDropDownlistPrintOutputWidth);
     guiSettingsMoviePrint->addBaseDraws("IMAGE CAPTION", &fboToPreview, false);
     
     guiSettingsMoviePrint->setColorBack(FAK_TRANSPARENT);
@@ -550,24 +557,20 @@ void testApp::calculateNewGrid(int _windowWidth, int _windowHeight){
     }
     
     thumbHeight = thumbWidth*gridRatio;
-
     
-    if (!manualGridMargin) {
-        gridMargin = thumbWidth * gridMarginRatio;
-    }
     
-    if (gridSetManually) {
+    if (displayGridSetWithColumnsAndRows) {
         numberOfStills = gridColumns*gridRows;
     } else {
-        numberOfStills = gridNumber;
-//        gridColumns = 4;
+        numberOfStills = printNumberOfThumbs;
+        //        gridColumns = 4;
         gridRows = ceil(numberOfStills/(float)gridColumns);
         
     }
     
-    gridWidth = (gridColumns * (thumbWidth + gridMargin) - gridMargin);
-    gridHeight = (gridRows * (thumbHeight + gridMargin)) - gridMargin;
-    ofLog(OF_LOG_VERBOSE, "gridMargin: " + ofToString(gridMargin));
+    gridWidth = (gridColumns * (thumbWidth + displayGridMargin) - displayGridMargin);
+    gridHeight = (gridRows * (thumbHeight + displayGridMargin)) - displayGridMargin;
+    ofLog(OF_LOG_VERBOSE, "displayGridMargin: " + ofToString(displayGridMargin));
     ofLog(OF_LOG_VERBOSE, "gridHeight: " + ofToString(thumbHeight));
     ofLog(OF_LOG_VERBOSE, "gridAreaHeight: " + ofToString(gridHeight));
 
@@ -875,7 +878,7 @@ void testApp::update(){
         if (manipulateSlider) {
             updateScrub = FALSE;
             updateInOut = TRUE;
-            if (timeSlider->hitLow) {
+            if (uiRangeSliderTimeline->hitLow) {
                 scrubWindowGridNumber = 0;
                 if (loadedMovie.gmHasNoFrames) {
                     loadedMovie.gmMovieScrub.setPosition((float)(uiSliderValueLow - 1)/(float)(loadedMovie.gmTotalFrames-1));
@@ -884,7 +887,7 @@ void testApp::update(){
                     loadedMovie.gmMovieScrub.setFrame(uiSliderValueLow);
                 }
                 loadedMovie.grabbedStill[scrubWindowGridNumber].gsFrameNumber = uiSliderValueLow;
-            } else if (timeSlider->hitHigh)
+            } else if (uiRangeSliderTimeline->hitHigh)
             {
                 scrubWindowGridNumber = numberOfStills-1;
                 if (loadedMovie.gmHasNoFrames) {
@@ -894,7 +897,7 @@ void testApp::update(){
                     loadedMovie.gmMovieScrub.setFrame(uiSliderValueHigh);
                 }
                 loadedMovie.grabbedStill[scrubWindowGridNumber].gsFrameNumber = uiSliderValueHigh;
-            } else if (timeSlider->hitCenter)
+            } else if (uiRangeSliderTimeline->hitCenter)
             {
                 scrubWindowGridNumber = numberOfStills/2;
                 if (loadedMovie.gmHasNoFrames) {
@@ -1087,13 +1090,13 @@ void testApp::draw(){
                     
                     ofSetColor(255, 255, 255, (int)(scrubFade/255)*255);
                     
-                    if (timeSlider->hitLow) {
+                    if (uiRangeSliderTimeline->hitLow) {
                         inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-inPointImage.getHeight()/2);
                     }
-                    if (timeSlider->hitHigh) {
+                    if (uiRangeSliderTimeline->hitHigh) {
                         outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-outPointImage.getHeight()/2);
                     }
-                    if (timeSlider->hitCenter) {
+                    if (uiRangeSliderTimeline->hitCenter) {
                         inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-inPointImage.getHeight()/2);
                         outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-outPointImage.getHeight()/2);
                     }
@@ -1271,11 +1274,11 @@ void testApp::keyReleased(int key){
     
     currentKey = -1;
     
-    if (timeSlider->getState()) {
+    if (uiRangeSliderTimeline->getState()) {
         
         if (key == OF_KEY_RIGHT || key == OF_KEY_LEFT || key == OF_KEY_UP || key == OF_KEY_DOWN) {
-            uiSliderValueLow = timeSlider->getScaledValueLow();
-            uiSliderValueHigh = timeSlider->getScaledValueHigh();
+            uiSliderValueLow = uiRangeSliderTimeline->getScaledValueLow();
+            uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
             updateAllStills();
     ofLog(OF_LOG_VERBOSE, "asdfadfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfaf" );
 
@@ -1450,8 +1453,8 @@ void testApp::windowResized(int w, int h){
     guiTimeline->setPosition(ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, h -(footerHeight/2 + timeSliderHeight/2) * menuTimeline.getRelSizeH());
     guiTimeline->setWidth(w);
     guiSettings1->setHeight(h);
-    timeSlider->setWidth(gridWidth);
-    ofLog(OF_LOG_VERBOSE, "Timeslider Width:" + ofToString(timeSlider->getWidth()) );;
+    uiRangeSliderTimeline->setWidth(ofGetWidth() - leftMargin - rightMargin);
+    ofLog(OF_LOG_VERBOSE, "Timeslider Width:" + ofToString(uiRangeSliderTimeline->getWidth()) );;
 
     windowResizedOnce++;
     }
@@ -1533,30 +1536,30 @@ void testApp::guiEvent(ofxUIEventArgs &e){
     }
     else if(name == "RSLIDER")
     {
-        if (timeSlider->hitLow) {
-            if ((timeSlider->getScaledValueHigh()-timeSlider->getScaledValueLow() < numberOfStills)) {
-                timeSlider->setValueLow(timeSlider->getScaledValueHigh()-(numberOfStills-1));
+        if (uiRangeSliderTimeline->hitLow) {
+            if ((uiRangeSliderTimeline->getScaledValueHigh()-uiRangeSliderTimeline->getScaledValueLow() < numberOfStills)) {
+                uiRangeSliderTimeline->setValueLow(uiRangeSliderTimeline->getScaledValueHigh()-(numberOfStills-1));
             }
         }
-        if (timeSlider->hitHigh) {
-            if ((timeSlider->getScaledValueHigh()-timeSlider->getScaledValueLow() < numberOfStills)) {
-                timeSlider->setValueHigh(timeSlider->getScaledValueLow()+(numberOfStills-1));
+        if (uiRangeSliderTimeline->hitHigh) {
+            if ((uiRangeSliderTimeline->getScaledValueHigh()-uiRangeSliderTimeline->getScaledValueLow() < numberOfStills)) {
+                uiRangeSliderTimeline->setValueHigh(uiRangeSliderTimeline->getScaledValueLow()+(numberOfStills-1));
             }
         }
-        if (timeSlider->hitCenter) {
-            if (timeSlider->getScaledValueHigh() >= totalFrames-1) {
-                if ((timeSlider->getScaledValueHigh()-timeSlider->getScaledValueLow() < numberOfStills)) {
-                    timeSlider->setValueLow(timeSlider->getScaledValueHigh()-(numberOfStills-1));
+        if (uiRangeSliderTimeline->hitCenter) {
+            if (uiRangeSliderTimeline->getScaledValueHigh() >= totalFrames-1) {
+                if ((uiRangeSliderTimeline->getScaledValueHigh()-uiRangeSliderTimeline->getScaledValueLow() < numberOfStills)) {
+                    uiRangeSliderTimeline->setValueLow(uiRangeSliderTimeline->getScaledValueHigh()-(numberOfStills-1));
                 }
             }
-            if (timeSlider->getScaledValueLow() == 0) {
-                if ((timeSlider->getScaledValueHigh()-timeSlider->getScaledValueLow() < numberOfStills)) {
-                    timeSlider->setValueHigh(timeSlider->getScaledValueLow()+(numberOfStills-1));
+            if (uiRangeSliderTimeline->getScaledValueLow() == 0) {
+                if ((uiRangeSliderTimeline->getScaledValueHigh()-uiRangeSliderTimeline->getScaledValueLow() < numberOfStills)) {
+                    uiRangeSliderTimeline->setValueHigh(uiRangeSliderTimeline->getScaledValueLow()+(numberOfStills-1));
                 }
             }
         }
-        uiSliderValueLow = timeSlider->getScaledValueLow();
-        uiSliderValueHigh = timeSlider->getScaledValueHigh();
+        uiSliderValueLow = uiRangeSliderTimeline->getScaledValueLow();
+        uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
         manipulateSlider = TRUE;
     }
 	else if(name == "Columns")
@@ -1564,23 +1567,23 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
 		ofLog(OF_LOG_VERBOSE, "Columns " + ofToString(slider->getScaledValue()));
 		gridColumns = (int)slider->getScaledValue();
-        windowResized(ofGetWidth(), ofGetHeight());
+//        windowResized(ofGetWidth(), ofGetHeight());
 	}
-	else if(name == "Rows")
-	{
-		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-		ofLog(OF_LOG_VERBOSE, "Rows " + ofToString(slider->getScaledValue()));
-		gridRows = (int)slider->getScaledValue();
-        windowResized(ofGetWidth(), ofGetHeight());
-	}
-	else if(name == "Number")
-	{
-		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-		ofLog(OF_LOG_VERBOSE, "Number " + ofToString(slider->getScaledValue()));
-//        gridColumns = 4;
-		gridNumber = (int)slider->getScaledValue();
-        windowResized(ofGetWidth(), ofGetHeight());
-	}
+//	else if(name == "Rows")
+//	{
+//		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
+//		ofLog(OF_LOG_VERBOSE, "Rows " + ofToString(slider->getScaledValue()));
+//		gridRows = (int)slider->getScaledValue();
+//        windowResized(ofGetWidth(), ofGetHeight());
+//	}
+//	else if(name == "Number")
+//	{
+//		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
+//		ofLog(OF_LOG_VERBOSE, "Number " + ofToString(slider->getScaledValue()));
+////        gridColumns = 4;
+//		gridNumber = (int)slider->getScaledValue();
+//        windowResized(ofGetWidth(), ofGetHeight());
+//	}
 	else if(name == "ThumbWidth")
 	{
 		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
@@ -1596,12 +1599,32 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         if (isnan(printScale) || printScale > 20.0 || printScale < 1.0) {
             printScale = 1.0;
         }
-        int tempOutputSizeWidth = (gridWidth + gridMargin * 2) * printScale;
-        int tempOutputSizeHeight = (gridHeight + gridMargin * 2) * printScale;
+        int tempOutputSizeWidth = (gridWidth + printGridMargin * 2) * printScale;
+        int tempOutputSizeHeight = (gridHeight + printGridMargin * 2) * printScale;
         
         ofLog(OF_LOG_VERBOSE, "tempOutputSize: " + ofToString(tempOutputSizeWidth) + "x" + ofToString(tempOutputSizeHeight));
-
-
+	}
+    else if(name == "PrintColumns")
+	{
+		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
+		ofLog(OF_LOG_VERBOSE, "Columns " + ofToString(slider->getScaledValue()));
+		printGridColumns = (int)slider->getScaledValue();
+        calculateNewDisplayGrid(ofGetWidth(), ofGetHeight());
+	}
+	else if(name == "PrintRows")
+	{
+		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
+		ofLog(OF_LOG_VERBOSE, "Rows " + ofToString(slider->getScaledValue()));
+		printGridRows = (int)slider->getScaledValue();
+        calculateNewDisplayGrid(ofGetWidth(), ofGetHeight());
+	}
+	else if(name == "PrintNumber")
+	{
+		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
+		ofLog(OF_LOG_VERBOSE, "Number " + ofToString(slider->getScaledValue()));
+        //        gridColumns = 4;
+		printNumberOfThumbs = (int)slider->getScaledValue();
+        calculateNewDisplayGrid(ofGetWidth(), ofGetHeight());
 	}
     else if(name == "TEXT INPUT")
     {
@@ -1628,11 +1651,11 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
         bool val = toggle->getValue();
         if (val) {
-            gridSetManually = TRUE;
-            columnSlider->setVisible(TRUE);
-            rowSlider->setVisible(TRUE);
-            numberSlider->setVisible(FALSE);
             windowResized(ofGetWidth(), ofGetHeight());
+            printGridSetWithColumnsAndRows = TRUE;
+            uiSliderColumns->setVisible(TRUE);
+            uiSliderRows->setVisible(TRUE);
+            uiSliderNumberOfThumbs->setVisible(FALSE);
         }
     }
     else if(name == "Set Number of Frames")
@@ -1640,11 +1663,11 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
         bool val = toggle->getValue();
         if (val) {
-            gridSetManually = FALSE;
-            rowSlider->setVisible(FALSE);
-            columnSlider->setVisible(true);
-            numberSlider->setVisible(true);
             windowResized(ofGetWidth(), ofGetHeight());
+            printGridSetWithColumnsAndRows = FALSE;
+            uiSliderRows->setVisible(FALSE);
+            uiSliderColumns->setVisible(true);
+            uiSliderNumberOfThumbs->setVisible(true);
         }
 	}
     else if(name == "TimeCode")
@@ -1738,14 +1761,13 @@ void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
     
     float tempX = (leftMargin + menuWidth - menuWidth * tweenzorX1) * _scaleFactor;
     float tempY = _scrollAmount * _scaleFactor + topMargin + headerHeight;
-    loadedMovie.drawMoviePrintPreview(tempX, tempY, moviePrintGridColumns, moviePrintGridMargin, _scaleFactor, 1);
-//    void drawMoviePrintPreview(float _x, float _y, int _gridColumns, float _gridMargin, float _scaleFactor, float _alpha){
+    loadedMovie.drawMoviePrintPreview(tempX, tempY, printGridColumns, printGridMargin, _scaleFactor, 1);
 
     
     
 }
 //--------------------------------------------------------------
-void testApp::drawUI(int _scaleFactor, bool _hideInPNG){
+void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     
     layoutHeaderImage.draw(0, 0, ofGetWindowWidth() * _scaleFactor, layoutHeaderImage.getHeight() * _scaleFactor);
 
@@ -1753,28 +1775,28 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPNG){
     int tempXPos = 0;
     int menuHeightInRows = 5;
 
-    menuMovieInfo.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*menuHeightInRows - gridMargin);
+    menuMovieInfo.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMovieInfo.drawMenu();
 
     tempXPos = 1;
-    menuSettings.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*menuHeightInRows - gridMargin);
+    menuSettings.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuSettings.drawMenu();
     
     tempXPos = 2;
-    menuMoviePrintPreview.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuMoviePrintPreview.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*menuHeightInRows - gridMargin);
+    menuMoviePrintPreview.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuMoviePrintPreview.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMoviePrintPreview.drawMenu();
     
     tempXPos = 3;
-    menuMoviePrintSettings.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*menuHeightInRows - gridMargin);
+    menuMoviePrintSettings.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMoviePrintSettings.drawMenu();
     
     tempXPos = 4;
-    menuHelp.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuHelp.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*menuHeightInRows - gridMargin);
+    menuHelp.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuHelp.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuHelp.drawMenu();
 
     menuTimeline.setPosition(0, ofGetWindowHeight());
@@ -1782,16 +1804,7 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPNG){
     menuTimeline.drawMenu();
     
     ofSetColor(255);
-    
-//    if (!_hideInPNG) {
-//        // draw the percentage loaded bar
-//        // the background
-//        ofSetColor(100);
-//        ofRect(ofGetWidth()/2-gridAreaWidth/2, tempX + loaderBarHeight, gridAreaWidth, loaderBarHeight);
-//        // draw the percentage
-//        ofSetColor(238, 71, 0);
-//        ofRect(ofGetWidth()/2-gridAreaWidth/2, tempX + loaderBarHeight, gridAreaWidth*loadValue, loaderBarHeight);
-//    }
+
 }
 
 //--------------------------------------------------------------
@@ -1806,7 +1819,7 @@ void testApp::drawMoviePrint(float _scaleFactor, bool _hideInPNG, bool _isBeingP
     }
     float tempX = (leftMargin + menuWidth - menuWidth * tweenzorX1) * _scaleFactor;
     float tempY = _scrollAmount * _scaleFactor + topMargin + headerHeight;
-    loadedMovie.drawGmMoviePrint(tempX, tempY, gridColumns, gridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
+    loadedMovie.drawGridOfStills(tempX, tempY, gridColumns, displayGridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
 }
 
 //--------------------------------------------------------------
@@ -1875,7 +1888,7 @@ void testApp::drawResizeScreen(){
     for(int i=0; i<(numberOfStills+gridColumns); i++)
     {
         ofSetColor(30,(int)scrubFade);
-        ofRectRounded(((thumbWidth+gridMargin)*(i%gridColumns))+(ofGetWidth()/2 - gridWidth/2), ((thumbHeight+gridMargin)*(i/gridColumns))+(ofGetHeight()/2 - gridHeight/2), thumbWidth, thumbHeight, thumbWidth/64);
+        ofRectRounded(((thumbWidth+displayGridMargin)*(i%gridColumns))+(ofGetWidth()/2 - gridWidth/2), ((thumbHeight+displayGridMargin)*(i/gridColumns))+(ofGetHeight()/2 - gridHeight/2), thumbWidth, thumbHeight, thumbWidth/64);
     }
 
     ofPopStyle();
@@ -1958,9 +1971,9 @@ void testApp::printImageToPNG(int _printSizeWidth){
     ofLog(OF_LOG_VERBOSE, dir.getOriginalDirectory() );
     
     if (loadedMovie.isMovieLoaded) {
-        float _newScaleFactor = (float)_printSizeWidth / (float)(gridWidth + gridMargin * 2);
-        int outputWidth = (gridWidth + gridMargin * 2) * _newScaleFactor;
-        int outputHeight = (gridHeight + gridMargin * 2) * _newScaleFactor;
+        float _newScaleFactor = (float)_printSizeWidth / (float)(gridWidth + printGridMargin * 2);
+        int outputWidth = (gridWidth + printGridMargin * 2) * _newScaleFactor;
+        int outputHeight = (gridHeight + printGridMargin * 2) * _newScaleFactor;
 //        if (outputWidth > 9999.0) {
 //            _scaleFactor = 9950.0 / (gridAreaWidth + gridMargin * 2);
 //            outputWidth = (gridAreaWidth + gridMargin * 2) * _scaleFactor;
@@ -1996,7 +2009,7 @@ void testApp::printImageToPNG(int _printSizeWidth){
         //        ofLog(OF_LOG_VERBOSE, "fboToSave:getDepthBuffer" + ofToString(fboToSave.getDepthBuffer()));
         //        ofLog(OF_LOG_VERBOSE, "fboToSave:getDepthBuffer" + ofToString(fboToSave.);
         //        ofLog(OF_LOG_VERBOSE, "gmPixToSave:getNumChannels" + ofToString(gmPixToSave.getNumChannels()));
-        loadedMovie.drawGmMoviePrint(gridMargin, gridMargin, gridColumns, gridMargin, 0, _newScaleFactor, 1, TRUE, TRUE, superKeyPressed, shiftKeyPressed, showPlaceHolder);
+        loadedMovie.drawGridOfStills(printGridMargin, printGridMargin, printGridColumns, printGridMargin, 0, _newScaleFactor, 1, TRUE, TRUE, superKeyPressed, shiftKeyPressed, showPlaceHolder);
         //        ofRect(100, 100, 300, 100);
         fboToSave.end();
         //        ofLog(OF_LOG_VERBOSE, "gmPixToSave:getImageType" + ofToString(gmPixToSave.getImageType()));
@@ -2170,16 +2183,16 @@ void testApp::rollOverButtonsClicked(int _rollOverMovieID, int _rollOverMovieBut
 //--------------------------------------------------------------
 void testApp::setInPoint(int _inPoint){
     int i = _inPoint;
-    int j = timeSlider->getScaledValueHigh();
-    if ((timeSlider->getScaledValueHigh()-i < numberOfStills)) {
+    int j = uiRangeSliderTimeline->getScaledValueHigh();
+    if ((uiRangeSliderTimeline->getScaledValueHigh()-i < numberOfStills)) {
         j = i + (numberOfStills - 1);
         if (j > (totalFrames-1)) {
             j = (totalFrames-1);
             i = j - (numberOfStills - 1);
         }
     }
-    timeSlider->setValueLow(i);
-    timeSlider->setValueHigh(j);
+    uiRangeSliderTimeline->setValueLow(i);
+    uiRangeSliderTimeline->setValueHigh(j);
     uiSliderValueLow = i;
     uiSliderValueHigh = j;
     updateAllStills();
@@ -2188,9 +2201,9 @@ void testApp::setInPoint(int _inPoint){
 
 //--------------------------------------------------------------
 void testApp::setOutPoint(int _outPoint){
-    int i = timeSlider->getScaledValueLow();
+    int i = uiRangeSliderTimeline->getScaledValueLow();
     int j = _outPoint;
-    if ((j - timeSlider->getScaledValueLow() < numberOfStills)) {
+    if ((j - uiRangeSliderTimeline->getScaledValueLow() < numberOfStills)) {
         i = j - (numberOfStills - 1);
         if (i < 0) {
             i = 0;
@@ -2198,8 +2211,8 @@ void testApp::setOutPoint(int _outPoint){
             
         }
     }
-    timeSlider->setValueLow(i);
-    timeSlider->setValueHigh(j);
+    uiRangeSliderTimeline->setValueLow(i);
+    uiRangeSliderTimeline->setValueHigh(j);
     uiSliderValueLow = i;
     uiSliderValueHigh = j;
     updateAllStills();
@@ -2209,21 +2222,21 @@ void testApp::setOutPoint(int _outPoint){
 //--------------------------------------------------------------
 void testApp::updateTimeSlider(bool _wholeRange) {
     
-    timeSlider->setMax(totalFrames-1);
-    timeSlider->setValueLow(0);
+    uiRangeSliderTimeline->setMax(totalFrames-1);
+    uiRangeSliderTimeline->setValueLow(0);
     
     if (_wholeRange) {
         if (totalFrames > 250) {
-            timeSlider->setValueLow(25);
-            timeSlider->setValueHigh(totalFrames-26);
+            uiRangeSliderTimeline->setValueLow(25);
+            uiRangeSliderTimeline->setValueHigh(totalFrames-26);
         } else {
-            timeSlider->setValueHigh(totalFrames-1);
+            uiRangeSliderTimeline->setValueHigh(totalFrames-1);
         }
     } else {
-        timeSlider->setValueHigh(numberOfStills);
+        uiRangeSliderTimeline->setValueHigh(numberOfStills);
     }
-    uiSliderValueLow = timeSlider->getScaledValueLow();
-    uiSliderValueHigh = timeSlider->getScaledValueHigh();
+    uiSliderValueLow = uiRangeSliderTimeline->getScaledValueLow();
+    uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
 }
 
 //--------------------------------------------------------------

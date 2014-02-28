@@ -309,7 +309,7 @@
 		3AAF4104176239F600F94546 /* fakGrabbedList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fakGrabbedList.h; sourceTree = "<group>"; };
 		3AAF4105176239F600F94546 /* fakGrabbedListItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fakGrabbedListItem.h; sourceTree = "<group>"; };
 		3AAF4106176239F600F94546 /* fakGrabbedMovie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fakGrabbedMovie.h; sourceTree = "<group>"; };
-		3AAF4107176239F600F94546 /* fakGrabbedStill.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fakGrabbedStill.h; sourceTree = "<group>"; };
+		3AAF4107176239F600F94546 /* fakGrabbedMovieStill.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fakGrabbedMovieStill.h; sourceTree = "<group>"; };
 		3AAF4108176239F600F94546 /* fakMemory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fakMemory.h; sourceTree = "<group>"; };
 		3AAF4109176239F600F94546 /* fakScrollBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fakScrollBar.h; sourceTree = "<group>"; };
 		3AAF410B17623AA300F94546 /* MoviePrint_Updating_v001_00000.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = MoviePrint_Updating_v001_00000.png; path = ../../../../../../../07_Compositing/99_Render_Compositing/130529/MoviePrint_Updating_v001_00000.png; sourceTree = "<group>"; };
@@ -1021,7 +1021,7 @@
 				3AAF4105176239F600F94546 /* fakGrabbedListItem.h */,
 				3AAF4106176239F600F94546 /* fakGrabbedMovie.h */,
 				3A8BA6D718B7611A00E8C9C8 /* fakMenu.h */,
-				3AAF4107176239F600F94546 /* fakGrabbedStill.h */,
+				3AAF4107176239F600F94546 /* fakGrabbedMovieStill.h */,
 				3AAF4108176239F600F94546 /* fakMemory.h */,
 				3AAF4109176239F600F94546 /* fakScrollBar.h */,
 			);

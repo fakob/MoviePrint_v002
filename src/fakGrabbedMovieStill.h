@@ -1,19 +1,19 @@
 //
-//  fakGrabbedStill.h
+//  fakGrabbedMovieStill.h
 //  fakBreakupVideo
 //
 //  Created by Jakob on 3/2/13.
 //
 //
 
-#ifndef fakBreakupVideo_fakGrabbedStill_h
-#define fakBreakupVideo_fakGrabbedStill_h
+#ifndef fakBreakupVideo_fakGrabbedMovieStill_h
+#define fakBreakupVideo_fakGrabbedMovieStill_h
 
-class fakGrabbedStill {
+class fakGrabbedMovieStill {
     
 public:
     
-    fakGrabbedStill(){}
+    fakGrabbedMovieStill(){}
     
     
     // Functions
