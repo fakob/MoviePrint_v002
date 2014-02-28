@@ -77,7 +77,7 @@ public:
         if (sbActive) {
             registerMouseEvents();
         }
-        ofLog(OF_LOG_VERBOSE, "sbActive:" + ofToString(sbActive) );
+//        ofLog(OF_LOG_VERBOSE, "sbActive:" + ofToString(sbActive) );
     }
     
     void setScrollBarWidth(int _scrollBarWidth){
@@ -202,7 +202,7 @@ public:
             
             
             if (sbScrollBarDrag) {
-                ofLog(OF_LOG_VERBOSE, "_____________barUpdate " + ofToString(sbMousePos.y) );
+//                ofLog(OF_LOG_VERBOSE, "_____________barUpdate " + ofToString(sbMousePos.y) );
                 if (sbRollOverScrollBar) {
                     if (!sbFirstClick) {
                         sbFirstClickMouseY = sbMousePos.y - sbScrollBarY;
@@ -220,18 +220,18 @@ public:
                 }
                 
             } else if (sbCalculateScrollInertia){
-                ofLog(OF_LOG_VERBOSE, "_____________scrollUpdate " + ofToString(sbMouseScrollVelocity.y) );
+//                ofLog(OF_LOG_VERBOSE, "_____________scrollUpdate " + ofToString(sbMouseScrollVelocity.y) );
                 
                 if ((sbScrollBarY > sbScrollBarYMax)) {
                     
                     if ( sbMouseScrollVelocity.y <= 0 ) { // Return to bottom position
                         sbMouseScrollVelocity.y = sbReturnToBaseConstant * abs(sbScrollBarY - sbScrollBarYMax) *-1;
-                        ofLog(OF_LOG_VERBOSE, "Return " + ofToString(sbScrollBarY,2));
+//                        ofLog(OF_LOG_VERBOSE, "Return " + ofToString(sbScrollBarY,2));
                     } else { // Slow down
                         float change = sbBounceDecelerationConstant * getTimeRampDown();
                         sbMouseScrollVelocity.y -= change;
                         sbMouseScrollVelocity.y = fmin(sbMouseScrollVelocity.y, sbMaxVelocity);
-                        ofLog(OF_LOG_VERBOSE, "Slow down " + ofToString(sbScrollBarY,2));
+//                        ofLog(OF_LOG_VERBOSE, "Slow down " + ofToString(sbScrollBarY,2));
                     }
                     
                     sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y * getTimeRampDown();

@@ -41,6 +41,7 @@ public:
     
     void updateAllStills();
     void calculateNewGrid(int _windowWidth, int _windowHeight);
+    void updateDisplayGrid();
     bool fequal(float _x, float _y, float _t);
     void drawUI(int _scaleFactor, bool _hideInPNG);
     void drawMoviePrint(float _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _drawPlaceHolder);

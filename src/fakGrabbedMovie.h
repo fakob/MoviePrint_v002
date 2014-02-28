@@ -143,7 +143,7 @@ public:
             }
             
         }
-        createGrid(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder);
+        allocateNewNumberOfStills(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder);
         
         updatingStill.resize(gmThumbWidth, gmThumbHeight);
         
@@ -253,7 +253,7 @@ public:
 
     }
     
-    void createGrid(int _numberOfStills, int _gmThumbWidth, int _gmThumbHeight, bool _drawPlaceHolder){
+    void allocateNewNumberOfStills(int _numberOfStills, int _gmThumbWidth, int _gmThumbHeight, bool _drawPlaceHolder){
         if (isMovieLoaded) {
             
             gmThumbWidth = _gmThumbWidth;
@@ -261,7 +261,7 @@ public:
             
             stop(TRUE);
             while (isThreadRunning()) {
-                ofLog(OF_LOG_VERBOSE, "createGrid is waiting for thread to stop");
+                ofLog(OF_LOG_VERBOSE, "allocateNewNumberOfStills is waiting for thread to stop");
             }
             
 //          unregister All Mouse Events of the Stills (old gmNumberOfStills)

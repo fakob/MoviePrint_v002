@@ -67,8 +67,9 @@ void testApp::setup(){
     loaderBarHeight = 20;
     timeSliderHeight = 10;
     gridColumns = 4;
-    gridNumber = 4;
-    gridNumber = 20;
+    gridRows = 5;
+    printGridColumns = 4;
+    printGridRows = 5;
     printNumberOfThumbs = 20;
     menuWidth = 255;
     
@@ -139,7 +140,7 @@ void testApp::setup(){
     calculateNewGrid(ofGetWidth(), ofGetHeight());
     loadedMovie.setup(loadedFile, numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
     totalFrames = 100;
-    loadedMovie.createGrid(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
+    loadedMovie.allocateNewNumberOfStills(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
 
     updateInOut = FALSE;
     manipulateSlider = FALSE;
@@ -560,19 +561,13 @@ void testApp::calculateNewGrid(int _windowWidth, int _windowHeight){
     
     
     if (displayGridSetWithColumnsAndRows) {
-        numberOfStills = gridColumns*gridRows;
+        numberOfStills = printGridColumns*printGridRows;
     } else {
         numberOfStills = printNumberOfThumbs;
         //        gridColumns = 4;
-        gridRows = ceil(numberOfStills/(float)gridColumns);
+        printGridRows = ceil(numberOfStills/(float)printGridColumns);
         
     }
-    
-    gridWidth = (gridColumns * (thumbWidth + displayGridMargin) - displayGridMargin);
-    gridHeight = (gridRows * (thumbHeight + displayGridMargin)) - displayGridMargin;
-    ofLog(OF_LOG_VERBOSE, "displayGridMargin: " + ofToString(displayGridMargin));
-    ofLog(OF_LOG_VERBOSE, "gridHeight: " + ofToString(thumbHeight));
-    ofLog(OF_LOG_VERBOSE, "gridAreaHeight: " + ofToString(gridHeight));
 
     if (!(gridTimeArray == 0)){
         delete[] gridTimeArray;
@@ -589,16 +584,32 @@ void testApp::calculateNewGrid(int _windowWidth, int _windowHeight){
     loadedMovie.gmThumbWidth = thumbWidth;
     loadedMovie.gmThumbHeight = thumbHeight;
     
-    scrollBar.updateScrollBar(_windowWidth, _windowHeight, headerHeight + topMargin, footerHeight/2 + bottomMargin, gridHeight);
-    scrollBar.setToTop();
-    scrollAmountRel = scrollBar.getRelativePos();
+    
+    updateDisplayGrid();
     
     ofxNotify() << "New Grid is Calculated - Total Number of Stills: " + ofToString(numberOfStills);
 
-    
-    ofLog(OF_LOG_VERBOSE, "gridWidth: " + ofToString(thumbWidth));
-    ofLog(OF_LOG_VERBOSE, "gridHeight: " + ofToString(thumbHeight));
+}
 
+//--------------------------------------------------------------
+void testApp::updateDisplayGrid(){
+    
+    gridWidth = (gridColumns * (thumbWidth + displayGridMargin) - displayGridMargin);
+    gridRows = ceil(numberOfStills/(float)gridColumns);
+    gridHeight = (gridRows * (thumbHeight + displayGridMargin)) - displayGridMargin;
+    ofLog(OF_LOG_VERBOSE, "displayGridMargin: " + ofToString(displayGridMargin));
+    ofLog(OF_LOG_VERBOSE, "gridHeight: " + ofToString(thumbHeight));
+    ofLog(OF_LOG_VERBOSE, "gridAreaHeight: " + ofToString(gridHeight));
+    
+    scrollBar.updateScrollBar(ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, gridHeight);
+    scrollBar.setToTop();
+    scrollAmountRel = scrollBar.getRelativePos();
+    
+    ofxNotify() << "updateDisplayGrid - Total Number of Stills: " + ofToString(numberOfStills);
+    
+    ofLog(OF_LOG_VERBOSE, "gridWidth: " + ofToString(gridWidth));
+    ofLog(OF_LOG_VERBOSE, "gridHeight: " + ofToString(gridHeight));
+    
 }
 
 //--------------------------------------------------------------
@@ -917,7 +928,7 @@ void testApp::update(){
         Tweener.addTween(scrubFade, 0, 0.5);
         if(scrubFade < 5){
             updateWindowResized = FALSE;
-            loadedMovie.createGrid(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
+            loadedMovie.allocateNewNumberOfStills(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
             updateAllStills();
             devTurnOffMovieSwitch = FALSE;
         }
@@ -961,13 +972,13 @@ void testApp::update(){
     if (scrollBar.sbActive) {
 //        ofLog(OF_LOG_VERBOSE, "scrollBar Active:" + ofToString(scrollAmountRel) );
         if (scrollGrid) {
-            ofLog(OF_LOG_VERBOSE, "scrollGrid True:" + ofToString(scrollAmountRel) );
+//            ofLog(OF_LOG_VERBOSE, "scrollGrid True:" + ofToString(scrollAmountRel) );
             if (!scrollBar.sbCalculateScrollInertia && !scrollBar.sbScrollBarDrag) {
                 scrollGrid = false;
             } else {
             scrollBar.update();
             scrollAmountRel = scrollBar.getRelativePos();
-            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
+//            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollAmountRel) );
             }
         }
     } else {
@@ -1567,6 +1578,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
 		ofLog(OF_LOG_VERBOSE, "Columns " + ofToString(slider->getScaledValue()));
 		gridColumns = (int)slider->getScaledValue();
+        updateDisplayGrid();
 //        windowResized(ofGetWidth(), ofGetHeight());
 	}
 //	else if(name == "Rows")
@@ -1607,24 +1619,28 @@ void testApp::guiEvent(ofxUIEventArgs &e){
     else if(name == "PrintColumns")
 	{
 		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-		ofLog(OF_LOG_VERBOSE, "Columns " + ofToString(slider->getScaledValue()));
+		ofLog(OF_LOG_VERBOSE, "PrintColumns " + ofToString(slider->getScaledValue()));
 		printGridColumns = (int)slider->getScaledValue();
-        calculateNewGrid(ofGetWidth(), ofGetHeight());
+        if (printGridSetWithColumnsAndRows) {
+            printNumberOfThumbs = printGridColumns * printGridRows;
+            windowResized(ofGetWidth(), ofGetHeight());
+        }
 	}
 	else if(name == "PrintRows")
 	{
 		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-		ofLog(OF_LOG_VERBOSE, "Rows " + ofToString(slider->getScaledValue()));
+		ofLog(OF_LOG_VERBOSE, "PrintRows " + ofToString(slider->getScaledValue()));
 		printGridRows = (int)slider->getScaledValue();
-        calculateNewGrid(ofGetWidth(), ofGetHeight());
+		printNumberOfThumbs = printGridColumns * printGridRows;
+        windowResized(ofGetWidth(), ofGetHeight());
 	}
 	else if(name == "PrintNumber")
 	{
 		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-		ofLog(OF_LOG_VERBOSE, "Number " + ofToString(slider->getScaledValue()));
+		ofLog(OF_LOG_VERBOSE, "PrintNumber " + ofToString(slider->getScaledValue()));
         //        gridColumns = 4;
 		printNumberOfThumbs = (int)slider->getScaledValue();
-        calculateNewGrid(ofGetWidth(), ofGetHeight());
+        windowResized(ofGetWidth(), ofGetHeight());
 	}
     else if(name == "TEXT INPUT")
     {
