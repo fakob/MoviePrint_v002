@@ -789,6 +789,7 @@ void testApp::update(){
         }
     }
     
+    // calculate rollout of ofxUI pos, scal
     guiMovieInfo->setPosition(menuMovieInfo.getPositionX(), menuMovieInfo.getPositionY()+headerHeight);
     guiMovieInfo->setWidth(menuMovieInfo.getSizeW());
     guiMovieInfo->setHeight(menuMovieInfo.getSizeH()-headerHeight);
@@ -801,8 +802,8 @@ void testApp::update(){
     guiMoviePrintSettings1->setWidth(menuMoviePrintSettings.getSizeW());
     guiMoviePrintSettings1->setHeight(menuMoviePrintSettings.getSizeH()-headerHeight);
     
-    
     guiTimeline->setPosition((ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING) + menuWidth - menuWidth * tweenzorX1, ofGetHeight() - footerHeight/2 +1 - (footerHeight/4) * menuTimeline.getRelSizeH());
+    
     
     if (loadedMovie.isMovieLoaded) { // if no movie is loaded or we are in dev mode then only draw rects
         
@@ -1730,29 +1731,30 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPNG){
 
     float tempY = 0;
     int tempXPos = 0;
+    int menuHeightInRows = 5;
 
     menuMovieInfo.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*5);
+    menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*menuHeightInRows - gridMargin);
     menuMovieInfo.drawMenu();
 
     tempXPos = 1;
     menuSettings.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*5);
+    menuSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*menuHeightInRows - gridMargin);
     menuSettings.drawMenu();
     
     tempXPos = 2;
     menuMoviePrintPreview.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuMoviePrintPreview.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*5);
+    menuMoviePrintPreview.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*menuHeightInRows - gridMargin);
     menuMoviePrintPreview.drawMenu();
     
     tempXPos = 3;
     menuMoviePrintSettings.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*5);
+    menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*menuHeightInRows - gridMargin);
     menuMoviePrintSettings.drawMenu();
     
     tempXPos = 4;
     menuHelp.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + gridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuHelp.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*5);
+    menuHelp.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + gridMargin)*menuHeightInRows - gridMargin);
     menuHelp.drawMenu();
 
     menuTimeline.setPosition(0, ofGetWindowHeight());
