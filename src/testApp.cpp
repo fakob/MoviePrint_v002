@@ -27,12 +27,12 @@
 void testApp::setup(){
 
     ofSetLogLevel(OF_LOG_VERBOSE);
-    drawNotify = FALSE;
+    drawNotify = true;
     
     setResourcePath();
     
     setupFinished = FALSE;
-    updateWindowResized = FALSE;
+    updateNewPrintGrid = FALSE;
     devTurnOffMovieSwitch = TRUE;
     showDroppedList = FALSE;
     updateMovieFromList = FALSE;
@@ -66,8 +66,8 @@ void testApp::setup(){
     displayGridMargin = 5;
     loaderBarHeight = 20;
     timeSliderHeight = 10;
-    gridColumns = 4;
-    gridRows = 5;
+    gridColumns = 5;
+    gridRows = 4;
     printGridColumns = 4;
     printGridRows = 5;
     printNumberOfThumbs = 20;
@@ -137,7 +137,7 @@ void testApp::setup(){
     loadedMovie.gmLowerLimitY = ofGetHeight() - footerHeight;
     loadedMovie.gmLeftLimitX = menuWidth;
     loadedMovie.gmRightLimitX = ofGetWidth() - rightMargin;
-    calculateNewGrid(ofGetWidth(), ofGetHeight());
+    calculateNewPrintGrid();
     loadedMovie.setup(loadedFile, numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
     totalFrames = 100;
     loadedMovie.allocateNewNumberOfStills(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
@@ -261,11 +261,11 @@ void testApp::setGUISettings(){
 //    uiRadioSetFitManually = (ofxUIRadio *) guiSettings1->getWidget("Grid-Number");
 //    uiRadioSetFitManually->activateToggle("Set Columns and Rows");
 //    
-	guiSettings1->addIntSlider("Columns", 4, 10, gridColumns, length-xInit,dim);
+//	guiSettings1->addIntSlider("Columns", 4, 10, gridColumns, length-xInit,dim);
 //	guiSettings1->addIntSlider("Rows", 1, 20, gridRows, length-xInit,dim);
 //   	guiSettings1->addIntSlider("Number", 4, 200, gridNumber, length-xInit,dim);
 //   	guiSettings1->addIntSlider("ThumbWidth", 0, 18, 1, length-xInit,dim);
-    uiSliderColumns = (ofxUIIntSlider *) guiSettings1->getWidget("Columns");
+//    uiSliderColumns = (ofxUIIntSlider *) guiSettings1->getWidget("Columns");
 //    uiSliderRows = (ofxUIIntSlider *) guiSettings1->getWidget("Rows");
 //    uiSliderNumberOfThumbs = (ofxUIIntSlider *) guiSettings1->getWidget("Number");
 //    uiSliderThumbWidth = (ofxUIIntSlider *) guiSettings1->getWidget("ThumbWidth");
@@ -539,7 +539,7 @@ void testApp::setGUIHelp1(){
 }
 
 //--------------------------------------------------------------
-void testApp::calculateNewGrid(int _windowWidth, int _windowHeight){
+void testApp::calculateNewPrintGrid(){
 
     
     float gridRatio;
@@ -564,7 +564,6 @@ void testApp::calculateNewGrid(int _windowWidth, int _windowHeight){
         numberOfStills = printGridColumns*printGridRows;
     } else {
         numberOfStills = printNumberOfThumbs;
-        //        gridColumns = 4;
         printGridRows = ceil(numberOfStills/(float)printGridColumns);
         
     }
@@ -584,6 +583,7 @@ void testApp::calculateNewGrid(int _windowWidth, int _windowHeight){
     loadedMovie.gmThumbWidth = thumbWidth;
     loadedMovie.gmThumbHeight = thumbHeight;
     
+    updateNewPrintGrid = true;
     
     updateDisplayGrid();
     
@@ -594,6 +594,8 @@ void testApp::calculateNewGrid(int _windowWidth, int _windowHeight){
 //--------------------------------------------------------------
 void testApp::updateDisplayGrid(){
     
+    gridColumns = (ofGetWindowWidth() - leftMargin - scrollBarWidth + displayGridMargin) / (thumbWidth + displayGridMargin);
+    
     gridWidth = (gridColumns * (thumbWidth + displayGridMargin) - displayGridMargin);
     gridRows = ceil(numberOfStills/(float)gridColumns);
     gridHeight = (gridRows * (thumbHeight + displayGridMargin)) - displayGridMargin;
@@ -601,7 +603,10 @@ void testApp::updateDisplayGrid(){
     ofLog(OF_LOG_VERBOSE, "gridHeight: " + ofToString(thumbHeight));
     ofLog(OF_LOG_VERBOSE, "gridAreaHeight: " + ofToString(gridHeight));
     
+    updateAllLimits();
     updateTheScrollBar();
+    updateTheListScrollBar();
+    updateTimeline();
     
     ofxNotify() << "updateDisplayGrid - Total Number of Stills: " + ofToString(numberOfStills);
     
@@ -622,7 +627,7 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
 
     ofxNotify() << "Movie has started to load";
     loadedMovie.loadNewMovieToBeGrabbed(_newMoviePath, numberOfStills, showPlaceHolder);
-    windowResized(ofGetWidth(), ofGetHeight());
+    calculateNewPrintGrid();
     if (loadedMovie.gmTotalFrames <=1) {
         movieProperlyLoaded = FALSE;
         ofxNotify() << "Movie could not be properly loaded";
@@ -780,7 +785,7 @@ void testApp::update(){
     loadValue = ofMap(loadedMovie.percLoaded(), 0, 1.0, 0.0, 1.0, true);
     
     // update Tweener
-    if (!updateInOut || !updateScrub || !updateWindowResized) {
+    if (!updateInOut || !updateScrub || !updateNewPrintGrid) {
         Tweener.update();
     }
     
@@ -810,7 +815,6 @@ void testApp::update(){
     guiSettings1->setHeight(menuSettings.getSizeH()-headerHeight);
     
     fboToPreview.begin();
-//    startImage.draw(0, 0, 255,255);
     ofClear(255,255,255, 0);
     drawMoviePrintPreview(0.1, false);
     fboToPreview.end();
@@ -818,8 +822,7 @@ void testApp::update(){
     guiSettingsMoviePrint->setWidth(menuMoviePrintSettings.getSizeW());
     guiSettingsMoviePrint->setHeight(menuMoviePrintSettings.getSizeH()-headerHeight);
     
-    guiTimeline->setPosition((ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING) + menuWidth - menuWidth * tweenzorX1, ofGetHeight() - footerHeight/2 +1 - (footerHeight/4) * menuTimeline.getRelSizeH());
-    
+    guiTimeline->setPosition(leftMargin - OFX_UI_GLOBAL_WIDGET_SPACING, ofGetWindowHeight() - footerHeight/2 +1 - (footerHeight/4) * menuTimeline.getRelSizeH());
     
     if (loadedMovie.isMovieLoaded) { // if no movie is loaded or we are in dev mode then only draw rects
         
@@ -918,12 +921,12 @@ void testApp::update(){
         }
     }
     
-    if (updateWindowResized == TRUE && !currPrintingList) {
+    if (updateNewPrintGrid == TRUE && !currPrintingList) {
         updateInOut = FALSE;
         updateScrub = FALSE;
         Tweener.addTween(scrubFade, 0, 0.5);
         if(scrubFade < 5){
-            updateWindowResized = FALSE;
+            updateNewPrintGrid = FALSE;
             loadedMovie.allocateNewNumberOfStills(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
             updateAllStills();
             devTurnOffMovieSwitch = FALSE;
@@ -1430,34 +1433,30 @@ void testApp::mouseScrolled(double x, double y){
 //--------------------------------------------------------------
 void testApp::windowResized(int w, int h){
     if (!currPrintingList) {
-        if (windowResizedOnce != 0) {
-            
-            Tweener.removeTween(scrubFade);
-            scrubFade = 255;
-            devTurnOffMovieSwitch = TRUE;
-            updateWindowResized = TRUE;
-            calculateNewGrid(w, h);
-            loadedMovie.setAllLimitsUpper(headerHeight);
-            droppedList.setAllLimitsUpper(headerHeight);
-            if (showMenu){
-                loadedMovie.setAllLimitsLeft(menuWidth);
-                droppedList.setAllLimitsLeft(menuWidth);
-            } else {
-                loadedMovie.setAllLimitsLeft(leftMargin);
-                droppedList.setAllLimitsLeft(leftMargin);
-            }
-            loadedMovie.setAllLimitsLower(ofGetHeight());
-            droppedList.setAllLimitsLower(ofGetHeight());
-            loadedMovie.setAllLimitsRight(ofGetWidth() - scrollBarWidth);
-            droppedList.setAllLimitsRight(ofGetWidth() - scrollBarWidth);
-        }
+//        if (windowResizedOnce != 0) {
+//            
+//            Tweener.removeTween(scrubFade);
+//            scrubFade = 255;
+//            devTurnOffMovieSwitch = TRUE;
+//            updateWindowResized = TRUE;
+//
+//        }
         
-        updateTheScrollBar();
-        updateTheListScrollBar();
-        updateTimeline();
-        
+        updateDisplayGrid();
         windowResizedOnce++;
     }
+}
+
+//--------------------------------------------------------------
+void testApp::updateAllLimits(){
+    loadedMovie.setAllLimitsUpper(headerHeight);
+    droppedList.setAllLimitsUpper(headerHeight);
+    loadedMovie.setAllLimitsLeft(leftMargin);
+    droppedList.setAllLimitsLeft(leftMargin);
+    loadedMovie.setAllLimitsLower(ofGetHeight());
+    droppedList.setAllLimitsLower(ofGetHeight());
+    loadedMovie.setAllLimitsRight(ofGetWidth() - scrollBarWidth);
+    droppedList.setAllLimitsRight(ofGetWidth() - scrollBarWidth);
 }
 
 //--------------------------------------------------------------
@@ -1476,11 +1475,13 @@ void testApp::updateTheScrollBar(){
 
 //--------------------------------------------------------------
 void testApp::updateTimeline(){
-    guiTimeline->setPosition(ofGetWindowWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, ofGetWindowHeight() -(footerHeight/2 + timeSliderHeight/2) * menuTimeline.getRelSizeH());
-    guiTimeline->setWidth(ofGetWindowWidth());
-    guiSettings1->setHeight(ofGetWindowHeight());
-    uiRangeSliderTimeline->setWidth(gridWidth);
-    ofLog(OF_LOG_VERBOSE, "Timeslider Width:" + ofToString(uiRangeSliderTimeline->getWidth()));
+    if (loadedMovie.isMovieLoaded) {
+        guiTimeline->setPosition(leftMargin - OFX_UI_GLOBAL_WIDGET_SPACING, ofGetWindowHeight()  - footerHeight/2 +1 - (footerHeight/4) * menuTimeline.getRelSizeH());
+        guiTimeline->setWidth(ofGetWindowWidth());
+        guiSettings1->setHeight(ofGetWindowHeight());
+        uiRangeSliderTimeline->setWidth(gridWidth);
+        ofLog(OF_LOG_VERBOSE, "Timeslider Width:" + ofToString(uiRangeSliderTimeline->getWidth()));
+    }
 }
 
 //--------------------------------------------------------------
@@ -1611,7 +1612,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
 		ofLog(OF_LOG_VERBOSE, "ThumbWidth " + ofToString(slider->getScaledValue()));
 		thumbWidth = possStillResWidth169[(int)slider->getScaledValue()];
-        windowResized(ofGetWidth(), ofGetHeight());
+        calculateNewPrintGrid();
 	}
 	else if(name == "PrintScale")
 	{
@@ -1633,7 +1634,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		printGridColumns = (int)slider->getScaledValue();
         if (printGridSetWithColumnsAndRows) {
             printNumberOfThumbs = printGridColumns * printGridRows;
-            windowResized(ofGetWidth(), ofGetHeight());
+            calculateNewPrintGrid();
         }
 	}
 	else if(name == "PrintRows")
@@ -1642,7 +1643,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofLog(OF_LOG_VERBOSE, "PrintRows " + ofToString(slider->getScaledValue()));
 		printGridRows = (int)slider->getScaledValue();
 		printNumberOfThumbs = printGridColumns * printGridRows;
-        windowResized(ofGetWidth(), ofGetHeight());
+        calculateNewPrintGrid();
 	}
 	else if(name == "PrintNumber")
 	{
@@ -1650,7 +1651,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofLog(OF_LOG_VERBOSE, "PrintNumber " + ofToString(slider->getScaledValue()));
         //        gridColumns = 4;
 		printNumberOfThumbs = (int)slider->getScaledValue();
-        windowResized(ofGetWidth(), ofGetHeight());
+        calculateNewPrintGrid();
 	}
     else if(name == "TEXT INPUT")
     {
@@ -1677,7 +1678,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
         bool val = toggle->getValue();
         if (val) {
-            windowResized(ofGetWidth(), ofGetHeight());
+            calculateNewPrintGrid();
             printGridSetWithColumnsAndRows = TRUE;
             uiSliderColumns->setVisible(TRUE);
             uiSliderRows->setVisible(TRUE);
@@ -1689,7 +1690,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
         bool val = toggle->getValue();
         if (val) {
-            windowResized(ofGetWidth(), ofGetHeight());
+            calculateNewPrintGrid();
             printGridSetWithColumnsAndRows = FALSE;
             uiSliderRows->setVisible(FALSE);
             uiSliderColumns->setVisible(true);
@@ -2093,7 +2094,7 @@ void testApp::printListToPNG(){
     if (!droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint && !movieIsBeingGrabbed && currPrintingList) {
         ofLog(OF_LOG_VERBOSE, "printImageToPNG: " + ofToString(itemToPrint) );
         if (loadedMovie.isMovieLoaded){
-            calculateNewGrid(ofGetWidth(), ofGetHeight());
+            calculateNewPrintGrid();
             printImageToPNG(printSizeWidth);
             droppedList.glDroppedItem[itemToPrint].itemProperties.ipPrinted = TRUE;
         }

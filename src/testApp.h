@@ -40,7 +40,7 @@ public:
     void guiEvent(ofxUIEventArgs &e);
     
     void updateAllStills();
-    void calculateNewGrid(int _windowWidth, int _windowHeight);
+    void calculateNewPrintGrid();
     void updateDisplayGrid();
     bool fequal(float _x, float _y, float _t);
     void drawUI(int _scaleFactor, bool _hideInPNG);
@@ -65,6 +65,7 @@ public:
     void updateTimeline();
     void updateTheScrollBar();
     void updateTheListScrollBar();
+    void updateAllLimits();
 
     void updateTimeSlider(bool _wholeRange);
     void drawPrintScreen();
@@ -123,7 +124,7 @@ public:
     bool updateScrub; // scrubbing plus fading
     bool updateDropped;
     bool showDroppedList;
-    bool updateWindowResized;
+    bool updateNewPrintGrid;
     bool updateMovieFromList;
     
     bool scrollGrid;
