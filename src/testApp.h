@@ -62,6 +62,9 @@ public:
     void setGUISettingsMoviePrint();
     void setGUIHelp1();
     void resetItemsToPrint();
+    void updateTimeline();
+    void updateTheScrollBar();
+    void updateTheListScrollBar();
 
     void updateTimeSlider(bool _wholeRange);
     void drawPrintScreen();

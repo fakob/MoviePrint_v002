@@ -601,9 +601,7 @@ void testApp::updateDisplayGrid(){
     ofLog(OF_LOG_VERBOSE, "gridHeight: " + ofToString(thumbHeight));
     ofLog(OF_LOG_VERBOSE, "gridAreaHeight: " + ofToString(gridHeight));
     
-    scrollBar.updateScrollBar(ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, gridHeight);
-    scrollBar.setToTop();
-    scrollAmountRel = scrollBar.getRelativePos();
+    updateTheScrollBar();
     
     ofxNotify() << "updateDisplayGrid - Total Number of Stills: " + ofToString(numberOfStills);
     
@@ -657,9 +655,7 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
         ofxNotify() << "Movie could not be loaded";
         ofxNotify() << "Movie could not be loaded";
     }
-    scrollBar.updateScrollBar(ofGetWidth(), ofGetHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, gridHeight);
-    scrollBar.setToTop();
-    scrollAmountRel = scrollBar.getRelativePos();
+    updateTheScrollBar();
     
     ofLog(OF_LOG_VERBOSE, "scrollAmountRel: " + ofToString(scrollAmountRel));
     
@@ -1435,7 +1431,7 @@ void testApp::mouseScrolled(double x, double y){
 void testApp::windowResized(int w, int h){
     if (!currPrintingList) {
         if (windowResizedOnce != 0) {
-
+            
             Tweener.removeTween(scrubFade);
             scrubFade = 255;
             devTurnOffMovieSwitch = TRUE;
@@ -1455,20 +1451,36 @@ void testApp::windowResized(int w, int h){
             loadedMovie.setAllLimitsRight(ofGetWidth() - scrollBarWidth);
             droppedList.setAllLimitsRight(ofGetWidth() - scrollBarWidth);
         }
-//    if (showDroppedList) {
-        scrollBarList.updateScrollBar(w, h, headerHeight, 0, droppedList.getListHeight());
-        scrollBarList.setToTop();
-        scrollListAmountRel = scrollBarList.getRelativePos();
-//    }
-    
-    guiTimeline->setPosition(ofGetWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, h -(footerHeight/2 + timeSliderHeight/2) * menuTimeline.getRelSizeH());
-    guiTimeline->setWidth(w);
-    guiSettings1->setHeight(h);
-    uiRangeSliderTimeline->setWidth(gridWidth);
-    ofLog(OF_LOG_VERBOSE, "Timeslider Width:" + ofToString(uiRangeSliderTimeline->getWidth()) );;
-
-    windowResizedOnce++;
+        
+        updateTheScrollBar();
+        updateTheListScrollBar();
+        updateTimeline();
+        
+        windowResizedOnce++;
     }
+}
+
+//--------------------------------------------------------------
+void testApp::updateTheListScrollBar(){
+    scrollBarList.updateScrollBar(ofGetWindowWidth(), ofGetWindowHeight(), headerHeight, 0, droppedList.getListHeight());
+    scrollBarList.setToTop();
+    scrollListAmountRel = scrollBarList.getRelativePos();
+}
+
+//--------------------------------------------------------------
+void testApp::updateTheScrollBar(){
+    scrollBar.updateScrollBar(ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, gridHeight);
+    scrollBar.setToTop();
+    scrollAmountRel = scrollBar.getRelativePos();
+}
+
+//--------------------------------------------------------------
+void testApp::updateTimeline(){
+    guiTimeline->setPosition(ofGetWindowWidth()/2-gridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, ofGetWindowHeight() -(footerHeight/2 + timeSliderHeight/2) * menuTimeline.getRelSizeH());
+    guiTimeline->setWidth(ofGetWindowWidth());
+    guiSettings1->setHeight(ofGetWindowHeight());
+    uiRangeSliderTimeline->setWidth(gridWidth);
+    ofLog(OF_LOG_VERBOSE, "Timeslider Width:" + ofToString(uiRangeSliderTimeline->getWidth()));
 }
 
 //--------------------------------------------------------------
@@ -1497,9 +1509,7 @@ void testApp::dragEvent(ofDragInfo dragInfo){
             }
             
             droppedList.setup(droppedFiles);
-            scrollBarList.updateScrollBar(ofGetWidth(), ofGetHeight(), headerHeight, 0, droppedList.getListHeight());
-            scrollBarList.setToTop();
-            scrollListAmountRel = scrollBarList.getRelativePos();
+            updateTheListScrollBar();
 
             if(droppedFiles.size() > 1){
                 moveToList();
