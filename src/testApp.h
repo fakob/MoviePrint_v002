@@ -44,7 +44,7 @@ public:
     void updateDisplayGrid();
     bool fequal(float _x, float _y, float _t);
     void drawUI(int _scaleFactor, bool _hideInPNG);
-    void drawMoviePrint(float _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _drawPlaceHolder);
+    void drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _drawPlaceHolder);
     void drawMoviePrintPreview(float _scaleFactor, bool _drawPlaceHolder);
     void drawList(float _scrollAmountRel);
     void printImageToPNG(int _printSizeWidth);
@@ -179,18 +179,18 @@ public:
     ofxUILabel *gmMIASamplingRate;
     
     // ofxUICanvas *guiSettings1
-    ofxUIIntSlider *uiSliderNumberOfThumbs;
-    
-    // ofxUICanvas *guiSettings1
-    ofxUIIntSlider *uiSliderRows;
-    ofxUIIntSlider *uiSliderColumns;
-    ofxUIIntSlider *uiSliderThumbWidth;
-    ofxUIRadio *uiRadioSetFrameDisplay;
-    ofxUIRadio *uiRadioSetFitManually;
     
     // ofxUICanvas *guiSettingsMoviePrint
+    ofxUIIntSlider *uiSliderPrintRows;
+    ofxUIIntSlider *uiSliderPrintColumns;
+//    ofxUIIntSlider *uiSliderThumbWidth;
+    ofxUIIntSlider *uiSliderPrintMargin;
+    ofxUIRadio *uiRadioSetFrameDisplay;
+    ofxUIRadio *uiRadioSetFitManually;
+    ofxUIIntSlider *uiSliderNumberOfThumbs;
     ofxUIDropDownList *uiDropDownListPrintOutputFormat;
     ofxUIDropDownList *uiDropDownlistPrintOutputWidth;
+    
 
     
     // ofxUICanvas *guiHelp1
@@ -236,7 +236,6 @@ public:
     ofImageFormat printFormat;
     ofFbo fboToSave;
     ofFbo fboToPreview;
-    ofPixels gmPixToSave;
     bool printHideInPrint;
     bool printSingleFrames;
     bool printDisplayVideoAudioInfo;

@@ -312,9 +312,11 @@ void testApp::setGUISettingsMoviePrint(){
 	guiSettingsMoviePrint->addIntSlider("PrintColumns", 4, 10, printGridColumns, length-xInit,dim);
 	guiSettingsMoviePrint->addIntSlider("PrintRows", 1, 20, printGridRows, length-xInit,dim);
    	guiSettingsMoviePrint->addIntSlider("PrintNumber", 4, 200, printNumberOfThumbs, length-xInit,dim);
-    uiSliderColumns = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintColumns");
-    uiSliderRows = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintRows");
+   	guiSettingsMoviePrint->addIntSlider("PrintMargin", 0, 100, printGridMargin, length-xInit,dim);
+    uiSliderPrintColumns = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintColumns");
+    uiSliderPrintRows = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintRows");
     uiSliderNumberOfThumbs = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintNumber");
+    uiSliderPrintMargin = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintMargin");
 
     guiSettingsMoviePrint->addToggle("DisplayVideoAudioInfo", printDisplayVideoAudioInfo);
     guiSettingsMoviePrint->addToggle("PrintSaveSingleFrames", printSingleFrames);
@@ -325,14 +327,15 @@ void testApp::setGUISettingsMoviePrint(){
     ofxUIRadio *uiRadioSetFrameDisplay = guiSettingsMoviePrint->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
     uiRadioSetFrameDisplay->activateToggle("TimeCode");
     
-    
-    vector<string> names3;
+        vector<string> names3;
     names3.push_back("png");
     names3.push_back("jpg");
-    names3.push_back("gif");
+//    names3.push_back("gif");
     uiDropDownListPrintOutputFormat = new ofxUIDropDownList(length-xInit, "Choose Output Format", names3, OFX_UI_FONT_MEDIUM);
     uiDropDownListPrintOutputFormat->setAllowMultiple(FALSE);
     uiDropDownListPrintOutputFormat->setAutoClose(true);
+    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
+    guiSettingsMoviePrint->addWidgetDown(uiDropDownListPrintOutputFormat);
     
     vector<string> names4;
     names4.push_back("1024px wide");
@@ -344,6 +347,7 @@ void testApp::setGUISettingsMoviePrint(){
     uiDropDownlistPrintOutputWidth->setAutoClose(true);
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
     guiSettingsMoviePrint->addWidgetDown(uiDropDownlistPrintOutputWidth);
+    
     guiSettingsMoviePrint->addBaseDraws("IMAGE CAPTION", &fboToPreview, false);
     
     guiSettingsMoviePrint->setColorBack(FAK_TRANSPARENT);
@@ -1051,7 +1055,7 @@ void testApp::draw(){
         ofSetColor(FAK_LIGHTGRAY);
         ofRect(0, 0, ofGetWidth(), ofGetHeight());
         ofPopStyle();
-        drawMoviePrint(1, FALSE, FALSE, scrollAmountRel, showPlaceHolder);
+        drawDisplayGrid(1, FALSE, FALSE, scrollAmountRel, showPlaceHolder);
         scrollBar.draw();
         drawUI(1, false);
     
@@ -1083,7 +1087,7 @@ void testApp::draw(){
                 ofPopStyle();
                 
                 // draw all frames
-                drawMoviePrint(1, FALSE, FALSE, scrollAmountRel, showPlaceHolder);
+                drawDisplayGrid(1, FALSE, FALSE, scrollAmountRel, showPlaceHolder);
                 
                 // draw the In and Out Point Manipulations
                 if (updateInOut) {
@@ -1649,7 +1653,6 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 	{
 		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
 		ofLog(OF_LOG_VERBOSE, "PrintNumber " + ofToString(slider->getScaledValue()));
-        //        gridColumns = 4;
 		printNumberOfThumbs = (int)slider->getScaledValue();
         calculateNewPrintGrid();
 	}
@@ -1680,8 +1683,8 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         if (val) {
             calculateNewPrintGrid();
             printGridSetWithColumnsAndRows = TRUE;
-            uiSliderColumns->setVisible(TRUE);
-            uiSliderRows->setVisible(TRUE);
+            uiSliderPrintColumns->setVisible(TRUE);
+            uiSliderPrintRows->setVisible(TRUE);
             uiSliderNumberOfThumbs->setVisible(FALSE);
         }
     }
@@ -1692,10 +1695,16 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         if (val) {
             calculateNewPrintGrid();
             printGridSetWithColumnsAndRows = FALSE;
-            uiSliderRows->setVisible(FALSE);
-            uiSliderColumns->setVisible(true);
+            uiSliderPrintRows->setVisible(FALSE);
+            uiSliderPrintColumns->setVisible(true);
             uiSliderNumberOfThumbs->setVisible(true);
         }
+	}
+    else if(name == "PrintMargin")
+	{
+		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
+		ofLog(OF_LOG_VERBOSE, "PrintMargin " + ofToString(slider->getScaledValue()));
+		printGridMargin = (int)slider->getScaledValue();
 	}
     else if(name == "TimeCode")
 	{
@@ -1786,7 +1795,7 @@ void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
     int moviePrintGridColumns = 4;
     float moviePrintGridMargin = 10;
     
-    float tempX = (leftMargin + menuWidth - menuWidth * tweenzorX1) * _scaleFactor;
+    float tempX = leftMargin * _scaleFactor;
     float tempY = _scrollAmount * _scaleFactor + topMargin + headerHeight;
     loadedMovie.drawMoviePrintPreview(tempX, tempY, printGridColumns, printGridMargin, _scaleFactor, 1);
 
@@ -1835,7 +1844,7 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
 }
 
 //--------------------------------------------------------------
-void testApp::drawMoviePrint(float _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _showPlaceHolder){
+void testApp::drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _showPlaceHolder){
     
     float _scrollAmount = 0;
     if (scrollBar.sbActive) {
@@ -1997,6 +2006,8 @@ void testApp::printImageToPNG(int _printSizeWidth){
     //now you can be sure that path exists
     ofLog(OF_LOG_VERBOSE, dir.getOriginalDirectory() );
     
+    ofPixels gmPixToSave;
+    
     if (loadedMovie.isMovieLoaded) {
         float _newScaleFactor = (float)_printSizeWidth / (float)(gridWidth + printGridMargin * 2);
         int outputWidth = (gridWidth + printGridMargin * 2) * _newScaleFactor;
@@ -2006,58 +2017,29 @@ void testApp::printImageToPNG(int _printSizeWidth){
 //            outputWidth = (gridAreaWidth + gridMargin * 2) * _scaleFactor;
 //            outputHeight = (gridAreaHeight + gridMargin * 2) * _scaleFactor;
 //        }
-
-        printFormat = OF_IMAGE_FORMAT_PNG; // jpeg not yet working
-        
+//        printFormat = OF_IMAGE_FORMAT_JPEG;
         if (printFormat == OF_IMAGE_FORMAT_JPEG) {
             fboToSave.allocate(outputWidth, outputHeight, GL_RGB);
             gmPixToSave.allocate(outputWidth, outputHeight, OF_IMAGE_FORMAT_JPEG);
-            //            gmPixToSave.allocate(outputWidth, outputHeight, OF_PIXELS_RGB);
         }
         else {
             fboToSave.allocate(outputWidth, outputHeight, GL_RGBA);
-            //        gmPixToSave.allocate(outputWidth,outputHeight,OF_IMAGE_COLOR);
-            //            gmPixToSave.allocate(outputWidth, outputHeight, OF_IMAGE_FORMAT_PNG);
             gmPixToSave.allocate(outputWidth, outputHeight, OF_PIXELS_RGB);
         }
-        //        gmPixToSave.allocate(outputWidth,outputHeight,OF_IMAGE_COLOR);
-        //        ofPixelFormat test;
-        //        ofImageFormat tests;
+
         ofPushMatrix();
         ofPushStyle();
         fboToSave.begin();
-        //        gmPixToSave.clear();
-        //        ofDisableAlphaBlending();
-        //        ofClear(0,0,0,0); //add this
+        ofClear(0,0,0,0);
         ofBackground(0, 0, 0, 0);
         ofSetColor(255, 255, 255, 255);
-        //        drawUI(scaleFactor, TRUE);
-        //        drawMoviePrint(scaleFactor, TRUE, TRUE, 0);
-        //        ofLog(OF_LOG_VERBOSE, "fboToSave:getDepthBuffer" + ofToString(fboToSave.getDepthBuffer()));
-        //        ofLog(OF_LOG_VERBOSE, "fboToSave:getDepthBuffer" + ofToString(fboToSave.);
-        //        ofLog(OF_LOG_VERBOSE, "gmPixToSave:getNumChannels" + ofToString(gmPixToSave.getNumChannels()));
         loadedMovie.drawGridOfStills(printGridMargin, printGridMargin, printGridColumns, printGridMargin, 0, _newScaleFactor, 1, TRUE, TRUE, superKeyPressed, shiftKeyPressed, showPlaceHolder);
-        //        ofRect(100, 100, 300, 100);
         fboToSave.end();
-        //        ofLog(OF_LOG_VERBOSE, "gmPixToSave:getImageType" + ofToString(gmPixToSave.getImageType()));
         fboToSave.readToPixels(gmPixToSave);
-        
-        // put some stuff in the pixels
-        //        int i = 0;
-        //        while( i < 300) {
-        ////            while( i < gmPixToSave.size()) {
-        //            char c = gmPixToSave[i];
-        ////            ofLog(OF_LOG_VERBOSE, "gmPixToSave out:" + c );
-        //            ofLog(OF_LOG_VERBOSE, "gmPixToSave out:" + ofToString(c));
-        //            i++;
-        //        }
-        
-        ofLog(OF_LOG_VERBOSE, "gmPixToSave:getImageType" + ofToString(gmPixToSave.getImageType()));
+                ofLog(OF_LOG_VERBOSE, "gmPixToSave:getImageType" + ofToString(gmPixToSave.getImageType()));
         ofPopStyle();
         ofPopMatrix();
-        //        ofImage testImage;
-        //        testImage.grabScreen(0, 0, 200, 200);
-        //        ofLoadImage(gmPixToSave, testImage);
+
         string pathName = loadedMovie.gmMovie.getMoviePath();
         pathName = loadedFilePath.getFileName(pathName, TRUE);
         string formatExtension;
@@ -2068,8 +2050,7 @@ void testApp::printImageToPNG(int _printSizeWidth){
         }
         string imageName = pathName + "_MoviePrint." + formatExtension;
         imageName = newPrintPath + "/" + imageName;
-        //        gmPixToSave.setChannel(4, gmPixToSave);
-        ofSaveImage(gmPixToSave, imageName, OF_IMAGE_QUALITY_MEDIUM);
+        ofSaveImage(gmPixToSave, imageName, OF_IMAGE_QUALITY_HIGH);
         ofLog(OF_LOG_VERBOSE, "Finished saving" + ofToString(imageName) );
     }
     
