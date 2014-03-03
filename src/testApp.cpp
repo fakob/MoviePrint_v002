@@ -345,7 +345,7 @@ void testApp::setGUISettingsMoviePrint(){
     uiDropDownlistPrintOutputWidth = new ofxUIDropDownList(length-xInit, "MoviePrint Width", names4, OFX_UI_FONT_MEDIUM);
     uiDropDownlistPrintOutputWidth->setAllowMultiple(FALSE);
     uiDropDownlistPrintOutputWidth->setAutoClose(true);
-    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
+    guiSettingsMoviePrint->addSpacer(length-xInit, 50);
     guiSettingsMoviePrint->addWidgetDown(uiDropDownlistPrintOutputWidth);
     
     guiSettingsMoviePrint->addBaseDraws("IMAGE CAPTION", &fboToPreview, false);
@@ -1044,10 +1044,6 @@ void testApp::draw(){
     if(showLoadMovieScreen){
         
         drawLoadMovieScreen();
-        
-    } else if(showFBO){ // test
-        
-        fboToSave.draw(100, 100);
         
     } else if(showPlaceHolder){ // test
         
@@ -1995,6 +1991,7 @@ void testApp::printImageToPNG(int _printSizeWidth){
     ofLog(OF_LOG_VERBOSE, dir.getOriginalDirectory() );
     
     ofPixels gmPixToSave;
+    ofFbo fboToSave;
     
     if (loadedMovie.isMovieLoaded) {
         float _newScaleFactor = (float)_printSizeWidth / (float)(gridWidth + printGridMargin * 2);
@@ -2005,10 +2002,10 @@ void testApp::printImageToPNG(int _printSizeWidth){
 //            outputWidth = (gridAreaWidth + gridMargin * 2) * _scaleFactor;
 //            outputHeight = (gridAreaHeight + gridMargin * 2) * _scaleFactor;
 //        }
-//        printFormat = OF_IMAGE_FORMAT_JPEG;
+        
         if (printFormat == OF_IMAGE_FORMAT_JPEG) {
             fboToSave.allocate(outputWidth, outputHeight, GL_RGB);
-            gmPixToSave.allocate(outputWidth, outputHeight, OF_IMAGE_FORMAT_JPEG);
+            gmPixToSave.allocate(outputWidth, outputHeight, OF_PIXELS_RGB);
         }
         else {
             fboToSave.allocate(outputWidth, outputHeight, GL_RGBA);

@@ -234,7 +234,6 @@ public:
     float printScale;
     int printSizeWidth;
     ofImageFormat printFormat;
-    ofFbo fboToSave;
     ofFbo fboToPreview;
     bool printHideInPrint;
     bool printSingleFrames;
