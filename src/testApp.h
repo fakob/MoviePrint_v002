@@ -41,6 +41,7 @@ public:
     
     void updateAllStills();
     void calculateNewPrintGrid();
+    void calculateNewPrintSize();
     void updateDisplayGrid();
     bool fequal(float _x, float _y, float _t);
     void drawUI(int _scaleFactor, bool _hideInPNG);
@@ -67,6 +68,7 @@ public:
     void updateTheScrollBar();
     void updateTheListScrollBar();
     void updateAllLimits();
+    void writeFboToPreview(float _scaleFactor, bool _drawPlaceholder);
 
     void updateTimeSlider(bool _wholeRange);
     void drawPrintScreen();
@@ -78,6 +80,7 @@ public:
     void setInPoint(int _inPoint);
     void setOutPoint(int _outPoint);
     bool checkExtension(string _tempExtension);
+    bool writeMoviePrint;
   
     string wrapString(string _tempString, int _tempWidth, int _tempHeight);
     string StringToUpper(string strToConvert);

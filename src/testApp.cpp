@@ -81,10 +81,7 @@ void testApp::setup(){
     finishedPrinting = TRUE;
     printFormat = OF_IMAGE_FORMAT_PNG;
     printSingleFrames = false;
-    fboToPreview.allocate(255, 255, GL_RGBA );
-    fboToPreview.begin();
-	ofClear(255,255,255, 0);
-    fboToPreview.end();
+    writeMoviePrint = false;
     
     showLoadMovieScreen = FALSE;
     finishedLoadingMovie = TRUE;
@@ -111,7 +108,13 @@ void testApp::setup(){
     scrollBarMargin = 2;
     scrollAmountRel = 0;
     scrollListAmountRel = 0;
-        
+
+    
+    fboToPreview.allocate(thumbWidth*2+displayGridMargin-OFX_UI_GLOBAL_WIDGET_SPACING*2, 660 - headerHeight - footerHeight*2, GL_RGBA );
+    fboToPreview.begin();
+	ofClear(255,255,255, 0);
+    fboToPreview.end();
+    
     counterToUpdate = 0;
     counterToLoad = 0;
     counterToPrint = 0;
@@ -365,7 +368,7 @@ void testApp::setGUIMoviePrintPreview(){
     guiMoviePrintPreview = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
     guiMoviePrintPreview->setFont("Ubuntu-Light.ttf");
     
-    guiMoviePrintPreview->addLabel("MOVIEPRINT PREVIEW", OFX_UI_FONT_LARGE);
+//    guiMoviePrintPreview->addButton("WriteMoviePrint", writeMoviePrint);
     guiMoviePrintPreview->addBaseDraws("IMAGE CAPTION", &fboToPreview, false);
     
     guiMoviePrintPreview->setColorBack(FAK_ORANGE3);
@@ -560,6 +563,12 @@ void testApp::setGUIHelp1(){
 }
 
 //--------------------------------------------------------------
+void testApp::calculateNewPrintSize(){
+    printGridWidth = (thumbWidth + printGridMargin) * printGridColumns - printGridMargin;
+    printGridHeight = (thumbHeight + printGridMargin) * printGridRows - printGridMargin;
+}
+
+//--------------------------------------------------------------
 void testApp::calculateNewPrintGrid(){
 
     
@@ -604,8 +613,7 @@ void testApp::calculateNewPrintGrid(){
     loadedMovie.gmThumbWidth = thumbWidth;
     loadedMovie.gmThumbHeight = thumbHeight;
     
-    printGridWidth = (thumbWidth + printGridMargin) * printGridColumns - printGridMargin;
-    printGridHeight = (thumbHeight + printGridMargin) * printGridRows - printGridMargin;
+    calculateNewPrintSize();
     
     updateNewPrintGrid = true;
     
@@ -840,6 +848,10 @@ void testApp::update(){
         }
     }
     
+    if (menuMoviePrintPreview.getMenuActivated()){
+        writeFboToPreview(fmin(fboToPreview.getWidth()/(float)printGridWidth, fboToPreview.getHeight()/(float)printGridHeight), false);
+    }
+    
     // calculate rollout of ofxUI pos, scal
     guiMovieInfo->setPosition(menuMovieInfo.getPositionX(), menuMovieInfo.getPositionY()+headerHeight);
     guiMovieInfo->setWidth(menuMovieInfo.getSizeW());
@@ -848,11 +860,6 @@ void testApp::update(){
     guiSettings1->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY()+headerHeight);
     guiSettings1->setWidth(menuSettings.getSizeW());
     guiSettings1->setHeight(menuSettings.getSizeH()-headerHeight);
-    
-    fboToPreview.begin();
-    ofClear(255,255,255, 0);
-    drawMoviePrintPreview(0.1, false);
-    fboToPreview.end();
     
     guiMoviePrintPreview->setPosition(menuMoviePrintPreview.getPositionX()-(thumbWidth + displayGridMargin)*1, menuMoviePrintPreview.getPositionY()+headerHeight);
     guiMoviePrintPreview->setWidth(menuMoviePrintPreview.getSizeW() + (thumbWidth + displayGridMargin)*1);
@@ -1203,6 +1210,13 @@ void testApp::draw(){
 }
 
 
+//--------------------------------------------------------------
+void testApp::writeFboToPreview(float _scaleFactor, bool _drawPlaceholder){
+    fboToPreview.begin();
+    ofClear(255,120,255, 120);
+    drawMoviePrintPreview(_scaleFactor, _drawPlaceholder);
+    fboToPreview.end();
+}
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
@@ -1736,6 +1750,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
 		ofLog(OF_LOG_VERBOSE, "PrintMargin " + ofToString(slider->getScaledValue()));
 		printGridMargin = (int)slider->getScaledValue();
+        calculateNewPrintSize();
 	}
     else if(name == "TimeCode")
 	{
@@ -1822,13 +1837,10 @@ void testApp::scrollEvent(ofVec2f & e){
 void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
     
     float _scrollAmount = 0;
-    bool _isBeingPrinted = true;
-    int moviePrintGridColumns = 4;
-    float moviePrintGridMargin = 10;
     
-    float tempX = leftMargin * _scaleFactor;
-    float tempY = _scrollAmount * _scaleFactor + topMargin + headerHeight;
-    loadedMovie.drawMoviePrintPreview(tempX, tempY, printGridColumns, printGridMargin, _scaleFactor, 1);
+    float tempX = leftMargin;
+    float tempY = topMargin + headerHeight;
+    loadedMovie.drawMoviePrintPreview(tempX, tempY, printGridColumns, printGridMargin, _scaleFactor, 1, _showPlaceHolder);
 
     
     

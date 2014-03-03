@@ -1017,11 +1017,10 @@ public:
         
     }
     
-    void drawMoviePrintPreview(float _x, float _y, int _gridColumns, float _gridMargin, float _scaleFactor, float _alpha){
+    void drawMoviePrintPreview(float _x, float _y, int _gridColumns, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder){
        
         bool _superKeyPressed = false;
         bool _shiftKeyPressed = false;
-        bool _drawPlaceHolder = false;
         bool _isBeingPrinted = true;
         
         // draw all frames
