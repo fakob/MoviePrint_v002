@@ -241,6 +241,7 @@ public:
     int printGridColumns;
     int printGridRows;
     int printNumberOfThumbs;
+    bool showMoviePrintPreview;
 
     // draw List
     string loadedFile;

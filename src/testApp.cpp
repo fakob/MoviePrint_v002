@@ -103,6 +103,7 @@ void testApp::setup(){
     gridRows = 6;
     displayGridSetWithColumnsAndRows = false;
     printGridSetWithColumnsAndRows = true;
+    showMoviePrintPreview = false;
     
     thumbWidth = 256;
     thumbHeight = 144;
@@ -318,8 +319,8 @@ void testApp::setGUISettingsMoviePrint(){
     uiSliderNumberOfThumbs = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintNumber");
     uiSliderPrintMargin = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintMargin");
 
+    guiSettingsMoviePrint->addToggle("ShowMoviePrintPreview", &showMoviePrintPreview);
     guiSettingsMoviePrint->addToggle("DisplayVideoAudioInfo", printDisplayVideoAudioInfo);
-    guiSettingsMoviePrint->addToggle("PrintSaveSingleFrames", printSingleFrames);
     guiSettingsMoviePrint->addToggle("PrintSaveSingleFrames", printSingleFrames);
     
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
@@ -800,8 +801,19 @@ void testApp::update(){
     
     // check if one of the topMenus is active and in this case turn of the mouseEvents for the thumbs
     if (menuMovieInfo.getMenuActivated() || menuSettings.getMenuActivated() || menuMoviePrintPreview.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated()) {
+        
         if (loadedMovie.getMouseEventsEnabled()) {
             loadedMovie.disableMouseEvents();
+        }
+        
+        // Preview gets closed when menuMoviePrintSettings is not active
+        if (menuMoviePrintPreview.getMenuActivated() && !menuMoviePrintSettings.getMenuActivated() && !menuMoviePrintPreview.getInsideMenuHead()) {
+            menuMoviePrintPreview.closeMenuManually();
+        }
+        
+        // Preview gets opened when menuMoviePrintSettings is active and showMoviePrintPreview is true
+        if (menuMoviePrintSettings.getMenuActivated() && showMoviePrintPreview && !menuMoviePrintPreview.getMenuActivated()){
+            menuMoviePrintPreview.openMenuManually();
         }
     } else {
         if (!loadedMovie.getMouseEventsEnabled()) {
@@ -925,7 +937,7 @@ void testApp::update(){
         }
     }
     
-    if (updateNewPrintGrid == TRUE && !currPrintingList) {
+    if (updateNewPrintGrid == TRUE && !currPrintingList && !ofGetMousePressed()) {
         updateInOut = FALSE;
         updateScrub = FALSE;
         Tweener.addTween(scrubFade, 0, 0.5);
@@ -1636,6 +1648,17 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofLog(OF_LOG_VERBOSE, "PrintNumber " + ofToString(slider->getScaledValue()));
 		printNumberOfThumbs = (int)slider->getScaledValue();
         calculateNewPrintGrid();
+	}
+    else if(name == "ShowMoviePrintPreview")
+	{
+        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+        bool val = toggle->getValue();
+        if (val) {
+            menuMoviePrintPreview.openMenuManually();
+        } else {
+            menuMoviePrintPreview.closeMenuManually();
+        }
+        
 	}
     else if(name == "TEXT INPUT")
     {

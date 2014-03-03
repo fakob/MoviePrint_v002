@@ -117,6 +117,16 @@ public:
         return _x >= minX && _x < maxX && _y >= minY && _y < maxY;
     }
     
+    void openMenuManually(){
+        mIsOpenManually = true;
+        tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,500,0);
+    }
+    
+    void closeMenuManually(){
+        mIsOpenManually = false;
+        tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,500,0);
+    }
+    
     void mouseMoved(ofMouseEventArgs & args){
         if (mMenuActive) {
             if (mInsideMenuHead) {
@@ -188,6 +198,10 @@ public:
     }
     
     bool getMenuActivated(){
+        return mInsideMenuHead || mIsOpenManually;
+    }
+
+    bool getInsideMenuHead(){
         return mInsideMenuHead;
     }
     
@@ -216,6 +230,7 @@ public:
     bool mInsideMenuHead;
     bool mMenuActive;
     bool mTopMenu;
+    bool mIsOpenManually;
     
     float mMenuX;
     float mMenuY;
