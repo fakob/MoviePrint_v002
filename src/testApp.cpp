@@ -309,10 +309,10 @@ void testApp::setGUISettingsMoviePrint(){
     uiRadioSetFitManually = (ofxUIRadio *) guiSettingsMoviePrint->getWidget("Grid-Number");
     uiRadioSetFitManually->activateToggle("Set Columns and Rows");
     
-	guiSettingsMoviePrint->addIntSlider("PrintColumns", 4, 10, printGridColumns, length-xInit,dim);
-	guiSettingsMoviePrint->addIntSlider("PrintRows", 1, 20, printGridRows, length-xInit,dim);
-   	guiSettingsMoviePrint->addIntSlider("PrintNumber", 4, 200, printNumberOfThumbs, length-xInit,dim);
-   	guiSettingsMoviePrint->addIntSlider("PrintMargin", 0, 100, printGridMargin, length-xInit,dim);
+	guiSettingsMoviePrint->addIntSlider("PrintColumns", 4, 10, &printGridColumns, length-xInit,dim);
+	guiSettingsMoviePrint->addIntSlider("PrintRows", 1, 20, &printGridRows, length-xInit,dim);
+   	guiSettingsMoviePrint->addIntSlider("PrintNumber", 4, 200, &printNumberOfThumbs, length-xInit,dim);
+   	guiSettingsMoviePrint->addIntSlider("PrintMargin", 0, 100, &printGridMargin, length-xInit,dim);
     uiSliderPrintColumns = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintColumns");
     uiSliderPrintRows = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintRows");
     uiSliderNumberOfThumbs = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintNumber");
@@ -1594,23 +1594,8 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofLog(OF_LOG_VERBOSE, "Columns " + ofToString(slider->getScaledValue()));
 		gridColumns = (int)slider->getScaledValue();
         updateDisplayGrid();
-//        windowResized(ofGetWidth(), ofGetHeight());
 	}
-//	else if(name == "Rows")
-//	{
-//		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-//		ofLog(OF_LOG_VERBOSE, "Rows " + ofToString(slider->getScaledValue()));
-//		gridRows = (int)slider->getScaledValue();
-//        windowResized(ofGetWidth(), ofGetHeight());
-//	}
-//	else if(name == "Number")
-//	{
-//		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-//		ofLog(OF_LOG_VERBOSE, "Number " + ofToString(slider->getScaledValue()));
-////        gridColumns = 4;
-//		gridNumber = (int)slider->getScaledValue();
-//        windowResized(ofGetWidth(), ofGetHeight());
-//	}
+
 	else if(name == "ThumbWidth")
 	{
 		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
@@ -1681,7 +1666,10 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
         bool val = toggle->getValue();
         if (val) {
-            calculateNewPrintGrid();
+            if (!(printNumberOfThumbs == (printGridColumns * printGridRows))){
+                printNumberOfThumbs = printGridColumns * printGridRows;
+                calculateNewPrintGrid();
+            }
             printGridSetWithColumnsAndRows = TRUE;
             uiSliderPrintColumns->setVisible(TRUE);
             uiSliderPrintRows->setVisible(TRUE);
@@ -1693,7 +1681,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
         bool val = toggle->getValue();
         if (val) {
-            calculateNewPrintGrid();
+//            calculateNewPrintGrid(); // not necessary as the number is the same
             printGridSetWithColumnsAndRows = FALSE;
             uiSliderPrintRows->setVisible(FALSE);
             uiSliderPrintColumns->setVisible(true);
