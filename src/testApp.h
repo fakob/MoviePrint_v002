@@ -217,8 +217,10 @@ public:
     int gridRows;
     int thumbWidth;
     int thumbHeight;
-    int gridWidth;
-    int gridHeight;
+    int displayGridWidth;
+    int displayGridHeight;
+    int printGridWidth;
+    int printGridHeight;
     int gridNumber;
     int numberOfStills;
     int menuWidth;
