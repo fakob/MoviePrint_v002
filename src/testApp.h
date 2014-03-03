@@ -59,6 +59,7 @@ public:
     void setGUITimeline();
     void setGUIMovieInfo();
     void setGUISettings();
+    void setGUIMoviePrintPreview();
     void setGUISettingsMoviePrint();
     void setGUIHelp1();
     void resetItemsToPrint();
@@ -147,6 +148,7 @@ public:
     ofxUICanvas *guiTimeline;
     ofxUICanvas *guiMovieInfo;
     ofxUICanvas *guiSettings1;
+    ofxUICanvas *guiMoviePrintPreview;
     ofxUICanvas *guiSettingsMoviePrint;
     ofxUICanvas *guiHelp1;
     

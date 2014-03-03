@@ -163,6 +163,7 @@ void testApp::setup(){
     setGUITimeline();
     setGUIMovieInfo();
     setGUISettings();
+    setGUIMoviePrintPreview();
     guiSettings1->loadSettings("guiSettings1.xml");
     setGUISettingsMoviePrint();
     guiSettingsMoviePrint->loadSettings("guiMoviePrintSettings.xml");
@@ -279,7 +280,6 @@ void testApp::setGUISettings(){
     uiRadioSetFrameDisplay->activateToggle("TimeCode");
     
     guiSettings1->setColorBack(FAK_TRANSPARENT);
-
 	ofAddListener(guiSettings1->newGUIEvent,this,&testApp::guiEvent);
 }
 
@@ -352,10 +352,26 @@ void testApp::setGUISettingsMoviePrint(){
     guiSettingsMoviePrint->addBaseDraws("IMAGE CAPTION", &fboToPreview, false);
     
     guiSettingsMoviePrint->setColorBack(FAK_TRANSPARENT);
-    
 	ofAddListener(guiSettingsMoviePrint->newGUIEvent,this,&testApp::guiEvent);
 }
 
+//--------------------------------------------------------------
+void testApp::setGUIMoviePrintPreview(){
+	
+	float dim = 16;
+	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
+    float length = menuWidth-xInit + (thumbWidth + displayGridMargin)*1;
+    
+    guiMoviePrintPreview = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
+    guiMoviePrintPreview->setFont("Ubuntu-Light.ttf");
+    
+    guiMoviePrintPreview->addLabel("MOVIEPRINT PREVIEW", OFX_UI_FONT_LARGE);
+    guiMoviePrintPreview->addBaseDraws("IMAGE CAPTION", &fboToPreview, false);
+    
+    guiMoviePrintPreview->setColorBack(FAK_ORANGE3);
+//    guiMoviePrintPreview->setColorBack(FAK_TRANSPARENT);
+	ofAddListener(guiMoviePrintPreview->newGUIEvent,this,&testApp::guiEvent);
+}
 
 //--------------------------------------------------------------
 void testApp::setGUIMovieInfo(){
@@ -471,6 +487,7 @@ void testApp::setGUIHelp1(){
 
     guiHelp1 = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
     guiHelp1->setFont("Ubuntu-Light.ttf");
+    guiMovieInfo->setColorBack(FAK_ORANGECOLOR);
     
     guiHelp1->addLabel("MOVIE INFO", OFX_UI_FONT_LARGE);
     
@@ -539,7 +556,6 @@ void testApp::setGUIHelp1(){
     ofxUIColor cp = ofxUIColor( 255, 255, 255, 100 ); // OFX_UI_COLOR_PADDED
     ofxUIColor cpo = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_PADDED_OUTLINE
     
-    guiMovieInfo->setColorBack(FAK_ORANGECOLOR);
     
 }
 
@@ -834,6 +850,11 @@ void testApp::update(){
     ofClear(255,255,255, 0);
     drawMoviePrintPreview(0.1, false);
     fboToPreview.end();
+    
+    guiMoviePrintPreview->setPosition(menuMoviePrintPreview.getPositionX()-(thumbWidth + displayGridMargin)*1, menuMoviePrintPreview.getPositionY()+headerHeight);
+    guiMoviePrintPreview->setWidth(menuMoviePrintPreview.getSizeW() + (thumbWidth + displayGridMargin)*1);
+    guiMoviePrintPreview->setHeight(menuMoviePrintPreview.getSizeH()-headerHeight);
+    
     guiSettingsMoviePrint->setPosition(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY()+headerHeight);
     guiSettingsMoviePrint->setWidth(menuMoviePrintSettings.getSizeW());
     guiSettingsMoviePrint->setHeight(menuMoviePrintSettings.getSizeH()-headerHeight);
@@ -1817,7 +1838,13 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     float tempY = 0;
     int tempXPos = 0;
     int menuHeightInRows = 5;
+    
+    tempXPos = 2;
+    menuMoviePrintPreview.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuMoviePrintPreview.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
+    menuMoviePrintPreview.drawMenu();
 
+    tempXPos = 0;
     menuMovieInfo.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMovieInfo.drawMenu();
@@ -1826,11 +1853,6 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     menuSettings.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuSettings.drawMenu();
-    
-    tempXPos = 2;
-    menuMoviePrintPreview.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuMoviePrintPreview.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
-    menuMoviePrintPreview.drawMenu();
     
     tempXPos = 3;
     menuMoviePrintSettings.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
