@@ -110,7 +110,10 @@ void testApp::setup(){
     scrollListAmountRel = 0;
 
     
-    fboToPreview.allocate(thumbWidth*2+displayGridMargin-OFX_UI_GLOBAL_WIDGET_SPACING*2, 660 - headerHeight - footerHeight*2, GL_RGBA );
+    fboToPreviewWidth = thumbWidth*2+displayGridMargin-OFX_UI_GLOBAL_WIDGET_SPACING*2;
+    fboToPreviewHeight = 660 - headerHeight - footerHeight*1;
+    
+    fboToPreview.allocate(fboToPreviewWidth, fboToPreviewHeight, GL_RGBA );
     fboToPreview.begin();
 	ofClear(255,255,255, 0);
     fboToPreview.end();
@@ -372,7 +375,7 @@ void testApp::setGUIMoviePrintPreview(){
     guiMoviePrintPreview->addBaseDraws("IMAGE CAPTION", &fboToPreview, false);
     
     guiMoviePrintPreview->setColorBack(FAK_ORANGE3);
-//    guiMoviePrintPreview->setColorBack(FAK_TRANSPARENT);
+    guiMoviePrintPreview->setColorBack(FAK_TRANSPARENT);
 	ofAddListener(guiMoviePrintPreview->newGUIEvent,this,&testApp::guiEvent);
 }
 
@@ -564,8 +567,8 @@ void testApp::setGUIHelp1(){
 
 //--------------------------------------------------------------
 void testApp::calculateNewPrintSize(){
-    printGridWidth = (thumbWidth + printGridMargin) * printGridColumns - printGridMargin;
-    printGridHeight = (thumbHeight + printGridMargin) * printGridRows - printGridMargin;
+    printGridWidth = (thumbWidth + printGridMargin) * printGridColumns + printGridMargin;
+    printGridHeight = (thumbHeight + printGridMargin) * printGridRows + printGridMargin;
 }
 
 //--------------------------------------------------------------
@@ -1211,11 +1214,34 @@ void testApp::draw(){
 
 
 //--------------------------------------------------------------
-void testApp::writeFboToPreview(float _scaleFactor, bool _drawPlaceholder){
+void testApp::writeFboToPreview(float _scaleFactor, bool _showPlaceHolder){
     fboToPreview.begin();
-    ofClear(255,120,255, 120);
-    drawMoviePrintPreview(_scaleFactor, _drawPlaceholder);
+    ofClear(255,255,255, 0);
+    drawMoviePrintPreview(_scaleFactor, _showPlaceHolder);
     fboToPreview.end();
+}
+
+//--------------------------------------------------------------
+void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
+    ofPushStyle();
+    _scaleFactor = _scaleFactor * 0.9;
+    float tempX = (fboToPreviewWidth - _scaleFactor * printGridWidth) / 2;
+    float tempY = (fboToPreviewHeight - _scaleFactor * printGridHeight) / 2;
+    ofSetColor(255);
+    ofRect(tempX, tempY, _scaleFactor * printGridWidth, _scaleFactor * printGridHeight);
+    loadedMovie.drawMoviePrintPreview(0, 0, tempX + printGridMargin * _scaleFactor, tempY + printGridMargin * _scaleFactor, printGridColumns, printGridMargin, _scaleFactor, 1, _showPlaceHolder);
+    // drawing frame
+    float tempFrameWidth = 3;
+    ofSetColor(220);
+    ofRect(tempX, tempY - tempFrameWidth, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
+    ofRect(tempX - tempFrameWidth, tempY - tempFrameWidth, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth);
+    ofRect(tempX + _scaleFactor * printGridWidth, tempY, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth);
+    ofRect(tempX - tempFrameWidth, tempY + _scaleFactor * printGridHeight, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
+    // drawing shadow
+    ofSetColor(0,128);
+    ofRect(tempX + _scaleFactor * printGridWidth + tempFrameWidth, tempY, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth*2);
+    ofRect(tempX, tempY + _scaleFactor * printGridHeight + tempFrameWidth, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
+    ofPopStyle();
 }
 
 //--------------------------------------------------------------
@@ -1657,10 +1683,6 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         if (isnan(printScale) || printScale > 20.0 || printScale < 1.0) {
             printScale = 1.0;
         }
-        int tempOutputSizeWidth = (printGridWidth + printGridMargin * 2) * printScale;
-        int tempOutputSizeHeight = (printGridHeight + printGridMargin * 2) * printScale;
-        
-        ofLog(OF_LOG_VERBOSE, "tempOutputSize: " + ofToString(tempOutputSizeWidth) + "x" + ofToString(tempOutputSizeHeight));
 	}
     else if(name == "PrintColumns")
 	{
@@ -1670,6 +1692,9 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         if (printGridSetWithColumnsAndRows) {
             printNumberOfThumbs = printGridColumns * printGridRows;
             calculateNewPrintGrid();
+        } else {
+            printGridRows = ceil(numberOfStills/(float)printGridColumns);
+            calculateNewPrintSize();
         }
 	}
 	else if(name == "PrintRows")
@@ -1833,18 +1858,6 @@ void testApp::scrollEvent(ofVec2f & e){
     }
 }
 
-//--------------------------------------------------------------
-void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
-    
-    float _scrollAmount = 0;
-    
-    float tempX = leftMargin;
-    float tempY = topMargin + headerHeight;
-    loadedMovie.drawMoviePrintPreview(tempX, tempY, printGridColumns, printGridMargin, _scaleFactor, 1, _showPlaceHolder);
-
-    
-    
-}
 //--------------------------------------------------------------
 void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     
@@ -2055,8 +2068,8 @@ void testApp::printImageToPNG(int _printSizeWidth){
     
     if (loadedMovie.isMovieLoaded) {
         float _newScaleFactor = (float)_printSizeWidth / (float)(printGridWidth + printGridMargin * 2);
-        int outputWidth = (printGridWidth + printGridMargin * 2) * _newScaleFactor;
-        int outputHeight = (printGridHeight + printGridMargin * 2) * _newScaleFactor;
+        int outputWidth = printGridWidth * _newScaleFactor;
+        int outputHeight = printGridHeight * _newScaleFactor;
 //        if (outputWidth > 9999.0) {
 //            _scaleFactor = 9950.0 / (gridAreaWidth + gridMargin * 2);
 //            outputWidth = (gridAreaWidth + gridMargin * 2) * _scaleFactor;

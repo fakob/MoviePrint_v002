@@ -45,8 +45,8 @@ public:
     void updateDisplayGrid();
     bool fequal(float _x, float _y, float _t);
     void drawUI(int _scaleFactor, bool _hideInPNG);
-    void drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _drawPlaceHolder);
-    void drawMoviePrintPreview(float _scaleFactor, bool _drawPlaceHolder);
+    void drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _showPlaceHolder);
+    void drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder);
     void drawList(float _scrollAmountRel);
     void printImageToPNG(int _printSizeWidth);
     void printListToPNG();
@@ -68,7 +68,7 @@ public:
     void updateTheScrollBar();
     void updateTheListScrollBar();
     void updateAllLimits();
-    void writeFboToPreview(float _scaleFactor, bool _drawPlaceholder);
+    void writeFboToPreview(float _scaleFactor, bool _showPlaceHolder);
 
     void updateTimeSlider(bool _wholeRange);
     void drawPrintScreen();
@@ -204,6 +204,8 @@ public:
     
     bool showPlaceHolder;
     bool showFBO;
+    int fboToPreviewWidth;
+    int fboToPreviewHeight;
     
     // UI Design settings
     bool drawPadding;

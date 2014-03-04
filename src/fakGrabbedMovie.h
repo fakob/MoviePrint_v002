@@ -970,8 +970,9 @@ public:
         ofSetColor(255, 255, 255, 255); // draw stills
         for(int i=0; i<gmNumberOfStills; i++)
         {
-            float tempY = ((gmThumbHeight+_gridMargin)*(i/_gridColumns) + _y );
-            drawStill(i, (_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor, tempY * _scaleFactor, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _isBeingPrinted, _superKeyPressed, _shiftKeyPressed, _drawPlaceHolder);
+            float tempX = (_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor;
+            float tempY = (_y + (gmThumbHeight+_gridMargin)*(i/_gridColumns)) * _scaleFactor;
+            drawStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _isBeingPrinted, _superKeyPressed, _shiftKeyPressed, _drawPlaceHolder);
         }
         
         
@@ -1017,7 +1018,7 @@ public:
         
     }
     
-    void drawMoviePrintPreview(float _x, float _y, int _gridColumns, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder){
+    void drawMoviePrintPreview(float _x, float _y, float _xOffset, float yOffset, int _gridColumns, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder){
        
         bool _superKeyPressed = false;
         bool _shiftKeyPressed = false;
@@ -1029,8 +1030,9 @@ public:
         ofSetColor(255, 255, 255, 255); // draw stills
         for(int i=0; i<gmNumberOfStills; i++)
         {
-            float tempY = ((gmThumbHeight+_gridMargin)*(i/_gridColumns) + _y );
-            drawStill(i, (_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor, tempY * _scaleFactor, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _isBeingPrinted, _superKeyPressed, _shiftKeyPressed, _drawPlaceHolder);
+            float tempX = (_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor;
+            float tempY = (_y + (gmThumbHeight+_gridMargin)*(i/_gridColumns)) * _scaleFactor;
+            drawStill(i, tempX + _xOffset, tempY + yOffset, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _isBeingPrinted, _superKeyPressed, _shiftKeyPressed, _drawPlaceHolder);
         }
         
         ofPopStyle();
