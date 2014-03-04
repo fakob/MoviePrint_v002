@@ -572,6 +572,7 @@ void testApp::setGUIHelp1(){
 void testApp::calculateNewPrintSize(){
     printGridWidth = (thumbWidth + printGridMargin) * printGridColumns + printGridMargin;
     printGridHeight = (thumbHeight + printGridMargin) * printGridRows + printGridMargin;
+    ofLog(OF_LOG_VERBOSE, "printGridSize" + ofToString(printGridWidth) + "x" + ofToString(printGridHeight));
 }
 
 //--------------------------------------------------------------
@@ -2085,7 +2086,7 @@ void testApp::printImageToPNG(int _printSizeWidth){
     ofFbo fboToSave;
     
     if (loadedMovie.isMovieLoaded) {
-        float _newScaleFactor = (float)_printSizeWidth / (float)(printGridWidth + printGridMargin * 2);
+        float _newScaleFactor = (float)_printSizeWidth / (float)(printGridWidth);
         int outputWidth = printGridWidth * _newScaleFactor;
         int outputHeight = printGridHeight * _newScaleFactor;
 //        if (outputWidth > 9999.0) {
@@ -2095,6 +2096,21 @@ void testApp::printImageToPNG(int _printSizeWidth){
 //        }
         
         if (printFormat == OF_IMAGE_FORMAT_JPEG) {
+            // make sure that the jpg size can be divided by 4
+            if ((outputWidth%2) == 1) {
+                outputWidth = outputWidth + 1;
+            }
+            if ((outputWidth%4) == 2) {
+                outputWidth = outputWidth + 2;
+            }
+            if ((outputHeight%2) == 1) {
+                outputHeight = outputHeight + 1;
+            }
+            if ((outputHeight%4) == 2) {
+                outputHeight = outputHeight + 2;
+            }
+            ofLog(OF_LOG_VERBOSE, "outputSize " + ofToString(outputWidth) + "x" + ofToString(outputHeight));
+
             fboToSave.allocate(outputWidth, outputHeight, GL_RGB);
             gmPixToSave.allocate(outputWidth, outputHeight, OF_PIXELS_RGB);
         }
