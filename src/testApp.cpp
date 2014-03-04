@@ -112,7 +112,6 @@ void testApp::setup(){
     
     fboToPreviewWidth = 1320 - leftMargin - rightMargin - thumbWidth*2 - displayGridMargin*2;
     fboToPreviewHeight = 660 - headerHeight - footerHeight;
-//    fboToPreviewWidth = fboToPreviewHeight;
     
     fboToPreview.allocate(fboToPreviewWidth, fboToPreviewHeight, GL_RGBA );
     fboToPreview.begin();
@@ -123,10 +122,11 @@ void testApp::setup(){
     counterToLoad = 0;
     counterToPrint = 0;
     
-    Tweenzor::init();
     showMenu = FALSE;
     showTopMenu = false;
-    Tweenzor::add(&tweenzorX1, 0.f, 1.f, 0.f, 0.5f, EASE_IN_OUT_EXPO);
+    tweenTimelineInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),ofRandom(0, 300));
+    tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),ofRandom(0, 300));
+
 
     startImage.loadImage("MoviePrint_StartBildschirm_v001_00000.png");
     backgroundImage.loadImage("MoviePrint_Background_v001_00000.jpg");
@@ -769,9 +769,10 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
 //--------------------------------------------------------------
 void testApp::update(){
     
-    threadIsRunning = loadedMovie.isThreadRunning();
+    ofLog(OF_LOG_VERBOSE, "showMenu:" + ofToString(tweenListInOut.update()));
 
-    Tweenzor::update( ofGetElapsedTimeMillis() );
+    
+    threadIsRunning = loadedMovie.isThreadRunning();
 
 //    loadedMovie.update();
     
@@ -806,7 +807,7 @@ void testApp::update(){
     }
     if (showTimeline) {
         if (finishedTimeline) {
-            if (timer.getElapsedSeconds() > 0.5) {
+            if (tweenTimelineInOut.update() > 0.5) {
                 showTimeline = FALSE;
                 moveInOutTimeline();
             }
@@ -1145,20 +1146,20 @@ void testApp::draw(){
                     ofRect(0, 0, ofGetWidth(), ofGetHeight());
                     ofSetColor(255,255,255,(int)scrubFade);
 
-                    loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
-                    loadedMovie.drawStillUI(scrubWindowGridNumber, ofGetWidth()/2-scrubWindowW/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (scrubFade/255));
+                    loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+                    loadedMovie.drawStillUI(scrubWindowGridNumber, ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (scrubFade/255));
                     
                     ofSetColor(255, 255, 255, (int)(scrubFade/255)*255);
                     
                     if (uiRangeSliderTimeline->hitLow) {
-                        inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-inPointImage.getHeight()/2);
+                        inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-inPointImage.getHeight()/2);
                     }
                     if (uiRangeSliderTimeline->hitHigh) {
-                        outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-outPointImage.getHeight()/2);
+                        outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-outPointImage.getHeight()/2);
                     }
                     if (uiRangeSliderTimeline->hitCenter) {
-                        inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-inPointImage.getHeight()/2);
-                        outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-outPointImage.getHeight()/2);
+                        inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-inPointImage.getHeight()/2);
+                        outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-outPointImage.getHeight()/2);
                     }
                     
                     ofPopStyle();
@@ -1184,11 +1185,11 @@ void testApp::draw(){
                     }
                     // draw the scrubSpeed
                     ofSetColor(FAK_ORANGECOLOR,(int)scrubFade);
-                    ofRect(ofGetWidth()/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2+scrubWindowH/2, scrubDelta*30.0, loaderBarHeight);
+                    ofRect(ofGetWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2+scrubWindowH/2, scrubDelta*30.0, loaderBarHeight);
                     ofSetColor(255,255,255,(int)scrubFade);
                     int j = loadedMovie.gmScrubID;
-                    loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
-                    loadedMovie.drawStillUI(j, ofGetWidth()/2-scrubWindowW/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (float)(scrubFade/255));
+                    loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+                    loadedMovie.drawStillUI(j, ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (float)(scrubFade/255));
                     
                     ofDisableAlphaBlending();
                     ofSetColor(255);
@@ -1313,19 +1314,12 @@ void testApp::keyPressed(int key){
         case 'h':
         case 'H':
         {
-            Tweenzor::resetAllTweens();
-            
-            float _end = 0.f;
-            float _begin = 0.f;
-            if (!showMenu) {
-                _end = 0.f;
-                _begin = 1.f;
+           
+            if (showMenu) {
+                tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),0);
             } else {
-                _end = 1.f;
-                _begin = 0.f;
+                tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,ofRandom(600, 1000),0);
             }
-            Tweenzor::add( &tweenzorX1, _begin, _end, 0.f, 0.5f , EASE_IN_OUT_EXPO);
-//            Tweenzor::addCompleteListener( Tweenzor::getTween(&tweenzorX1), this, &testApp::onCompleteTweenzor);
             
             showMenu = !showMenu;
 
@@ -1884,27 +1878,27 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     int menuHeightInRows = 5;
     
     tempXPos = 2;
-    menuMoviePrintPreview.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuMoviePrintPreview.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMoviePrintPreview.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMoviePrintPreview.drawMenu();
 
     tempXPos = 0;
-    menuMovieInfo.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuMovieInfo.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMovieInfo.drawMenu();
 
     tempXPos = 1;
-    menuSettings.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuSettings.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuSettings.drawMenu();
     
     tempXPos = 4;
-    menuMoviePrintSettings.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuMoviePrintSettings.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMoviePrintSettings.drawMenu();
     
     tempXPos = 3;
-    menuHelp.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuHelp.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuHelp.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuHelp.drawMenu();
 
@@ -1929,7 +1923,7 @@ void testApp::drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeing
     if (isnan(_scrollAmount)) {
         _scrollAmount = 0;
     }
-    float tempX = (leftMargin + menuWidth - menuWidth * tweenzorX1) * _scaleFactor;
+    float tempX = (leftMargin + menuWidth * tweenListInOut.update()) * _scaleFactor;
     float tempY = _scrollAmount * _scaleFactor + topMargin + headerHeight;
     loadedMovie.drawGridOfStills(tempX, tempY, gridColumns, displayGridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
 }
@@ -1955,7 +1949,7 @@ void testApp::drawList(float _scrollAmountRel){
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
     ofPopStyle();
     
-    droppedList.draw(leftMargin + menuWidth - menuWidth * tweenzorX1, topMargin, ofGetWidth() - scrollBarWidth - rightMargin - leftMargin, _scrollAmount);
+    droppedList.draw(leftMargin + menuWidth * tweenListInOut.update(), topMargin, ofGetWidth() - scrollBarWidth - rightMargin - leftMargin, _scrollAmount);
 
     
 }
@@ -1969,9 +1963,9 @@ void testApp::drawPrintScreen(){
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
     ofSetColor(255, 255, 255, 255);
     if (currPrintingList) {
-        printListImage.draw(ofGetWidth()/2-printImage.getWidth()/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-printImage.getHeight()/2);
+        printListImage.draw(ofGetWidth()/2-printImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-printImage.getHeight()/2);
     } else {
-        printImage.draw(ofGetWidth()/2-printImage.getWidth()/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-printImage.getHeight()/2);
+        printImage.draw(ofGetWidth()/2-printImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-printImage.getHeight()/2);
 
     }
     ofPopStyle();
@@ -1984,7 +1978,7 @@ void testApp::drawStartScreen(){
     ofPushStyle();
     ofSetColor(255, 255, 255, 255);
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
-    startImage.draw(ofGetWidth()/2-startImage.getWidth()/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-startImage.getHeight()/2);
+    startImage.draw(ofGetWidth()/2-startImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-startImage.getHeight()/2);
     ofPopStyle();
     
 }
@@ -2017,7 +2011,7 @@ void testApp::drawUpdateScreen(){
     int tempLoaderBarWidth = 262;
     int tempLoaderBarHeight = 20;
     int tempOffsetY = 155;
-    float tempX = ofGetWidth()/2 - tempLoaderBarWidth/2 + menuWidth - menuWidth * tweenzorX1;
+    float tempX = ofGetWidth()/2 - tempLoaderBarWidth/2 + menuWidth * tweenListInOut.update();
     float tempY = ofGetHeight()/2 - tempLoaderBarHeight/2;
         // draw the percentage loaded bar
         // the background
@@ -2028,7 +2022,7 @@ void testApp::drawUpdateScreen(){
         ofRect(tempX, tempY + tempOffsetY, tempLoaderBarWidth*loadValue, tempLoaderBarHeight);
 
     ofSetColor(255, 255, 255, 255);
-    updatingImage.draw(ofGetWidth()/2-updatingImage.getWidth()/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-updatingImage.getHeight()/2);
+    updatingImage.draw(ofGetWidth()/2-updatingImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-updatingImage.getHeight()/2);
     ofPopStyle();
     
 }
@@ -2039,7 +2033,7 @@ void testApp::drawLoadMovieScreen(){
     ofPushStyle();
     ofSetColor(255, 255, 255, 255);
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
-    loadMovieImage.draw(ofGetWidth()/2-loadMovieImage.getWidth()/2 + menuWidth - menuWidth * tweenzorX1, ofGetHeight()/2-loadMovieImage.getHeight()/2);
+    loadMovieImage.draw(ofGetWidth()/2-loadMovieImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-loadMovieImage.getHeight()/2);
     ofPopStyle();
     
 }
@@ -2047,16 +2041,10 @@ void testApp::drawLoadMovieScreen(){
 //--------------------------------------------------------------
 void testApp::moveInOutTimeline(){
     
-    Tweenzor::resetAllTweens();
-    
-    float _end = 0.f;
-    float _begin = 0.f;
     if (showTimeline) {
-        _end = 1.f;
-        _begin = 0.f;
+        tweenTimelineInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),0);
     } else {
-        _end = 0.f;
-        _begin = 1.f;
+        tweenTimelineInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,ofRandom(600, 1000),0);
     }
    
     if (showTimeline){
@@ -2474,11 +2462,6 @@ void testApp::setResourcePath(){
     ofLog(OF_LOG_VERBOSE, "appPathUpStr: " + ofToString(appPathUpStr) );
     ofLog(OF_LOG_VERBOSE, "newDataPath: " + ofToString(newPath) );
     ofSetDataPathRoot(newPath); // tell OF to look for resources here
-}
-
-//--------------------------------------------------------------
-void testApp::onCompleteTweenzor(float* arg) {
-	ofLog(OF_LOG_VERBOSE, "testApp :: onComplete : arg = " + ofToString(*arg));
 }
 
 //--------------------------------------------------------------

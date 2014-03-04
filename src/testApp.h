@@ -11,12 +11,12 @@
 #include "ofxNotify.h"
 #include "fakScrollBar.h"
 #include "ofxFontStash.h"
-#include "ofxTweenzor.h"
 #include "boost/any.hpp"
 #include "ofxMSATimer.h"
 //#include "ofxModifierKeys.h"
 #include <iostream>
 #include "fakMenu.h"
+#include "ofxTween.h"
 
 
 class testApp : public ofBaseApp{
@@ -202,6 +202,22 @@ public:
     ofxUITextArea *helpText;
 
     
+    ofxTween tweenTimelineInOut;
+    ofxTween tweenListInOut;
+    
+    ofxEasingBack 	easingback;
+    ofxEasingBounce 	easingbounce;
+    ofxEasingCirc 	easingcirc;
+    ofxEasingCubic 	easingcubic;
+    ofxEasingElastic easingelastic;
+    ofxEasingExpo 	easingexpo;
+    ofxEasingLinear 	easinglinear;
+    ofxEasingQuad 	easingquad;
+    ofxEasingQuart 	easingquart;
+    ofxEasingQuint 	easingquint;
+    ofxEasingSine	easingsine;
+    
+    
     bool showPlaceHolder;
     bool showFBO;
     int fboToPreviewWidth;
@@ -281,11 +297,6 @@ public:
     int counterToUpdate;
     int counterToLoad;
     int counterToPrint;
-    
-    // Tweens
-    void onCompleteTweenzor(float* arg);
-    float tweenzorX1;
-    float tweenzorY1;
 
     float scrubFade;
     

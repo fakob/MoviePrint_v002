@@ -80,8 +80,6 @@
 		3AAF41A517623B5600F94546 /* ofxFontStash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF412F17623B5600F94546 /* ofxFontStash.cpp */; };
 		3AAF41A917623B5600F94546 /* ofxMSATimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF413A17623B5600F94546 /* ofxMSATimer.cpp */; };
 		3AAF41AA17623B5600F94546 /* ofxNotify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF413E17623B5600F94546 /* ofxNotify.cpp */; };
-		3AAF41AB17623B5600F94546 /* Tween.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF414417623B5600F94546 /* Tween.cpp */; };
-		3AAF41AC17623B5600F94546 /* Tweenzor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF414917623B5600F94546 /* Tweenzor.cpp */; };
 		3AAF41AD17623B5600F94546 /* ofTextConverter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF419417623B5600F94546 /* ofTextConverter.cpp */; };
 		3AAF41AE17623B5600F94546 /* ofUnicode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF419617623B5600F94546 /* ofUnicode.cpp */; };
 		3AAF41AF17623B5600F94546 /* ofUTF8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF419817623B5600F94546 /* ofUTF8.cpp */; };
@@ -346,15 +344,6 @@
 		3AAF413B17623B5600F94546 /* ofxMSATimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxMSATimer.h; sourceTree = "<group>"; };
 		3AAF413E17623B5600F94546 /* ofxNotify.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxNotify.cpp; sourceTree = "<group>"; };
 		3AAF413F17623B5600F94546 /* ofxNotify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxNotify.h; sourceTree = "<group>"; };
-		3AAF414117623B5600F94546 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
-		3AAF414317623B5600F94546 /* ofxTweenzor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTweenzor.h; sourceTree = "<group>"; };
-		3AAF414417623B5600F94546 /* Tween.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tween.cpp; sourceTree = "<group>"; };
-		3AAF414517623B5600F94546 /* Tween.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tween.h; sourceTree = "<group>"; };
-		3AAF414617623B5600F94546 /* TweenEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweenEvent.h; sourceTree = "<group>"; };
-		3AAF414717623B5600F94546 /* TweenFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweenFunctions.h; sourceTree = "<group>"; };
-		3AAF414817623B5600F94546 /* TweenSelector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweenSelector.h; sourceTree = "<group>"; };
-		3AAF414917623B5600F94546 /* Tweenzor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tweenzor.cpp; sourceTree = "<group>"; };
-		3AAF414A17623B5600F94546 /* Tweenzor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tweenzor.h; sourceTree = "<group>"; };
 		3AAF417F17623B5600F94546 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		3AAF418417623B5600F94546 /* checked.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = checked.h; sourceTree = "<group>"; };
 		3AAF418517623B5600F94546 /* core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = core.h; sourceTree = "<group>"; };
@@ -751,31 +740,6 @@
 			path = src;
 			sourceTree = "<group>";
 		};
-		3AAF414017623B5600F94546 /* ofxTweenzor */ = {
-			isa = PBXGroup;
-			children = (
-				3AAF414117623B5600F94546 /* .gitignore */,
-				3AAF414217623B5600F94546 /* src */,
-			);
-			name = ofxTweenzor;
-			path = ../../../addons/ofxTweenzor;
-			sourceTree = "<group>";
-		};
-		3AAF414217623B5600F94546 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				3AAF414317623B5600F94546 /* ofxTweenzor.h */,
-				3AAF414417623B5600F94546 /* Tween.cpp */,
-				3AAF414517623B5600F94546 /* Tween.h */,
-				3AAF414617623B5600F94546 /* TweenEvent.h */,
-				3AAF414717623B5600F94546 /* TweenFunctions.h */,
-				3AAF414817623B5600F94546 /* TweenSelector.h */,
-				3AAF414917623B5600F94546 /* Tweenzor.cpp */,
-				3AAF414A17623B5600F94546 /* Tweenzor.h */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
 		3AAF417E17623B5600F94546 /* ofxUnicode */ = {
 			isa = PBXGroup;
 			children = (
@@ -942,7 +906,6 @@
 				3AAF412817623B5600F94546 /* ofxFontStash */,
 				3AAF413717623B5600F94546 /* ofxMSATimer */,
 				3AAF413C17623B5600F94546 /* ofxNotify */,
-				3AAF414017623B5600F94546 /* ofxTweenzor */,
 				3AAF417E17623B5600F94546 /* ofxUnicode */,
 				3AAF419A17623B5600F94546 /* ofxXmlSettings */,
 			);
@@ -1217,13 +1180,11 @@
 				3AAF41AA17623B5600F94546 /* ofxNotify.cpp in Sources */,
 				3A5F1F7E18B7BA27008F7486 /* ofxUIFPSSlider.cpp in Sources */,
 				3A5F1F8C18B7BA27008F7486 /* ofxUIRadio.cpp in Sources */,
-				3AAF41AB17623B5600F94546 /* Tween.cpp in Sources */,
 				3A8BA70318B77C3900E8C9C8 /* ofxEasingQuart.cpp in Sources */,
 				3A5F1F7618B7BA27008F7486 /* ofxUIBiLabelSlider.cpp in Sources */,
 				3A5F1F7718B7BA27008F7486 /* ofxUIButton.cpp in Sources */,
 				3A5F1F9D18B7BA27008F7486 /* ofxUIWidget.cpp in Sources */,
 				3A5F1F7B18B7BA27008F7486 /* ofxUIDropDownList.cpp in Sources */,
-				3AAF41AC17623B5600F94546 /* Tweenzor.cpp in Sources */,
 				3AAF41AD17623B5600F94546 /* ofTextConverter.cpp in Sources */,
 				3AAF41AE17623B5600F94546 /* ofUnicode.cpp in Sources */,
 				3A5F1F7818B7BA27008F7486 /* ofxUICanvas.cpp in Sources */,

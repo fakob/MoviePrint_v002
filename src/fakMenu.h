@@ -92,7 +92,7 @@ public:
     
     void setTweenIn(){
         tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,500,0);
-        tweenMenuInOut2.setParameters(1,easingback,ofxTween::easeOut,0.0,1.0,200,0);
+        tweenMenuInOut2.setParameters(1,easingexpo,ofxTween::easeOut,0.0,1.0,300,0);
     }
     
     void setTweenOut(){
