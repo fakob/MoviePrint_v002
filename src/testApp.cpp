@@ -27,7 +27,7 @@
 void testApp::setup(){
 
     ofSetLogLevel(OF_LOG_VERBOSE);
-    drawNotify = true;
+    drawNotify = false; // ofxNotify
     
     setResourcePath();
     
@@ -110,8 +110,9 @@ void testApp::setup(){
     scrollListAmountRel = 0;
 
     
-    fboToPreviewWidth = thumbWidth*2+displayGridMargin-OFX_UI_GLOBAL_WIDGET_SPACING*2;
-    fboToPreviewHeight = 660 - headerHeight - footerHeight*1;
+    fboToPreviewWidth = 1320 - leftMargin - rightMargin - thumbWidth*2 - displayGridMargin*2;
+    fboToPreviewHeight = 660 - headerHeight - footerHeight;
+//    fboToPreviewWidth = fboToPreviewHeight;
     
     fboToPreview.allocate(fboToPreviewWidth, fboToPreviewHeight, GL_RGBA );
     fboToPreview.begin();
@@ -175,22 +176,22 @@ void testApp::setup(){
     guiSettingsMoviePrint->loadSettings("guiMoviePrintSettings.xml");
 
 
-    menuMovieInfo.setupMenu(1,0,0,0,0,headerHeight, true, true);
+    menuMovieInfo.setupMenu(1,0,0,0,0,headerHeight, true, true, false);
     menuMovieInfo.registerMouseEvents();
     
-    menuSettings.setupMenu(2,0,0,0,0,headerHeight, true, true);
+    menuSettings.setupMenu(4,0,0,0,0,headerHeight, false, true, false);
     menuSettings.registerMouseEvents();
     
-    menuMoviePrintPreview.setupMenu(3,0,0,0,0,headerHeight, true, true);
+    menuMoviePrintPreview.setupMenu(3,0,0,0,0,headerHeight, true, true, true);
     menuMoviePrintPreview.registerMouseEvents();
     
-    menuMoviePrintSettings.setupMenu(4,0,0,0,0,headerHeight, true, true);
+    menuMoviePrintSettings.setupMenu(5,0,0,0,0,headerHeight, true, true, false);
     menuMoviePrintSettings.registerMouseEvents();
     
-    menuHelp.setupMenu(5,0,0,0,0,headerHeight, true, true);
+    menuHelp.setupMenu(2,0,0,0,0,headerHeight, false, true, false);
     menuHelp.registerMouseEvents();
     
-    menuTimeline.setupMenu(0,0,0,0,0,footerHeight/2, true, false);
+    menuTimeline.setupMenu(0,0,0,0,0,footerHeight/2, true, false, false);
     menuTimeline.registerMouseEvents();
     
     moveInOutTimeline();
@@ -286,7 +287,9 @@ void testApp::setGUISettings(){
     uiRadioSetFrameDisplay->activateToggle("TimeCode");
     
     guiSettings1->setColorBack(FAK_TRANSPARENT);
-	ofAddListener(guiSettings1->newGUIEvent,this,&testApp::guiEvent);
+    
+    guiSettings1->setVisible(FALSE);
+//	ofAddListener(guiSettings1->newGUIEvent,this,&testApp::guiEvent);
 }
 
 //--------------------------------------------------------------
@@ -372,7 +375,7 @@ void testApp::setGUIMoviePrintPreview(){
     guiMoviePrintPreview->setFont("Ubuntu-Light.ttf");
     
 //    guiMoviePrintPreview->addButton("WriteMoviePrint", writeMoviePrint);
-    guiMoviePrintPreview->addBaseDraws("IMAGE CAPTION", &fboToPreview, false);
+//    guiMoviePrintPreview->addBaseDraws("IMAGE CAPTION", &fboToPreview, false);
     
     guiMoviePrintPreview->setColorBack(FAK_ORANGE3);
     guiMoviePrintPreview->setColorBack(FAK_TRANSPARENT);
@@ -860,13 +863,13 @@ void testApp::update(){
     guiMovieInfo->setWidth(menuMovieInfo.getSizeW());
     guiMovieInfo->setHeight(menuMovieInfo.getSizeH()-headerHeight);
 
-    guiSettings1->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY()+headerHeight);
-    guiSettings1->setWidth(menuSettings.getSizeW());
-    guiSettings1->setHeight(menuSettings.getSizeH()-headerHeight);
+//    guiSettings1->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY()+headerHeight);
+//    guiSettings1->setWidth(menuSettings.getSizeW());
+//    guiSettings1->setHeight(menuSettings.getSizeH()-headerHeight);
     
-    guiMoviePrintPreview->setPosition(menuMoviePrintPreview.getPositionX()-(thumbWidth + displayGridMargin)*1, menuMoviePrintPreview.getPositionY()+headerHeight);
-    guiMoviePrintPreview->setWidth(menuMoviePrintPreview.getSizeW() + (thumbWidth + displayGridMargin)*1);
-    guiMoviePrintPreview->setHeight(menuMoviePrintPreview.getSizeH()-headerHeight);
+//    guiMoviePrintPreview->setPosition(menuMoviePrintPreview.getPositionX()-(thumbWidth + displayGridMargin)*1, menuMoviePrintPreview.getPositionY()+headerHeight);
+//    guiMoviePrintPreview->setWidth(menuMoviePrintPreview.getSizeW() + (thumbWidth + displayGridMargin)*1);
+//    guiMoviePrintPreview->setHeight(menuMoviePrintPreview.getSizeH()-headerHeight);
     
     guiSettingsMoviePrint->setPosition(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY()+headerHeight);
     guiSettingsMoviePrint->setWidth(menuMoviePrintSettings.getSizeW());
@@ -1224,7 +1227,7 @@ void testApp::writeFboToPreview(float _scaleFactor, bool _showPlaceHolder){
 //--------------------------------------------------------------
 void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
     ofPushStyle();
-    _scaleFactor = _scaleFactor * 0.9;
+    _scaleFactor = _scaleFactor * 0.95;
     float tempX = (fboToPreviewWidth - _scaleFactor * printGridWidth) / 2;
     float tempY = (fboToPreviewHeight - _scaleFactor * printGridHeight) / 2;
     ofSetColor(255);
@@ -1238,7 +1241,7 @@ void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
     ofRect(tempX + _scaleFactor * printGridWidth, tempY, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth);
     ofRect(tempX - tempFrameWidth, tempY + _scaleFactor * printGridHeight, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
     // drawing shadow
-    ofSetColor(0,128);
+    ofSetColor(0,200);
     ofRect(tempX + _scaleFactor * printGridWidth + tempFrameWidth, tempY, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth*2);
     ofRect(tempX, tempY + _scaleFactor * printGridHeight + tempFrameWidth, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
     ofPopStyle();
@@ -1861,6 +1864,18 @@ void testApp::scrollEvent(ofVec2f & e){
 //--------------------------------------------------------------
 void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     
+    
+    ofPushStyle();
+    ofSetColor(255);
+
+    // overlay von MoviePrintPreview
+    ofPushStyle();
+    ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
+    ofSetColor(0, 0, 0, menuMoviePrintPreview.getRelSizeH2() * 100);
+    ofRect(ofGetWindowWidth()/2, (ofGetWindowHeight()-headerHeight-footerHeight/2)/2 + headerHeight, ofGetWindowWidth(), (ofGetWindowHeight()-headerHeight-footerHeight/2));
+    ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
+    ofPopStyle();
+    
     layoutHeaderImage.draw(0, 0, ofGetWindowWidth() * _scaleFactor, layoutHeaderImage.getHeight() * _scaleFactor);
 
     float tempY = 0;
@@ -1882,12 +1897,12 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     menuSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuSettings.drawMenu();
     
-    tempXPos = 3;
+    tempXPos = 4;
     menuMoviePrintSettings.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMoviePrintSettings.drawMenu();
     
-    tempXPos = 4;
+    tempXPos = 3;
     menuHelp.setPosition((leftMargin + menuWidth - menuWidth * tweenzorX1 + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuHelp.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuHelp.drawMenu();
@@ -1896,8 +1911,11 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     menuTimeline.setSize(ofGetWindowWidth(), footerHeight/2);
     menuTimeline.drawMenu();
     
-    ofSetColor(255);
-
+    ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
+    fboToPreview.draw(ofGetWindowWidth()/2, (ofGetWindowHeight()-headerHeight-footerHeight/2)/2 + headerHeight, menuMoviePrintPreview.getRelSizeH2() * fboToPreviewWidth, menuMoviePrintPreview.getRelSizeH2() * fboToPreviewHeight);
+    ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
+    
+    ofPopStyle;
 }
 
 //--------------------------------------------------------------

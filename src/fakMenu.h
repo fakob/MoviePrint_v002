@@ -45,13 +45,14 @@ public:
     
     // functions
     
-    void setupMenu(int _ID, float _mMenuX, float _mMenuY, float _mMenuWidth, float _mMenuHeight, float _mMenuRollOverHeight, bool _mButtonActive, bool _mTopMenu){
+    void setupMenu(int _ID, float _mMenuX, float _mMenuY, float _mMenuWidth, float _mMenuHeight, float _mMenuRollOverHeight, bool _mButtonActive, bool _mTopMenu, bool _mNoBackground){
         mMenuX = _mMenuX;
         mMenuY = _mMenuY;
         mMenuWidth = _mMenuWidth;
         mMenuHeight = _mMenuHeight;
         mMenuRollOverHeight = _mMenuRollOverHeight;
         tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),ofRandom(0, 300));
+        tweenMenuInOut2.setParameters(1,easingelastic,ofxTween::easeOut,1.0,0.0,ofRandom(600, 1000),ofRandom(0, 300));
         mMenuOffsetX = 2;
         mMenuOffsetY = 28;
         mShadowMargin = 1.5;
@@ -59,7 +60,7 @@ public:
         mInsideMenuHead = FALSE;
         mMenuActive = _mButtonActive;
         mTopMenu = _mTopMenu;
-        
+        mNoBackground = _mNoBackground;
         
         switch (_ID) {
             case 1:
@@ -76,17 +77,27 @@ public:
                 break;
             case 4:
                 mMenuImage.loadImage("MoviePrint_Layout_Menu4_v001_00001.png");
-                mBackgroundColor = FAK_ORANGE4;
+                mBackgroundColor = FAK_ORANGE5;
                 break;
             case 5:
                 mMenuImage.loadImage("MoviePrint_Layout_Menu5_v001_00001.png");
-                mBackgroundColor = FAK_ORANGE5;
+                mBackgroundColor = FAK_ORANGE4;
                 break;
             default:
                 mBackgroundColor = FAK_GRAY;
                 break;
         }
         
+    }
+    
+    void setTweenIn(){
+        tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,500,0);
+        tweenMenuInOut2.setParameters(1,easingback,ofxTween::easeOut,0.0,1.0,200,0);
+    }
+    
+    void setTweenOut(){
+        tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,500,0);
+        tweenMenuInOut2.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,300,0);
     }
     
     bool insideMenuHead(float _x, float _y ){
@@ -119,12 +130,12 @@ public:
     
     void openMenuManually(){
         mIsOpenManually = true;
-        tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,500,0);
+        setTweenIn();
     }
     
     void closeMenuManually(){
         mIsOpenManually = false;
-        tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,500,0);
+        setTweenOut();
     }
     
     void mouseMoved(ofMouseEventArgs & args){
@@ -132,12 +143,12 @@ public:
             if (mInsideMenuHead) {
                 if (!insideMenu(args.x, args.y)) {
                     mInsideMenuHead = false;
-                    tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,500,0);
+                    setTweenOut();
                 }
             } else {
                 if (insideMenuHead(args.x, args.y)) {
                     mInsideMenuHead = TRUE;
-                    tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,500,0);
+                    setTweenIn();
                 }
             }
         }
@@ -192,6 +203,10 @@ public:
 	float getRelSizeH(){
         return tweenMenuInOut.update();
     }
+
+    float getRelSizeH2(){
+        return tweenMenuInOut2.update();
+    }
     
     void updateMenu(){
 
@@ -213,8 +228,13 @@ public:
             mMenuImage.draw(mMenuX - mMenuOffsetX, mMenuY, mMenuImage.getWidth(), mMenuImage.getHeight());
 //            ofSetColor(FAK_SHADOW);
 //            ofRectRounded(mMenuX - mShadowMargin*0.3 + mMenuOffsetX, mMenuY + mMenuOffsetY, mMenuWidth - mMenuOffsetX + mShadowMargin*2, mMenuStripeHeight + mMenuHeight * tweenMenuInOut.update(),4.0 * tweenMenuInOut.update());
-            ofSetColor(mBackgroundColor);
-            ofRectRounded(mMenuX, mMenuY + mMenuOffsetY, mMenuWidth, mMenuStripeHeight + (mMenuHeight - mMenuOffsetY - mMenuStripeHeight) * tweenMenuInOut.update(), 4.0 * tweenMenuInOut.update());
+            if (!mNoBackground) {
+                ofSetColor(mBackgroundColor);
+                ofRectRounded(mMenuX, mMenuY + mMenuOffsetY, mMenuWidth, mMenuStripeHeight + (mMenuHeight - mMenuOffsetY - mMenuStripeHeight) * tweenMenuInOut.update(), 4.0 * tweenMenuInOut.update());
+            } else {
+                ofSetColor(mBackgroundColor);
+                ofRect(mMenuX, mMenuY + mMenuOffsetY, mMenuWidth, mMenuStripeHeight);
+            }
         } else {
             ofEnableAlphaBlending();
             ofSetColor(mBackgroundColor);
@@ -231,6 +251,7 @@ public:
     bool mMenuActive;
     bool mTopMenu;
     bool mIsOpenManually;
+    bool mNoBackground;
     
     float mMenuX;
     float mMenuY;
@@ -245,6 +266,7 @@ public:
     ofColor mBackgroundColor;
     
     ofxTween tweenMenuInOut;
+    ofxTween tweenMenuInOut2;
     
     ofxEasingBack 	easingback;
     ofxEasingBounce 	easingbounce;
