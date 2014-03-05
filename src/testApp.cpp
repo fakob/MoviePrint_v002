@@ -320,7 +320,7 @@ void testApp::setGUISettingsMoviePrint(){
     uiRadioSetFitManually = (ofxUIRadio *) guiSettingsMoviePrint->getWidget("Grid-Number");
     uiRadioSetFitManually->activateToggle("Set Columns and Rows");
     
-	guiSettingsMoviePrint->addIntSlider("PrintColumns", 4, 10, &printGridColumns, length-xInit,dim);
+	guiSettingsMoviePrint->addIntSlider("PrintColumns", 1, 10, &printGridColumns, length-xInit,dim);
 	guiSettingsMoviePrint->addIntSlider("PrintRows", 1, 20, &printGridRows, length-xInit,dim);
    	guiSettingsMoviePrint->addIntSlider("PrintNumber", 4, 200, &printNumberOfThumbs, length-xInit,dim);
    	guiSettingsMoviePrint->addIntSlider("PrintMargin", 0, 100, &printGridMargin, length-xInit,dim);
@@ -2017,16 +2017,11 @@ void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
 void testApp::drawScrubScreen(float _scaleFactor){
     ofPushStyle();
     ofEnableAlphaBlending();
-    ofSetColor(0,(scrubFade/255)*200);
-    if (showTimeline){
-        ofRect(0, 0, ofGetWidth(), ofGetHeight()-footerHeight);
-    } else {
-        ofRect(0, 0, ofGetWidth(), ofGetHeight());
-    }
-    // draw the scrubSpeed
-    ofSetColor(FAK_ORANGECOLOR,(int)scrubFade);
-    ofRect(ofGetWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2+scrubWindowH/2, scrubDelta*30.0, loaderBarHeight);
-    ofSetColor(255,255,255,(int)scrubFade);
+    ofSetColor(0,(scrubFade/255)*100);
+    ofRect(0, 0, ofGetWidth(), ofGetHeight()-footerHeight/2);
+
+    // draw the scrubMovie
+    ofSetColor(255,(int)scrubFade);
     int j = loadedMovie.gmScrubID;
     loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
     loadedMovie.drawStillUI(j, ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (float)(scrubFade/255));
@@ -2035,16 +2030,20 @@ void testApp::drawScrubScreen(float _scaleFactor){
     float tempX = ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update();
     float tempY = ofGetHeight()/2-scrubWindowH/2;
     float tempFrameWidth = 3;
-    ofSetColor(220);
+    ofSetColor(220,(int)scrubFade);
     ofRect(tempX, tempY - tempFrameWidth, _scaleFactor * scrubWindowW + tempFrameWidth, tempFrameWidth);
     ofRect(tempX - tempFrameWidth, tempY - tempFrameWidth, tempFrameWidth, _scaleFactor * scrubWindowH + tempFrameWidth);
     ofRect(tempX + _scaleFactor * scrubWindowW, tempY, tempFrameWidth, _scaleFactor * scrubWindowH + tempFrameWidth);
     ofRect(tempX - tempFrameWidth, tempY + _scaleFactor * scrubWindowH, _scaleFactor * scrubWindowW + tempFrameWidth, tempFrameWidth);
     // drawing shadow
-    ofSetColor(0,200);
+    ofSetColor(0,200*(scrubFade/255.0));
     ofRect(tempX + _scaleFactor * scrubWindowW + tempFrameWidth, tempY, tempFrameWidth, _scaleFactor * scrubWindowH + tempFrameWidth*2);
     ofRect(tempX, tempY + _scaleFactor * scrubWindowH + tempFrameWidth, _scaleFactor * scrubWindowW + tempFrameWidth, tempFrameWidth);
 
+    // draw the scrubSpeed
+    ofSetColor(FAK_ORANGECOLOR,(int)scrubFade);
+    ofRect(ofGetWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2+scrubWindowH/2+tempFrameWidth*3, scrubDelta*30.0, loaderBarHeight/2);
+    ofSetColor(255,255,255,(int)scrubFade);
     
     ofDisableAlphaBlending();
     ofSetColor(255);
