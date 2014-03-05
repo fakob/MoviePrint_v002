@@ -293,6 +293,7 @@ public:
 
     // Once Counter
     int windowResizedOnce;
+    bool windowWasResized;
     int updateOnce;
     int counterToUpdate;
     int counterToLoad;

@@ -55,7 +55,8 @@ void testApp::setup(){
     totalFrames = 0;
     itemToPrint = 0;
     loadNewMovieToBeScrubbedBool = FALSE;
-    
+    windowWasResized = false;
+
     // UI Values
     leftMargin = 5;
     rightMargin = 5;
@@ -773,6 +774,12 @@ void testApp::update(){
 
     
     threadIsRunning = loadedMovie.isThreadRunning();
+    
+    // set window to minium width !!NOT WORKING
+//    if (windowWasResized && !ofGetMousePressed()) {
+//        ofSetWindowShape(fmin(ofGetWindowWidth(),1320),ofGetWindowHeight());
+//        windowWasResized = false;
+//    }
 
 //    loadedMovie.update();
     
@@ -1507,16 +1514,8 @@ void testApp::mouseScrolled(double x, double y){
 //--------------------------------------------------------------
 void testApp::windowResized(int w, int h){
     if (!currPrintingList) {
-//        if (windowResizedOnce != 0) {
-//            
-//            Tweener.removeTween(scrubFade);
-//            scrubFade = 255;
-//            devTurnOffMovieSwitch = TRUE;
-//            updateWindowResized = TRUE;
-//
-//        }
-        
         updateDisplayGrid();
+//        windowWasResized = true;
         windowResizedOnce++;
     }
 }
@@ -1875,9 +1874,9 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
 
     float tempY = 0;
     int tempXPos = 0;
-    int menuHeightInRows = 5;
+    int menuHeightInRows = 4;
     
-    tempXPos = 2;
+    tempXPos = gridColumns/2;
     menuMoviePrintPreview.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMoviePrintPreview.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMoviePrintPreview.drawMenu();
@@ -1892,12 +1891,12 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     menuSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuSettings.drawMenu();
     
-    tempXPos = 4;
+    tempXPos = gridColumns-1;
     menuMoviePrintSettings.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMoviePrintSettings.drawMenu();
     
-    tempXPos = 3;
+    tempXPos = gridColumns-2;
     menuHelp.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuHelp.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuHelp.drawMenu();
@@ -1907,7 +1906,7 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     menuTimeline.drawMenu();
     
     ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
-    fboToPreview.draw(ofGetWindowWidth()/2, (ofGetWindowHeight()-headerHeight-footerHeight/2)/2 + headerHeight, menuMoviePrintPreview.getRelSizeH2() * fboToPreviewWidth, menuMoviePrintPreview.getRelSizeH2() * fboToPreviewHeight);
+    fboToPreview.draw((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*(gridColumns/2) + thumbWidth/2), headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin, menuMoviePrintPreview.getRelSizeH2() * fboToPreviewWidth, menuMoviePrintPreview.getRelSizeH2() * fboToPreviewHeight);
     ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
     
     ofPopStyle;
