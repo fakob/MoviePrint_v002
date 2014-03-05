@@ -249,6 +249,7 @@ public:
     int numberOfStills;
     int menuWidth;
     float scrubWindowW, scrubWindowH;
+    int printHeaderHeight;
     
     // Menu
     fakMenu menuMovieInfo;

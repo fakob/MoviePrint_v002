@@ -105,6 +105,7 @@ void testApp::setup(){
     
     thumbWidth = 256;
     thumbHeight = 144;
+    printHeaderHeight = thumbHeight/4;
     scrollBarWidth = 12;
     scrollBarMargin = 2;
     scrollAmountRel = 0;
@@ -330,7 +331,7 @@ void testApp::setGUISettingsMoviePrint(){
     uiSliderPrintMargin = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintMargin");
 
     guiSettingsMoviePrint->addToggle("ShowMoviePrintPreview", &showMoviePrintPreview);
-    guiSettingsMoviePrint->addToggle("DisplayVideoAudioInfo", printDisplayVideoAudioInfo);
+    guiSettingsMoviePrint->addToggle("DisplayVideoAudioInfo", &printDisplayVideoAudioInfo);
     guiSettingsMoviePrint->addToggle("PrintSaveSingleFrames", printSingleFrames);
     
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
@@ -570,7 +571,11 @@ void testApp::setGUIHelp1(){
 //--------------------------------------------------------------
 void testApp::calculateNewPrintSize(){
     printGridWidth = (thumbWidth + printGridMargin) * printGridColumns + printGridMargin;
-    printGridHeight = (thumbHeight + printGridMargin) * printGridRows + printGridMargin;
+    if (printDisplayVideoAudioInfo) {
+        printGridHeight = (thumbHeight + printGridMargin) * printGridRows + printGridMargin + printHeaderHeight;
+    } else {
+        printGridHeight = (thumbHeight + printGridMargin) * printGridRows + printGridMargin;
+    }
     ofLog(OF_LOG_VERBOSE, "printGridSize" + ofToString(printGridWidth) + "x" + ofToString(printGridHeight));
 }
 
@@ -1671,6 +1676,17 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         }
         
 	}
+    else if(name == "DisplayVideoAudioInfo")
+	{
+        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+        bool val = toggle->getValue();
+        if (val) {
+            printDisplayVideoAudioInfo = true;
+        } else {
+            printDisplayVideoAudioInfo = false;
+        }
+        calculateNewPrintSize();
+	}
     else if(name == "TEXT INPUT")
     {
         ofxUITextInput *textinput = (ofxUITextInput *) e.widget;
@@ -1876,7 +1892,7 @@ void testApp::drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeing
     }
     float tempX = (leftMargin + menuWidth * tweenListInOut.update()) * _scaleFactor;
     float tempY = _scrollAmount * _scaleFactor + topMargin + headerHeight;
-    loadedMovie.drawGridOfStills(tempX, tempY, gridColumns, displayGridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
+    loadedMovie.drawGridOfStills(tempX, tempY, gridColumns, displayGridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder, printHeaderHeight);
     ofPopStyle();
 }
 
@@ -1998,7 +2014,13 @@ void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
     float tempY = (fboToPreviewHeight - _scaleFactor * printGridHeight) / 2;
     ofSetColor(255);
     ofRect(tempX, tempY, _scaleFactor * printGridWidth, _scaleFactor * printGridHeight);
-    loadedMovie.drawMoviePrintPreview(0, 0, tempX + printGridMargin * _scaleFactor, tempY + printGridMargin * _scaleFactor, printGridColumns, printGridMargin, _scaleFactor, 1, _showPlaceHolder);
+    int tempPrintHeaderHeight;
+    if (printDisplayVideoAudioInfo) {
+        tempPrintHeaderHeight = printHeaderHeight;
+    } else {
+        tempPrintHeaderHeight = 0;
+    }
+    loadedMovie.drawMoviePrintPreview(tempX + printGridMargin * _scaleFactor, tempY + printGridMargin * _scaleFactor, printGridColumns, printGridMargin, _scaleFactor, 1, _showPlaceHolder, tempPrintHeaderHeight);
     // drawing frame
     float tempFrameWidth = 3;
     ofSetColor(220);
@@ -2130,7 +2152,7 @@ void testApp::printImageToPNG(int _printSizeWidth){
         ofClear(0,0,0,0);
         ofBackground(0, 0, 0, 0);
         ofSetColor(255, 255, 255, 255);
-        loadedMovie.drawGridOfStills(printGridMargin, printGridMargin, printGridColumns, printGridMargin, 0, _newScaleFactor, 1, TRUE, TRUE, superKeyPressed, shiftKeyPressed, showPlaceHolder);
+        loadedMovie.drawGridOfStills(printGridMargin, printGridMargin, printGridColumns, printGridMargin, 0, _newScaleFactor, 1, TRUE, TRUE, superKeyPressed, shiftKeyPressed, showPlaceHolder, printHeaderHeight);
         fboToSave.end();
         fboToSave.readToPixels(gmPixToSave);
                 ofLog(OF_LOG_VERBOSE, "gmPixToSave:getImageType" + ofToString(gmPixToSave.getImageType()));

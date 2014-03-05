@@ -90,12 +90,16 @@ public:
         frameBackward3Image.loadImage("MoviePrint_FrameBackward_v001_00002.png");
         corruptImage.loadImage("MoviePrint_Corrupt_v001_00000.jpg");
         updatingStill.loadImage("MoviePrint_StillUpdating_v001_00000.png");
-
+        headerImage.loadImage("MoviePrint_Layout_Header_v001_00000.png");
         
         setNumberOfStills(_numberOfStills);
         
         gmFontStash.setup("Ubuntu-Light.ttf", 1.03);
         gmFontStashFranchise.setup("Franchise-Bold.ttf", 0.9);
+        
+        franchiseBold30.loadFont("Franchise-Bold.ttf", 30, true, true);
+        helveticaThin24.loadFont("HelveticaNeueLTCom-ThCn.ttf", 24, true, true);
+        ubuntuLight24.loadFont("Ubuntu-Light.ttf", 24, true, true);
         
         franchiseFontRightSize = 0;
         stringMargin = 2;
@@ -106,6 +110,11 @@ public:
         
         gmSetupFinished = TRUE;
         gmShowFramesUI = TRUE;
+        
+        fboHeaderInformation.allocate(3600, 36, GL_RGBA );
+        fboHeaderInformation.begin();
+        ofClear(255,255,255, 0);
+        fboHeaderInformation.end();
         
     }
     
@@ -471,110 +480,6 @@ public:
         
     }
     
-    void drawTitle(float _x, float _y, float _width, float _height, float _alpha, bool _isBeingPrinted, bool _isActive){
-        float tempStringMargin = franchiseFontRightSize/10;
-        
-        if (gmSetTitleInfo) {
-            string pathName = gmMovie.getMoviePath();
-            gmMIFilePath = gmLoadedFilePath.getFileName(pathName, TRUE);
-            gmMovieName = wrapStringFontStashFranchise(pathName, _width , _height);
-//            gmSetTitleInfo = FALSE;
-        }
-
-        gmFontStashFranchise.drawMultiLine(gmMovieName, franchiseFontRightSize, _x + tempStringMargin, _y + tempStringMargin + franchiseFontRightSize*0.8);
-    }
-    
-    void drawInfo1(float _x, float _y, float _width, float _height, float _alpha, bool _isBeingPrinted, bool _isActive){
-//        float tempFontSize = 11.0;
-        float tempFontSize = ofMap(_width, 0.0, 1000.0, 0.0, 45.0);
-        float tempStringMargin = tempFontSize/4;
-        int distance = 0;
-        if (gmSetTitleInfo) {
-            gmMIFileName = wrapStringFontStash(gmMIFileName, tempFontSize, (_width+tempStringMargin+tempStringMargin));
-            gmSetTitleInfo = FALSE;
-        }
-        gmFontStash.drawMultiLine(gmMIFileName, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*1);
-        distance = CountNewlines(wrapStringFontStash(gmMIFileName, tempFontSize, (_width+tempStringMargin+tempStringMargin))) + 1;
-        if (tempStringMargin + tempFontSize*1.03*(1+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIFormat, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(1+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(2+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIFormatString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(2+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(3+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIFileSizeString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(3+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(4+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIDurationString1, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(4+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(5+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIFrameCount, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(5+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(6+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIWidth, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(6+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(7+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIDisplayAspectRatioString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(7+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(8+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIFrameRateString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(8+distance));
-        }
-    }
-
-    void drawInfo2(float _x, float _y, float _width, float _height, float _alpha, bool _isBeingPrinted, bool _isActive){
-        
-        float tempFontSize = ofMap(_width, 0.0, 1000.0, 0.0, 45.0);
-        float tempStringMargin = tempFontSize/4;
-        int distance = 1;
-        gmFontStash.drawMultiLine(gmMIVFormat, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*1);
-        if (tempStringMargin + tempFontSize*1.03*(1+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIPixelAspectRatio, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(1+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(2+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIDisplayAspectRatio, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(2+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(3+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIFrameRate_ModeString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(3+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(4+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIColorSpace, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(4+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(5+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIChromaSubsampling, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(5+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(6+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIBitDepthString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(6+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(7+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIInterlacementString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(7+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(8+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIAFormat, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(8+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(9+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIAChannelsString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(9+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(10+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIASamplingRate, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(10+distance));
-        }
-    }
-
-    void drawInfo3(float _x, float _y, float _width, float _height, float _alpha, bool _isBeingPrinted, bool _isActive){
-        float tempFontSize = ofMap(_width, 0.0, 1000.0, 0.0, 45.0);
-        float tempStringMargin = tempFontSize/4;
-        int distance = 1;
-        string tempDispFrames = "Displayed Frames : " + ofToString(gmNumberOfStills);
-        string tempInPoint = "InPoint : " + ofToString(grabbedStill[0].gsFrameNumber);
-        string tempOutPoint = "OutPoint : " + ofToString(grabbedStill[gmNumberOfStills-1].gsFrameNumber);
-        gmFontStash.drawMultiLine(tempDispFrames, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*1);
-        if (tempStringMargin + tempFontSize*1.03*(1+distance) < _height) {
-            gmFontStash.drawMultiLine(tempInPoint, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(1+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(2+distance) < _height) {
-            gmFontStash.drawMultiLine(tempOutPoint, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(2+distance));
-        }
-    }
-
     void scrubMovie(int & i){
         if (isMovieLoaded) {
             gmScrubID = i;
@@ -786,7 +691,7 @@ public:
         }
     }
     
-    void drawStill(int i, float _x, float _y, float _w, float _h, float _alpha, bool _isBeingPrinted, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
+    void drawStill(int i, float _x, float _y, float _w, float _h, float _alpha, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
         
         if (isMovieLoaded) {
             
@@ -809,12 +714,11 @@ public:
                     grabbedStill[i].gsToBeUpdated = FALSE;
                 }
             }
-            if (!_isBeingPrinted) { // draw selection
+            // draw selection
                 if (grabbedStill[i].gsRollOver) {
                     int tempSelectionWidth = 2;
                     ofRect(grabbedStill[i].gsX - tempSelectionWidth/2, grabbedStill[i].gsY - tempSelectionWidth/2, grabbedStill[i].gsDrawWidth + tempSelectionWidth, grabbedStill[i].gsDrawHeight + tempSelectionWidth);
                 }
-            }
             
             shader.begin(); // draw still with rounded corners
             shader.setUniformTexture("maskTex", maskFbo.getTextureReference(), 1 );
@@ -840,7 +744,7 @@ public:
                 drawStillUI(i, grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, _alpha);
             }
             
-            if (!_isBeingPrinted) { // drawing overlay graphics
+            // drawing overlay graphics
                 if (grabbedStill[i].gsRollOver) {
                     ofSetColor(255, 50);
                     if (grabbedStill[i].gsRollOver3) {
@@ -878,7 +782,6 @@ public:
                     }
 
                 }
-            }
             ofPopStyle();
             ofSetColor(255);
         } else if (_drawPlaceHolder){
@@ -911,11 +814,63 @@ public:
             ofPopStyle();
             ofSetColor(255);        }
     }
+
+    void printStill(int i, float _x, float _y, float _w, float _h, bool _drawPlaceHolder){
+        
+        if (isMovieLoaded) {
+            
+            ofPushStyle();
+            ofEnableAlphaBlending();
+            ofSetColor(255);
+            
+            grabbedStill[i].gsDrawWidth = _w;
+            grabbedStill[i].gsDrawHeight = _h;
+            grabbedStill[i].gsResizeFactor = gmMovie.getWidth()/_w;
+            
+            if (grabbedStill[i].gsToBeUpdated) { // load textures in proper size
+                if (!grabbedStill[i].gsToBeGrabbed) {
+                    if (gmCalcResizeSwitch) {
+                        grabbedStill[i].gsImage.resize(grabbedStill[i].gsWidth, grabbedStill[i].gsHeight);
+                    }
+                    grabbedStill[i].gsTexture.loadData(grabbedStill[i].gsImage);
+                    grabbedStill[i].gsToBeUpdated = FALSE;
+                }
+            }
+            
+            shader.begin(); // draw still with rounded corners
+            shader.setUniformTexture("maskTex", maskFbo.getTextureReference(), 1 );
+            grabbedStill[i].gsTexture.draw(_x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
+            shader.end();
+            
+            if (gmShowFramesUI) { // drawing UI
+                drawStillUI(i, _x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, 1.0);
+            }
+            
+            ofPopStyle();
+            ofSetColor(255);
+        } else if (_drawPlaceHolder){
+            ofPushStyle();
+            ofEnableAlphaBlending();
+            ofSetColor(255);
+           
+            ofPushMatrix();
+            ofPushStyle();
+            ofSetColor(FAK_MIDDLEGRAY);
+            
+            ofRect(_x, _y, _w, _h);
+            
+            ofPopStyle();
+            ofPopMatrix();
+            
+            ofPopStyle();
+            ofSetColor(255);
+        }
+    }
     
-    void drawGridOfStills(float _x, float _y, int _gridColumns, float _gridMargin, float _scrollAmount, float _scaleFactor, float _alpha, bool _isBeingPrinted, bool _isActive, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
+    void drawGridOfStills(float _x, float _y, int _gridColumns, float _gridMargin, float _scrollAmount, float _scaleFactor, float _alpha, bool _isBeingPrinted, bool _isActive, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder, float _printHeaderHeight){
 
         if (_isBeingPrinted) {
-            gmSetTitleInfo = TRUE; //create new title size und umbruch
+            drawTitle((_x + (gmThumbWidth+_gridMargin)*0) * _scaleFactor, _y * _scaleFactor, gmThumbWidth * _scaleFactor, _printHeaderHeight * _scaleFactor, _scaleFactor);
         }
         
         // draw all frames
@@ -927,10 +882,7 @@ public:
 //        ofRectRounded((_x + (gmThumbWidth+_gridMargin)*1) * _scaleFactor, _y * _scaleFactor, ((gmThumbWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor, gmThumbHeight * _scaleFactor, gmThumbWidth * _scaleFactor/64);
 //        ofSetColor(255); // draw title and infos
 ////        drawTitle((_x + (gmThumbWidth+_gridMargin)*0) * _scaleFactor, _y * _scaleFactor, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
-////        drawInfo1((_x + (gmThumbWidth+_gridMargin)*1) * _scaleFactor, _y * _scaleFactor, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
-////        drawInfo2((_x + (gmThumbWidth+_gridMargin)*2) * _scaleFactor, _y * _scaleFactor, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
-////        drawInfo3((_x + (gmThumbWidth+_gridMargin)*3) * _scaleFactor, _y * _scaleFactor, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
-//        
+//
 //        ofSetColor(FAK_DARKORANGECOLOR); // draw mini timeline 
 //        int tempTimelineHeight = 5;
 //        ofRect((_x + (gmThumbWidth+_gridMargin)*1) * _scaleFactor, (_y + gmThumbHeight - tempTimelineHeight) * _scaleFactor, ((gmThumbWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor, tempTimelineHeight * _scaleFactor);
@@ -971,8 +923,8 @@ public:
         for(int i=0; i<gmNumberOfStills; i++)
         {
             float tempX = (_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor;
-            float tempY = (_y + (gmThumbHeight+_gridMargin)*(i/_gridColumns)) * _scaleFactor;
-            drawStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _isBeingPrinted, _superKeyPressed, _shiftKeyPressed, _drawPlaceHolder);
+            float tempY = (_y + (gmThumbHeight+_gridMargin)*(i/_gridColumns) + _printHeaderHeight) * _scaleFactor;
+            drawStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _superKeyPressed, _shiftKeyPressed, _drawPlaceHolder);
         }
         
         
@@ -1018,25 +970,56 @@ public:
         
     }
     
-    void drawMoviePrintPreview(float _x, float _y, float _xOffset, float yOffset, int _gridColumns, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder){
-       
-        bool _superKeyPressed = false;
-        bool _shiftKeyPressed = false;
-        bool _isBeingPrinted = true;
+    void drawMoviePrintPreview(float _x, float _y, int _gridColumns, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder, float _printHeaderHeight){
         
         // draw all frames
         ofPushStyle();
+        ofPushMatrix();
         ofEnableAlphaBlending();
         ofSetColor(255, 255, 255, 255); // draw stills
+        
+        drawTitle(_x, _y, ((gmThumbWidth+_gridMargin)* _gridColumns - _gridMargin) * _scaleFactor, _printHeaderHeight * _scaleFactor, _scaleFactor);
+        
+        if (_printHeaderHeight != 0) {
+            ofTranslate(0, (_printHeaderHeight) * _scaleFactor);
+        }
         for(int i=0; i<gmNumberOfStills; i++)
         {
-            float tempX = (_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor;
-            float tempY = (_y + (gmThumbHeight+_gridMargin)*(i/_gridColumns)) * _scaleFactor;
-            drawStill(i, tempX + _xOffset, tempY + yOffset, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _isBeingPrinted, _superKeyPressed, _shiftKeyPressed, _drawPlaceHolder);
+            float tempX = _x + (gmThumbWidth+_gridMargin)*(i%_gridColumns) * _scaleFactor;
+            float tempY = _y + (gmThumbHeight+_gridMargin)*(i/_gridColumns) * _scaleFactor;
+            printStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, _drawPlaceHolder);
         }
-        
+        ofPopMatrix();
         ofPopStyle();
         
+    }
+    
+    void drawTitle(float _x, float _y, float _width, float _height, float _scaleFactor){
+        float tempMargin = 5;
+        ofPushStyle();
+        ofPushMatrix();
+        ofEnableAlphaBlending();
+        ofSetColor(255, 255, 255, 255); // draw stills
+        
+        headerImage.draw(_x, _y, _width, _height);
+//        ofRect(_x, _y, _width, _height);
+        
+        fboHeaderInformation.begin();
+        ofSetColor(FAK_ORANGECOLOR);
+        ofRect(0, 0, fboHeaderInformation.getWidth(), fboHeaderInformation.getHeight());
+        ofSetColor(255, 255, 255);
+        ofRectangle tempRect1 = franchiseBold30.getStringBoundingBox("name", 0, 0);
+        ofRectangle tempRect2 = helveticaThin24.getStringBoundingBox(gmMIFilePath, 0, 0);
+        franchiseBold30.drawString("name", tempMargin, fboHeaderInformation.getHeight() - tempMargin);
+        helveticaThin24.drawString(gmMIFilePath, tempMargin*2 + tempRect1.getMaxX(), fboHeaderInformation.getHeight() - tempMargin);
+        fboHeaderInformation.end();
+        float tempTypeWidth = tempMargin*3 + tempRect1.getMaxX() + tempRect2.getMaxX();
+        float tempScaleFactor = fmin(_height / (float)fboHeaderInformation.getHeight(), _width / tempTypeWidth);
+//        fboHeaderInformation.draw(_x, _y, fboHeaderInformation.getWidth() * _scaleFactor, fboHeaderInformation.getHeight() * _scaleFactor);
+        fboHeaderInformation.draw(_x, _y, fboHeaderInformation.getWidth() * tempScaleFactor, fboHeaderInformation.getHeight() * tempScaleFactor);
+
+        ofPopMatrix();
+        ofPopStyle();
     }
     
     void drawStillUI(int i, float x, float y, float w, float h, float _alpha){
@@ -1158,6 +1141,13 @@ public:
     ofImage frameBackward3Image;
     ofImage corruptImage;
     ofImage updatingStill;
+    ofImage headerImage;
+    
+    ofFbo fboHeaderInformation;
+    
+    ofTrueTypeFont	franchiseBold30;
+    ofTrueTypeFont	ubuntuLight24;
+    ofTrueTypeFont helveticaThin24;
     
     ofxFontStash gmFontStash;
     ofxFontStash gmFontStashFranchise;
