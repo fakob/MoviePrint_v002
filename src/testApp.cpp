@@ -206,7 +206,7 @@ void testApp::setGUITimeline(){
     
     // setup gui
     guiTimeline = new ofxUICanvas(ofGetWidth()/2-displayGridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, ofGetHeight()-(footerHeight/2) - timeSliderHeight/2, ofGetWidth(),footerHeight); //ofxUICanvas(float x, float y, float width, float height)
-    guiTimeline->setFont("Ubuntu-Light.ttf");
+    guiTimeline->setFont("HelveticaNeueLTCom-LtCn.ttf");
     drawPadding = FALSE;
     guiTimeline->setDrawBack(FALSE);
 //    ofColor paddingColor = ofColor(FAK_ORANGE3);
@@ -262,7 +262,7 @@ void testApp::setGUISettings(){
 	names.push_back("off");
     
     guiSettings1 = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
-    guiSettings1->setFont("Ubuntu-Light.ttf");
+    guiSettings1->setFont("HelveticaNeueLTCom-LtCn.ttf");
 
     guiSettings1->addLabel("SETTINGS", OFX_UI_FONT_LARGE);
     guiSettings1->addSpacer(length-xInit, 1);
@@ -311,7 +311,7 @@ void testApp::setGUISettingsMoviePrint(){
 	names.push_back("off");
     
     guiSettingsMoviePrint = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
-    guiSettingsMoviePrint->setFont("Ubuntu-Light.ttf");
+    guiSettingsMoviePrint->setFont("HelveticaNeueLTCom-LtCn.ttf");
     
     guiSettingsMoviePrint->addLabel("MOVIEPRINT SETTINGS", OFX_UI_FONT_LARGE);
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
@@ -372,7 +372,7 @@ void testApp::setGUIMoviePrintPreview(){
     float length = menuWidth-xInit + (thumbWidth + displayGridMargin)*1;
     
     guiMoviePrintPreview = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
-    guiMoviePrintPreview->setFont("Ubuntu-Light.ttf");
+    guiMoviePrintPreview->setFont("HelveticaNeueLTCom-LtCn.ttf");
     
 //    guiMoviePrintPreview->addButton("WriteMoviePrint", writeMoviePrint);
 //    guiMoviePrintPreview->addBaseDraws("IMAGE CAPTION", &fboToPreview, false);
@@ -399,7 +399,7 @@ void testApp::setGUIMovieInfo(){
 	names.push_back("off");
     
     guiMovieInfo = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
-    guiMovieInfo->setFont("Ubuntu-Light.ttf");
+    guiMovieInfo->setFont("HelveticaNeueLTCom-LtCn.ttf");
     
     guiMovieInfo->addLabel("MOVIE INFO", OFX_UI_FONT_LARGE);
 
@@ -495,7 +495,7 @@ void testApp::setGUIHelp1(){
     float length = menuWidth-xInit;
 
     guiHelp1 = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
-    guiHelp1->setFont("Ubuntu-Light.ttf");
+    guiHelp1->setFont("HelveticaNeueLTCom-LtCn.ttf");
     guiMovieInfo->setColorBack(FAK_ORANGECOLOR);
     
     guiHelp1->addLabel("MOVIE INFO", OFX_UI_FONT_LARGE);

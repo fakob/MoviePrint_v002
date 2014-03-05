@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		3A129DF918C77C95008E94DF /* HelveticaNeueLTCom-ThCn.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A129DF818C77B7B008E94DF /* HelveticaNeueLTCom-ThCn.ttf */; };
+		3A129DFB18C77D78008E94DF /* HelveticaNeueLTCom-LtCn.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A129DFA18C77D6F008E94DF /* HelveticaNeueLTCom-LtCn.ttf */; };
+		3A129DFD18C77F5E008E94DF /* HelveticaNeueLTCom-Lt.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A129DFC18C77F54008E94DF /* HelveticaNeueLTCom-Lt.ttf */; };
+		3A129E0918C78E32008E94DF /* ofxFontStash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A129E0018C78E32008E94DF /* ofxFontStash.cpp */; };
+		3A129E0A18C78E32008E94DF /* fontstash.c in Sources */ = {isa = PBXBuildFile; fileRef = 3A129E0518C78E32008E94DF /* fontstash.c */; };
+		3A129E0B18C78E32008E94DF /* stb_truetype.c in Sources */ = {isa = PBXBuildFile; fileRef = 3A129E0718C78E32008E94DF /* stb_truetype.c */; };
 		3A5F1F7318B7BA27008F7486 /* ofxUI2DGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A5F1F1618B7BA27008F7486 /* ofxUI2DGraph.cpp */; };
 		3A5F1F7418B7BA27008F7486 /* ofxUI2DPad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A5F1F1818B7BA27008F7486 /* ofxUI2DPad.cpp */; };
 		3A5F1F7518B7BA27008F7486 /* ofxUIBaseDraws.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A5F1F1A18B7BA27008F7486 /* ofxUIBaseDraws.cpp */; };
@@ -77,8 +82,6 @@
 		3A8C167D18BDF27700EA178E /* MoviePrint_Layout_Menu4_v001_00002.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A8C167218BDF27700EA178E /* MoviePrint_Layout_Menu4_v001_00002.png */; };
 		3A8C167E18BDF27700EA178E /* MoviePrint_Layout_Menu5_v001_00001.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A8C167318BDF27700EA178E /* MoviePrint_Layout_Menu5_v001_00001.png */; };
 		3A8C167F18BDF27700EA178E /* MoviePrint_Layout_Menu5_v001_00002.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A8C167418BDF27700EA178E /* MoviePrint_Layout_Menu5_v001_00002.png */; };
-		3AAF41A417623B5600F94546 /* fontstash.c in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF412A17623B5600F94546 /* fontstash.c */; };
-		3AAF41A517623B5600F94546 /* ofxFontStash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF412F17623B5600F94546 /* ofxFontStash.cpp */; };
 		3AAF41A917623B5600F94546 /* ofxMSATimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF413A17623B5600F94546 /* ofxMSATimer.cpp */; };
 		3AAF41AA17623B5600F94546 /* ofxNotify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF413E17623B5600F94546 /* ofxNotify.cpp */; };
 		3AAF41AD17623B5600F94546 /* ofTextConverter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF419417623B5600F94546 /* ofTextConverter.cpp */; };
@@ -169,6 +172,14 @@
 
 /* Begin PBXFileReference section */
 		3A129DF818C77B7B008E94DF /* HelveticaNeueLTCom-ThCn.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "HelveticaNeueLTCom-ThCn.ttf"; path = "bin/data/HelveticaNeueLTCom-ThCn.ttf"; sourceTree = "<group>"; };
+		3A129DFA18C77D6F008E94DF /* HelveticaNeueLTCom-LtCn.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "HelveticaNeueLTCom-LtCn.ttf"; path = "bin/data/HelveticaNeueLTCom-LtCn.ttf"; sourceTree = "<group>"; };
+		3A129DFC18C77F54008E94DF /* HelveticaNeueLTCom-Lt.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "HelveticaNeueLTCom-Lt.ttf"; path = "bin/data/HelveticaNeueLTCom-Lt.ttf"; sourceTree = "<group>"; };
+		3A129E0018C78E32008E94DF /* ofxFontStash.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxFontStash.cpp; sourceTree = "<group>"; };
+		3A129E0118C78E32008E94DF /* ofxFontStash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxFontStash.h; sourceTree = "<group>"; };
+		3A129E0518C78E32008E94DF /* fontstash.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = fontstash.c; sourceTree = "<group>"; };
+		3A129E0618C78E32008E94DF /* fontstash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fontstash.h; sourceTree = "<group>"; };
+		3A129E0718C78E32008E94DF /* stb_truetype.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = stb_truetype.c; sourceTree = "<group>"; };
+		3A129E0818C78E32008E94DF /* stb_truetype.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stb_truetype.h; sourceTree = "<group>"; };
 		3A467811176259610099F7C8 /* MoviePrintDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoviePrintDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A5F1F1518B7BA27008F7486 /* ofxUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxUI.h; sourceTree = "<group>"; };
 		3A5F1F1618B7BA27008F7486 /* ofxUI2DGraph.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxUI2DGraph.cpp; sourceTree = "<group>"; };
@@ -335,12 +346,6 @@
 		3AAF412517623B5600F94546 /* libmediainfo.0.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libmediainfo.0.0.0.dylib; sourceTree = "<group>"; };
 		3AAF412617623B5600F94546 /* MediaInfoDLL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaInfoDLL.h; sourceTree = "<group>"; };
 		3AAF412717623B5600F94546 /* MediaInfoDLL_Static.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaInfoDLL_Static.h; sourceTree = "<group>"; };
-		3AAF412A17623B5600F94546 /* fontstash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fontstash.c; sourceTree = "<group>"; };
-		3AAF412B17623B5600F94546 /* fontstash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fontstash.h; sourceTree = "<group>"; };
-		3AAF412C17623B5600F94546 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
-		3AAF412D17623B5600F94546 /* stb_truetype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_truetype.h; sourceTree = "<group>"; };
-		3AAF412F17623B5600F94546 /* ofxFontStash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxFontStash.cpp; sourceTree = "<group>"; };
-		3AAF413017623B5600F94546 /* ofxFontStash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxFontStash.h; sourceTree = "<group>"; };
 		3AAF413817623B5600F94546 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		3AAF413A17623B5600F94546 /* ofxMSATimer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxMSATimer.cpp; sourceTree = "<group>"; };
 		3AAF413B17623B5600F94546 /* ofxMSATimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxMSATimer.h; sourceTree = "<group>"; };
@@ -433,6 +438,53 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3A129DFE18C78E32008E94DF /* ofxFontStash */ = {
+			isa = PBXGroup;
+			children = (
+				3A129DFF18C78E32008E94DF /* src */,
+				3A129E0218C78E32008E94DF /* libs */,
+			);
+			name = ofxFontStash;
+			sourceTree = "<group>";
+		};
+		3A129DFF18C78E32008E94DF /* src */ = {
+			isa = PBXGroup;
+			children = (
+				3A129E0018C78E32008E94DF /* ofxFontStash.cpp */,
+				3A129E0118C78E32008E94DF /* ofxFontStash.h */,
+			);
+			name = src;
+			path = ../../../addons/ofxFontStash/src;
+			sourceTree = "<group>";
+		};
+		3A129E0218C78E32008E94DF /* libs */ = {
+			isa = PBXGroup;
+			children = (
+				3A129E0318C78E32008E94DF /* fontstash */,
+			);
+			name = libs;
+			path = ../../../addons/ofxFontStash/libs;
+			sourceTree = "<group>";
+		};
+		3A129E0318C78E32008E94DF /* fontstash */ = {
+			isa = PBXGroup;
+			children = (
+				3A129E0418C78E32008E94DF /* src */,
+			);
+			path = fontstash;
+			sourceTree = "<group>";
+		};
+		3A129E0418C78E32008E94DF /* src */ = {
+			isa = PBXGroup;
+			children = (
+				3A129E0518C78E32008E94DF /* fontstash.c */,
+				3A129E0618C78E32008E94DF /* fontstash.h */,
+				3A129E0718C78E32008E94DF /* stb_truetype.c */,
+				3A129E0818C78E32008E94DF /* stb_truetype.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
 		3A5F1F1318B7BA27008F7486 /* ofxUI */ = {
 			isa = PBXGroup;
 			children = (
@@ -616,6 +668,8 @@
 		3AAF410A17623A1E00F94546 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				3A129DFC18C77F54008E94DF /* HelveticaNeueLTCom-Lt.ttf */,
+				3A129DFA18C77D6F008E94DF /* HelveticaNeueLTCom-LtCn.ttf */,
 				3A129DF818C77B7B008E94DF /* HelveticaNeueLTCom-ThCn.ttf */,
 				3A8C166A18BDF27700EA178E /* MoviePrint_Layout_Header_v001_00000.png */,
 				3A8C166B18BDF27700EA178E /* MoviePrint_Layout_Menu1_v001_00001.png */,
@@ -674,36 +728,6 @@
 				3AAF412517623B5600F94546 /* libmediainfo.0.0.0.dylib */,
 			);
 			path = libs;
-			sourceTree = "<group>";
-		};
-		3AAF412817623B5600F94546 /* ofxFontStash */ = {
-			isa = PBXGroup;
-			children = (
-				3AAF412917623B5600F94546 /* lib */,
-				3AAF412E17623B5600F94546 /* src */,
-			);
-			name = ofxFontStash;
-			path = ../../../addons/ofxFontStash;
-			sourceTree = "<group>";
-		};
-		3AAF412917623B5600F94546 /* lib */ = {
-			isa = PBXGroup;
-			children = (
-				3AAF412A17623B5600F94546 /* fontstash.c */,
-				3AAF412B17623B5600F94546 /* fontstash.h */,
-				3AAF412C17623B5600F94546 /* README.md */,
-				3AAF412D17623B5600F94546 /* stb_truetype.h */,
-			);
-			path = lib;
-			sourceTree = "<group>";
-		};
-		3AAF412E17623B5600F94546 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				3AAF412F17623B5600F94546 /* ofxFontStash.cpp */,
-				3AAF413017623B5600F94546 /* ofxFontStash.h */,
-			);
-			path = src;
 			sourceTree = "<group>";
 		};
 		3AAF413717623B5600F94546 /* ofxMSATimer */ = {
@@ -901,12 +925,12 @@
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
+				3A129DFE18C78E32008E94DF /* ofxFontStash */,
 				3A5F1F1318B7BA27008F7486 /* ofxUI */,
 				3A8BA6DC18B77C3900E8C9C8 /* ofxTween */,
 				3A75C0F518B35E6D0013648A /* ofxMultiTouchPad */,
 				3AAF41B417623C0900F94546 /* ofxTweener */,
 				3AAF412317623B5600F94546 /* MediaInfoDLL */,
-				3AAF412817623B5600F94546 /* ofxFontStash */,
 				3AAF413717623B5600F94546 /* ofxMSATimer */,
 				3AAF413C17623B5600F94546 /* ofxNotify */,
 				3AAF417E17623B5600F94546 /* ofxUnicode */,
@@ -1076,6 +1100,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3A129DFB18C77D78008E94DF /* HelveticaNeueLTCom-LtCn.ttf in Resources */,
 				3A129DF918C77C95008E94DF /* HelveticaNeueLTCom-ThCn.ttf in Resources */,
 				3AAF41C317623DC500F94546 /* Franchise-Bold.ttf in Resources */,
 				3A8C167C18BDF27700EA178E /* MoviePrint_Layout_Menu4_v001_00001.png in Resources */,
@@ -1083,6 +1108,7 @@
 				3A8C167618BDF27700EA178E /* MoviePrint_Layout_Menu1_v001_00001.png in Resources */,
 				3AAF41C617623DC500F94546 /* MoviePrint_Updating_v001_00000.png in Resources */,
 				3AAF41C717623DC500F94546 /* MoviePrint_StillUpdating_v001_00000.png in Resources */,
+				3A129DFD18C77F5E008E94DF /* HelveticaNeueLTCom-Lt.ttf in Resources */,
 				3A8C167518BDF27700EA178E /* MoviePrint_Layout_Header_v001_00000.png in Resources */,
 				3AAF41C817623DC500F94546 /* MoviePrint_StillUpdating_v001_00000.jpg in Resources */,
 				3A8C167F18BDF27700EA178E /* MoviePrint_Layout_Menu5_v001_00002.png in Resources */,
@@ -1166,6 +1192,7 @@
 				3A5F1F8118B7BA27008F7486 /* ofxUIImageSampler.cpp in Sources */,
 				3A5F1F9318B7BA27008F7486 /* ofxUISpacer.cpp in Sources */,
 				3A8BA70018B77C3900E8C9C8 /* ofxEasingExpo.cpp in Sources */,
+				3A129E0B18C78E32008E94DF /* stb_truetype.c in Sources */,
 				3A5F1F8718B7BA27008F7486 /* ofxUIMinimalSlider.cpp in Sources */,
 				3A5F1F9118B7BA27008F7486 /* ofxUISlider.cpp in Sources */,
 				3A5F1F7418B7BA27008F7486 /* ofxUI2DPad.cpp in Sources */,
@@ -1174,8 +1201,6 @@
 				3A8BA6FC18B77C3900E8C9C8 /* ofxEasingBounce.cpp in Sources */,
 				3A75C0FA18B35E6D0013648A /* ofxMultiTouchPad.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* testApp.cpp in Sources */,
-				3AAF41A417623B5600F94546 /* fontstash.c in Sources */,
-				3AAF41A517623B5600F94546 /* ofxFontStash.cpp in Sources */,
 				3A5F1F8418B7BA27008F7486 /* ofxUILabel.cpp in Sources */,
 				3A5F1F7A18B7BA27008F7486 /* ofxUIDragableLabelButton.cpp in Sources */,
 				3A5F1F8B18B7BA27008F7486 /* ofxUINumberDialer.cpp in Sources */,
@@ -1193,6 +1218,7 @@
 				3AAF41AE17623B5600F94546 /* ofUnicode.cpp in Sources */,
 				3A5F1F7818B7BA27008F7486 /* ofxUICanvas.cpp in Sources */,
 				3A5F1F7F18B7BA27008F7486 /* ofxUIImage.cpp in Sources */,
+				3A129E0918C78E32008E94DF /* ofxFontStash.cpp in Sources */,
 				3A5F1F9A18B7BA27008F7486 /* ofxUIToggleMatrix.cpp in Sources */,
 				3AAF41AF17623B5600F94546 /* ofUTF8.cpp in Sources */,
 				3A5F1F9E18B7BA27008F7486 /* ofxUIWidgetWithLabel.cpp in Sources */,
@@ -1210,6 +1236,7 @@
 				3A5F1F8D18B7BA27008F7486 /* ofxUIRangeSlider.cpp in Sources */,
 				3A5F1F8318B7BA27008F7486 /* ofxUIImageToggle.cpp in Sources */,
 				3A8BA6FD18B77C3900E8C9C8 /* ofxEasingCirc.cpp in Sources */,
+				3A129E0A18C78E32008E94DF /* fontstash.c in Sources */,
 				3AAF41B317623B5600F94546 /* ofxXmlSettings.cpp in Sources */,
 				3A5F1F8818B7BA27008F7486 /* ofxUIMovingGraph.cpp in Sources */,
 				3A5F1F7518B7BA27008F7486 /* ofxUIBaseDraws.cpp in Sources */,

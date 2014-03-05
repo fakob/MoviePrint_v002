@@ -96,9 +96,10 @@ public:
         
         gmFontStash.setup("Ubuntu-Light.ttf", 1.03);
         gmFontStashFranchise.setup("Franchise-Bold.ttf", 0.9);
+        gmFontStashHelvetica.setup("HelveticaNeueLTCom-Lt.ttf");
         
         franchiseBold30.loadFont("Franchise-Bold.ttf", 30, true, true);
-        helveticaThin24.loadFont("HelveticaNeueLTCom-ThCn.ttf", 24, true, true);
+        helveticaThin24.loadFont("HelveticaNeueLTCom-Lt.ttf", 24, true, true);
         ubuntuLight24.loadFont("Ubuntu-Light.ttf", 24, true, true);
         
         franchiseFontRightSize = 0;
@@ -111,7 +112,7 @@ public:
         gmSetupFinished = TRUE;
         gmShowFramesUI = TRUE;
         
-        fboHeaderInformation.allocate(3600, 36, GL_RGBA );
+        fboHeaderInformation.allocate(3600, 40, GL_RGBA );
         fboHeaderInformation.begin();
         ofClear(255,255,255, 0);
         fboHeaderInformation.end();
@@ -327,117 +328,6 @@ public:
             grabbedStill.clear();
             grabbedStill.resize(_numberOfStills);
         }
-    }
-    
-    string wrapStringFontStash(string _text, float _size ,int _width) {
-        
-        _width = stringMargin*2 + _width;
-        string typeWrapped = "";
-        string tempString = "";
-        //        vector <string> words = ofSplitString(_text, " ");
-        vector <string> words;
-        boost::split(words, _text, boost::is_any_of(" \n"));
-        //        ofLog(OF_LOG_VERBOSE, "words: " + ofToString(words));
-        
-        for(int i=0; i<words.size(); i++) {
-            
-            string wrd = words[i];
-            
-            // if we aren't on the first word, add a space
-            if (i > 0) {
-                tempString += " ";
-            }
-            tempString += wrd;
-            
-            float stringwidth = gmFontStash.getWidth(tempString, _size) + _size/3;
-            stringwidth = ceil (stringwidth);
-            //            ofLog(OF_LOG_VERBOSE, "stringwidth:" + ofToString(stringwidth) + " tempString:" + ofToString(tempString));
-            
-            if(stringwidth >= _width) {
-                typeWrapped += "\n";
-                tempString = wrd;       // make sure we're including the extra word on the next line
-            } else if (i > 0) {
-                // if we aren't on the first word, add a space
-                typeWrapped += " ";
-            }
-            
-            typeWrapped += wrd;
-            
-        }
-        
-        //        ofLog(OF_LOG_VERBOSE, "typeWrapped" + ofToString(typeWrapped));
-        
-        return typeWrapped;
-        
-    }
-
-    string wrapStringFontStashFranchise(string _tempString, int _tempWidth, int _tempHeight) {
-        
-        int tempLineHeight = 0;
-        int tempCutPoint = 0;
-        float tempLineHeightFactor = 0.9;
-        franchiseFontRightSize = 0;
-        string tempTempString = _tempString;
-        vector<int> tempTempVecIterator;
-        tempTempVecIterator.clear();
-//        ofLog(OF_LOG_VERBOSE, "_tempString: " + ofToString(_tempString));
-
-        
-        for (int j=0; j<sizeof(tempFontSize); j++) {
-            
-            for (int i=1; i<_tempString.length(); i++) {
-                string tempStringIncrement = _tempString.substr(tempCutPoint,i-tempCutPoint);
-                float tempStringWidth = gmFontStashFranchise.getWidth(tempStringIncrement, tempFontSize[j]);
-//                ofLog(OF_LOG_VERBOSE, "tempFontSize[j]: " + ofToString(tempFontSize[j]));
-//                ofLog(OF_LOG_VERBOSE, "tempStringIncrement: " + ofToString(tempStringIncrement));
-//                ofLog(OF_LOG_VERBOSE, "tempStringWidth: " + ofToString(tempStringWidth));
-
-                if ((int)tempStringWidth > (_tempWidth-(stringMargin+stringMargin+stringMargin))) {
-                    tempCutPoint = i-1;
-                    tempLineHeight = tempLineHeight + tempFontSize[j] * tempLineHeightFactor;
-                }
-//                ofLog(OF_LOG_VERBOSE, "tempLineHeight: " + ofToString(tempLineHeight));
-
-            }
-
-                if (tempLineHeight > (_tempHeight-(tempFontSize[j] * tempLineHeightFactor + stringMargin + stringMargin))) {
-                franchiseFontRightSize = tempFontSize[j-1];
-                break;
-            }
-            if (j == (sizeof(tempFontSize)-1)) {
-                franchiseFontRightSize = tempFontSize[j];
-                break;
-            }
-            tempLineHeight = 0;
-            tempCutPoint = 0;
-        }
-        
-        tempLineHeight = 0;
-        tempCutPoint = 0;
-        
-//        ofLog(OF_LOG_VERBOSE, "franchiseFontRightSize: " + ofToString(franchiseFontRightSize));
-        for (int i=1; i<_tempString.length(); i++) {
-            string tempStringIncrement = _tempString.substr(tempCutPoint,i-tempCutPoint);
-            float tempStringWidth = gmFontStashFranchise.getWidth(tempStringIncrement, franchiseFontRightSize);
-//            ofLog(OF_LOG_VERBOSE, "tempStringIncrement: " + ofToString(tempStringIncrement));
-//            ofLog(OF_LOG_VERBOSE, "tempStringWidth: " + ofToString(tempStringWidth));
-            if ((int)tempStringWidth > (_tempWidth-(stringMargin+stringMargin+stringMargin))) {
-                tempCutPoint = i-1;
-                tempLineHeight = tempLineHeight + franchiseFontRightSize * tempLineHeightFactor;
-                tempTempVecIterator.push_back(tempCutPoint);
-            }
-            if (i == (_tempString.length()-1)) {
-                tempTempVecIterator.push_back(tempCutPoint);
-            }
-        }
-        for (int k = tempTempVecIterator.size()-1; k-- > 0; ) {
-            tempTempString.insert(tempTempVecIterator[k], "\n");
-        }
-        tempTempString = StringToUpper(tempTempString);
-        tempTempString = tempTempString.substr(0,tempTempString.length()-4);
-//        ofLog(OF_LOG_VERBOSE, "tempTempString: " + ofToString(tempTempString));
-        
-        return tempTempString;
     }
     
     string StringToUpper(string strToConvert){
@@ -978,7 +868,10 @@ public:
         ofEnableAlphaBlending();
         ofSetColor(255, 255, 255, 255); // draw stills
         
-        drawTitle(_x, _y, ((gmThumbWidth+_gridMargin)* _gridColumns - _gridMargin) * _scaleFactor, _printHeaderHeight * _scaleFactor, _scaleFactor);
+//        drawTitle(_x, _y, ((gmThumbWidth+_gridMargin)* _gridColumns - _gridMargin) * _scaleFactor, _printHeaderHeight * _scaleFactor, _scaleFactor);
+        gmFontStashFranchise.draw("name",20, 5, 28 - 5);
+        gmFontStashHelvetica.draw(gmMIFilePath,34, 5*2 + 100, 28 - 5);
+
         
         if (_printHeaderHeight != 0) {
             ofTranslate(0, (_printHeaderHeight) * _scaleFactor);
@@ -1006,17 +899,21 @@ public:
         
         fboHeaderInformation.begin();
         ofSetColor(FAK_ORANGECOLOR);
-        ofRect(0, 0, fboHeaderInformation.getWidth(), fboHeaderInformation.getHeight());
+        ofRect(0, 0, ofGetWindowWidth(), fboHeaderInformation.getHeight());
         ofSetColor(255, 255, 255);
+        ofRect(tempMargin, 28, ofGetWindowWidth(), 8);
+
         ofRectangle tempRect1 = franchiseBold30.getStringBoundingBox("name", 0, 0);
         ofRectangle tempRect2 = helveticaThin24.getStringBoundingBox(gmMIFilePath, 0, 0);
-        franchiseBold30.drawString("name", tempMargin, fboHeaderInformation.getHeight() - tempMargin);
-        helveticaThin24.drawString(gmMIFilePath, tempMargin*2 + tempRect1.getMaxX(), fboHeaderInformation.getHeight() - tempMargin);
+//        franchiseBold30.drawString("name", tempMargin, fboHeaderInformation.getHeight() - tempMargin);
+//        helveticaThin24.drawString(gmMIFilePath, tempMargin*2 + tempRect1.getMaxX(), fboHeaderInformation.getHeight() - tempMargin);
+        gmFontStashFranchise.draw("name",20, tempMargin, 28 - tempMargin);
+        gmFontStashHelvetica.draw(gmMIFilePath,14, tempMargin*2 + tempRect1.getMaxX(), 28 - tempMargin);
         fboHeaderInformation.end();
         float tempTypeWidth = tempMargin*3 + tempRect1.getMaxX() + tempRect2.getMaxX();
         float tempScaleFactor = fmin(_height / (float)fboHeaderInformation.getHeight(), _width / tempTypeWidth);
-//        fboHeaderInformation.draw(_x, _y, fboHeaderInformation.getWidth() * _scaleFactor, fboHeaderInformation.getHeight() * _scaleFactor);
-        fboHeaderInformation.draw(_x, _y, fboHeaderInformation.getWidth() * tempScaleFactor, fboHeaderInformation.getHeight() * tempScaleFactor);
+//        fboHeaderInformation.draw(0, 40, fboHeaderInformation.getWidth() * tempScaleFactor, fboHeaderInformation.getHeight() * tempScaleFactor);
+        fboHeaderInformation.draw(0, 0);
 
         ofPopMatrix();
         ofPopStyle();
@@ -1038,7 +935,7 @@ public:
             ofPushStyle();
             ofEnableAlphaBlending();
             
-            ofRectangle rect = gmFontStash.getBoundingBoxSize(dummyString, tempFontSize, 0, 0);
+            ofRectangle rect = gmFontStash.getBBox(dummyString, tempFontSize, 0, 0);
             if (grabbedStill[i].gsManipulated) {
                 ofSetColor(FAK_ORANGECOLOR, 200*_alpha);
             } else {
@@ -1149,6 +1046,7 @@ public:
     ofTrueTypeFont	ubuntuLight24;
     ofTrueTypeFont helveticaThin24;
     
+    ofxFontStash gmFontStashHelvetica;
     ofxFontStash gmFontStash;
     ofxFontStash gmFontStashFranchise;
     int tempFontSize[24] = {6, 10, 14, 18, 22, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 80, 92, 108, 128, 256, 300};

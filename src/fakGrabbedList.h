@@ -139,7 +139,7 @@ public:
         glFontStash.drawMultiLine("ID", tempSize, _x + 2, _y + _scrollAmount + tempSize);
         glFontStash.drawMultiLine("Name", tempSize, _x + glDroppedItem[0].gliIDWidth + 2, _y + _scrollAmount + tempSize);
 //        glFontStash.drawMultiLine("Tried", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth - 5, _y + _scrollAmount + tempSize);
-        glFontStash.drawMultiLine("Printed", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth + glDroppedItem[0].gliPrintedWidth - 2 - glFontStash.getWidth("Printed", tempSize), _y + _scrollAmount + tempSize);
+        glFontStash.drawMultiLine("Printed", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth + glDroppedItem[0].gliPrintedWidth - 2 - glFontStash.getBBox("Printed", tempSize,0,0).getMaxY(), _y + _scrollAmount + tempSize);
 
         for(int k = 0; k < glDroppedItem.size(); k++){
             glDroppedItem[k].gliX = _x;
