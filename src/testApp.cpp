@@ -28,6 +28,7 @@ void testApp::setup(){
 
     ofSetLogLevel(OF_LOG_VERBOSE);
     drawNotify = false; // ofxNotify
+    showPlaceHolder = false; // added for developing
     
     setResourcePath();
     
@@ -95,7 +96,6 @@ void testApp::setup(){
     
     rollOverClicked = FALSE;
     
-    showPlaceHolder = true; // added for developing
     showFBO = FALSE;
     
     gridRows = 6;
@@ -338,28 +338,26 @@ void testApp::setGUISettingsMoviePrint(){
     ofxUIRadio *uiRadioSetFrameDisplay = guiSettingsMoviePrint->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
     uiRadioSetFrameDisplay->activateToggle("TimeCode");
     
-        vector<string> names3;
+    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
+
+    guiSettingsMoviePrint->addLabel("Choose Output Format", OFX_UI_FONT_MEDIUM);
+    vector<string> names3;
     names3.push_back("png");
     names3.push_back("jpg");
 //    names3.push_back("gif");
-    uiDropDownListPrintOutputFormat = new ofxUIDropDownList(length-xInit, "Choose Output Format", names3, OFX_UI_FONT_MEDIUM);
-    uiDropDownListPrintOutputFormat->setAllowMultiple(FALSE);
-    uiDropDownListPrintOutputFormat->setAutoClose(true);
-    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
-    guiSettingsMoviePrint->addWidgetDown(uiDropDownListPrintOutputFormat);
+    guiSettingsMoviePrint->addRadio("Choose Output Format", names3, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
+    uiRadioPrintOutputFormat =(ofxUIRadio *) guiSettingsMoviePrint->getWidget("Choose Output Format");
     
+    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
+
+    guiSettingsMoviePrint->addLabel("MoviePrint Width", OFX_UI_FONT_MEDIUM);
     vector<string> names4;
     names4.push_back("1024px wide");
     names4.push_back("2048px wide");
     names4.push_back("3072px wide");
     names4.push_back("4096px wide");
-    uiDropDownlistPrintOutputWidth = new ofxUIDropDownList(length-xInit, "MoviePrint Width", names4, OFX_UI_FONT_MEDIUM);
-    uiDropDownlistPrintOutputWidth->setAllowMultiple(FALSE);
-    uiDropDownlistPrintOutputWidth->setAutoClose(true);
-    guiSettingsMoviePrint->addSpacer(length-xInit, 50);
-    guiSettingsMoviePrint->addWidgetDown(uiDropDownlistPrintOutputWidth);
-    
-    guiSettingsMoviePrint->addBaseDraws("IMAGE CAPTION", &fboToPreview, false);
+    guiSettingsMoviePrint->addRadio("MoviePrint Width", names4, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
+    uiRadioPrintOutputFormat =(ofxUIRadio *) guiSettingsMoviePrint->getWidget("MoviePrint Width");
     
     guiSettingsMoviePrint->setColorBack(FAK_TRANSPARENT);
 	ofAddListener(guiSettingsMoviePrint->newGUIEvent,this,&testApp::guiEvent);
@@ -770,9 +768,6 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
 //--------------------------------------------------------------
 void testApp::update(){
     
-    ofLog(OF_LOG_VERBOSE, "showMenu:" + ofToString(tweenListInOut.update()));
-
-    
     threadIsRunning = loadedMovie.isThreadRunning();
     
     // set window to minium width !!NOT WORKING
@@ -1169,8 +1164,6 @@ void testApp::draw(){
                         outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-outPointImage.getHeight()/2);
                     }
                     
-                    ofPopStyle();
-                    
                     if(scrubFade < 5){
                         updateInOut = FALSE;
                         manipulateSlider = FALSE;
@@ -1178,32 +1171,13 @@ void testApp::draw(){
 
                     ofSetColor(255);
 
+                    ofPopStyle();
+
                 }
                 
                 // draw the scrubbed video
                 if (updateScrub) {
-                    
-                    ofEnableAlphaBlending();
-                    ofSetColor(0,(scrubFade/255)*200);
-                    if (showTimeline){
-                        ofRect(0, 0, ofGetWidth(), ofGetHeight()-footerHeight);
-                    } else {
-                        ofRect(0, 0, ofGetWidth(), ofGetHeight());
-                    }
-                    // draw the scrubSpeed
-                    ofSetColor(FAK_ORANGECOLOR,(int)scrubFade);
-                    ofRect(ofGetWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2+scrubWindowH/2, scrubDelta*30.0, loaderBarHeight);
-                    ofSetColor(255,255,255,(int)scrubFade);
-                    int j = loadedMovie.gmScrubID;
-                    loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
-                    loadedMovie.drawStillUI(j, ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (float)(scrubFade/255));
-                    
-                    ofDisableAlphaBlending();
-                    ofSetColor(255);
-                    if(scrubFade < 5){
-                        updateScrub = FALSE;
-                        loadedMovie.gmScrubMovie = FALSE;
-                    }
+                    drawScrubScreen(1.0);
                 }
                 
                 scrollBar.draw();
@@ -1231,29 +1205,6 @@ void testApp::writeFboToPreview(float _scaleFactor, bool _showPlaceHolder){
     ofClear(255,255,255, 0);
     drawMoviePrintPreview(_scaleFactor, _showPlaceHolder);
     fboToPreview.end();
-}
-
-//--------------------------------------------------------------
-void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
-    ofPushStyle();
-    _scaleFactor = _scaleFactor * 0.95;
-    float tempX = (fboToPreviewWidth - _scaleFactor * printGridWidth) / 2;
-    float tempY = (fboToPreviewHeight - _scaleFactor * printGridHeight) / 2;
-    ofSetColor(255);
-    ofRect(tempX, tempY, _scaleFactor * printGridWidth, _scaleFactor * printGridHeight);
-    loadedMovie.drawMoviePrintPreview(0, 0, tempX + printGridMargin * _scaleFactor, tempY + printGridMargin * _scaleFactor, printGridColumns, printGridMargin, _scaleFactor, 1, _showPlaceHolder);
-    // drawing frame
-    float tempFrameWidth = 3;
-    ofSetColor(220);
-    ofRect(tempX, tempY - tempFrameWidth, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
-    ofRect(tempX - tempFrameWidth, tempY - tempFrameWidth, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth);
-    ofRect(tempX + _scaleFactor * printGridWidth, tempY, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth);
-    ofRect(tempX - tempFrameWidth, tempY + _scaleFactor * printGridHeight, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
-    // drawing shadow
-    ofSetColor(0,200);
-    ofRect(tempX + _scaleFactor * printGridWidth + tempFrameWidth, tempY, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth*2);
-    ofRect(tempX, tempY + _scaleFactor * printGridHeight + tempFrameWidth, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
-    ofPopStyle();
 }
 
 //--------------------------------------------------------------
@@ -1915,6 +1866,7 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
 //--------------------------------------------------------------
 void testApp::drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _showPlaceHolder){
     
+    ofPushStyle();
     float _scrollAmount = 0;
     if (scrollBar.sbActive) {
         _scrollAmount = ((displayGridHeight - (ofGetWindowHeight() - headerHeight - topMargin - bottomMargin)) * -1) * _scrollAmountRel;
@@ -1925,6 +1877,7 @@ void testApp::drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeing
     float tempX = (leftMargin + menuWidth * tweenListInOut.update()) * _scaleFactor;
     float tempY = _scrollAmount * _scaleFactor + topMargin + headerHeight;
     loadedMovie.drawGridOfStills(tempX, tempY, gridColumns, displayGridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
+    ofPopStyle();
 }
 
 //--------------------------------------------------------------
@@ -2035,6 +1988,72 @@ void testApp::drawLoadMovieScreen(){
     loadMovieImage.draw(ofGetWidth()/2-loadMovieImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-loadMovieImage.getHeight()/2);
     ofPopStyle();
     
+}
+
+//--------------------------------------------------------------
+void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
+    ofPushStyle();
+    _scaleFactor = _scaleFactor * 0.95;
+    float tempX = (fboToPreviewWidth - _scaleFactor * printGridWidth) / 2;
+    float tempY = (fboToPreviewHeight - _scaleFactor * printGridHeight) / 2;
+    ofSetColor(255);
+    ofRect(tempX, tempY, _scaleFactor * printGridWidth, _scaleFactor * printGridHeight);
+    loadedMovie.drawMoviePrintPreview(0, 0, tempX + printGridMargin * _scaleFactor, tempY + printGridMargin * _scaleFactor, printGridColumns, printGridMargin, _scaleFactor, 1, _showPlaceHolder);
+    // drawing frame
+    float tempFrameWidth = 3;
+    ofSetColor(220);
+    ofRect(tempX, tempY - tempFrameWidth, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
+    ofRect(tempX - tempFrameWidth, tempY - tempFrameWidth, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth);
+    ofRect(tempX + _scaleFactor * printGridWidth, tempY, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth);
+    ofRect(tempX - tempFrameWidth, tempY + _scaleFactor * printGridHeight, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
+    // drawing shadow
+    ofSetColor(0,200);
+    ofRect(tempX + _scaleFactor * printGridWidth + tempFrameWidth, tempY, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth*2);
+    ofRect(tempX, tempY + _scaleFactor * printGridHeight + tempFrameWidth, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
+    ofPopStyle();
+}
+
+//--------------------------------------------------------------
+void testApp::drawScrubScreen(float _scaleFactor){
+    ofPushStyle();
+    ofEnableAlphaBlending();
+    ofSetColor(0,(scrubFade/255)*200);
+    if (showTimeline){
+        ofRect(0, 0, ofGetWidth(), ofGetHeight()-footerHeight);
+    } else {
+        ofRect(0, 0, ofGetWidth(), ofGetHeight());
+    }
+    // draw the scrubSpeed
+    ofSetColor(FAK_ORANGECOLOR,(int)scrubFade);
+    ofRect(ofGetWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2+scrubWindowH/2, scrubDelta*30.0, loaderBarHeight);
+    ofSetColor(255,255,255,(int)scrubFade);
+    int j = loadedMovie.gmScrubID;
+    loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+    loadedMovie.drawStillUI(j, ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (float)(scrubFade/255));
+    
+    // drawing frame
+    float tempX = ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update();
+    float tempY = ofGetHeight()/2-scrubWindowH/2;
+    float tempFrameWidth = 3;
+    ofSetColor(220);
+    ofRect(tempX, tempY - tempFrameWidth, _scaleFactor * scrubWindowW + tempFrameWidth, tempFrameWidth);
+    ofRect(tempX - tempFrameWidth, tempY - tempFrameWidth, tempFrameWidth, _scaleFactor * scrubWindowH + tempFrameWidth);
+    ofRect(tempX + _scaleFactor * scrubWindowW, tempY, tempFrameWidth, _scaleFactor * scrubWindowH + tempFrameWidth);
+    ofRect(tempX - tempFrameWidth, tempY + _scaleFactor * scrubWindowH, _scaleFactor * scrubWindowW + tempFrameWidth, tempFrameWidth);
+    // drawing shadow
+    ofSetColor(0,200);
+    ofRect(tempX + _scaleFactor * scrubWindowW + tempFrameWidth, tempY, tempFrameWidth, _scaleFactor * scrubWindowH + tempFrameWidth*2);
+    ofRect(tempX, tempY + _scaleFactor * scrubWindowH + tempFrameWidth, _scaleFactor * scrubWindowW + tempFrameWidth, tempFrameWidth);
+
+    
+    ofDisableAlphaBlending();
+    ofSetColor(255);
+    if(scrubFade < 5){
+        updateScrub = FALSE;
+        loadedMovie.gmScrubMovie = FALSE;
+    }
+    ofPopStyle();
+
 }
 
 //--------------------------------------------------------------
@@ -2201,7 +2220,8 @@ void testApp::rollOverButtonsClicked(int _rollOverMovieID, int _rollOverMovieBut
     if (_rollOverMovieButtonID == 3) {
         setInPoint(loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber);
         loadedMovie.gmRollOver = FALSE;
-        
+        ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
+
     } else if (_rollOverMovieButtonID == 4) {
         setOutPoint(loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber);
         loadedMovie.gmRollOver = FALSE;

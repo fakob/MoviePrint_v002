@@ -48,6 +48,7 @@ public:
     void drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _showPlaceHolder);
     void drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder);
     void drawList(float _scrollAmountRel);
+    void drawScrubScreen(float _scaleFactor);
     void printImageToPNG(int _printSizeWidth);
     void printListToPNG();
     void listClick(int & i);
@@ -195,7 +196,9 @@ public:
     ofxUIIntSlider *uiSliderNumberOfThumbs;
     ofxUIDropDownList *uiDropDownListPrintOutputFormat;
     ofxUIDropDownList *uiDropDownlistPrintOutputWidth;
-    
+    ofxUIRadio *uiRadioPrintOutputFormat;
+    ofxUIRadio *uiRadioPrintOutputWidth;
+
 
     
     // ofxUICanvas *guiHelp1
