@@ -106,15 +106,12 @@ public:
         
         setNumberOfStills(_numberOfStills);
         
-        gmFontStash.setup("Ubuntu-Light.ttf", 1.03);
+        gmFontStashUbuntu.setup("Ubuntu-Light.ttf", 1.03);
         gmFontStashFranchise.setup("Franchise-Bold.ttf", 0.9);
         gmFontStashHelveticaLight.setup("HelveticaNeueLTCom-Lt.ttf");
         gmFontStashHelveticaMedium.setup("HelveticaNeueLTCom-Md.ttf");
         
-        franchiseBold110.loadFont("Franchise-Bold.ttf", 110, true, true);
-        helveticaThin08.loadFont("HelveticaNeueLTCom-Lt.ttf", 8, true, true);
-        ubuntuLight24.loadFont("Ubuntu-Light.ttf", 24, true, true);
-        
+      
         franchiseFontRightSize = 0;
         stringMargin = 2;
 
@@ -124,8 +121,6 @@ public:
         
         gmSetupFinished = TRUE;
         gmShowFramesUI = TRUE;
-        
-        fboHeaderInformation.allocate(4000, 400, GL_RGBA );
         
     }
     
@@ -874,15 +869,11 @@ public:
     }
     
     void drawMoviePrint(float _x, float _y, int _gridColumns, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder, float _printHeaderHeight, bool _printDisplayVideoAudioInfo, bool _drawPreview){
-        
-        // draw all frames
-        ofPushStyle();
-        ofPushMatrix();
-        ofEnableAlphaBlending();
-        ofSetColor(255, 255, 255, 255); // draw stills
-        if (_printDisplayVideoAudioInfo) {
+
+        if (_printDisplayVideoAudioInfo) { // draw info header
             ofPushStyle();
             ofPushMatrix();
+            ofEnableAlphaBlending();
             ofSetColor(FAK_GRAY);
             ofRect(_x * _scaleFactor, _y * _scaleFactor, (_gridMargin + (gmThumbWidth+_gridMargin) * _gridColumns) * _scaleFactor, _printHeaderHeight * _scaleFactor);
             for(int i=0; i<_gridColumns; i++)
@@ -917,23 +908,24 @@ public:
                 ofRect(((_x + _gridMargin + gmThumbWidth/4.0) * _scaleFactor), ((_y + _printHeaderHeight*0.45) * _scaleFactor), ((gmThumbWidth/4)*3) * _scaleFactor, _printHeaderHeight*0.15 * _scaleFactor);
             } else {
                 // draw Info text
-                
-                // get Width of Type
-                float tempWidthOfName = gmFontStashFranchise.getBBox("name", 20 * _scaleFactor, 0, 0).getWidth();
-                float tempWidthOfPathName = gmFontStashHelveticaMedium.getBBox(ofToString(gmMovie.getMoviePath()), 12 * _scaleFactor, 0, 0).getWidth();
-                float tempWidthOfPath = gmFontStashHelveticaLight.getBBox(ofToString(gmMIFilePathOhne), 12 * _scaleFactor, 0, 0).getWidth();
+                float tempFontHeightBig = 20;
+                float tempFontHeightSmall = 10;
                 float tempFontScale = _scaleFactor;
+
+                // get Width of Type
+                float tempWidthOfName = gmFontStashFranchise.getBBox("name", tempFontHeightBig * _scaleFactor, 0, 0).getWidth();
+                float tempWidthOfPathName = gmFontStashHelveticaMedium.getBBox(ofToString(gmMovie.getMoviePath()), tempFontHeightSmall * _scaleFactor, 0, 0).getWidth();
                 
                 // when PathName width bigger then display width then downscale the PathName
                 if ((((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName) <= tempWidthOfPathName) {
                     tempFontScale = tempFontScale * (((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName)/tempWidthOfPathName*0.75;
-//                    ofLog(OF_LOG_VERBOSE, "_____________________tempFontScale: " + ofToString(tempFontScale));
-//                    ofLog(OF_LOG_VERBOSE, "_____________________scaleFactor: " + ofToString(_scaleFactor));
                 }
+                float tempWidthOfPath = gmFontStashHelveticaLight.getBBox(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, 0, 0).getWidth();
+
                 ofSetColor(255, 255, 255, 255);
                 gmFontStashFranchise.draw("name",20 * _scaleFactor, (int)((_x + _gridMargin) * _scaleFactor), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
-                gmFontStashHelveticaLight.draw(ofToString(gmMIFilePathOhne), 12 * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
-                gmFontStashHelveticaMedium.draw(ofToString(gmMIFileNameClean), 12 * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1 + tempWidthOfPath), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+                gmFontStashHelveticaLight.draw(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+                gmFontStashHelveticaMedium.draw(ofToString(gmMIFileNameClean), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1 + tempWidthOfPath), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
             }
 
             ofPopMatrix();
@@ -941,7 +933,12 @@ public:
             
             ofTranslate(0, (_printHeaderHeight) * _scaleFactor);
         }
-
+        
+        // draw all frames
+        ofPushStyle();
+        ofPushMatrix();
+        ofEnableAlphaBlending();
+        ofSetColor(255, 255, 255, 255);
         for(int i=0; i<gmNumberOfStills; i++)
         {
             float tempX = (_x + _gridMargin + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor;
@@ -950,29 +947,8 @@ public:
         }
         ofPopMatrix();
         ofPopStyle();
-        
     }
-    
-    void drawTitle(float _scaleFactor){
-        float tempMargin = 5;
-        ofPushStyle();
-        ofPushMatrix();
-        ofEnableAlphaBlending();
 
-        fboHeaderInformation.begin();
-        ofClear(255,255,255, 0);
-        ofSetColor(255, 255, 255);
-        franchiseBold110.drawString("name", 0,fboHeaderInformation.getHeight());
-        helveticaThin08.drawString("/Users/fakob/Movies/Daft Punk - Get Lucky by Shortology.mp4", 0 + 45, fboHeaderInformation.getHeight());
-//        helveticaThin08.drawString(ofToString(gmMovie.getMoviePath()), 0 + 45, fboHeaderInformation.getHeight());
-
-        fboHeaderInformation.end();
-        
-        ofPopMatrix();
-        ofPopStyle();
-
-    }
-    
     void drawStillUI(int i, float x, float y, float w, float h, float _alpha){
         
         if (isMovieLoaded) {
@@ -989,7 +965,7 @@ public:
             ofPushStyle();
             ofEnableAlphaBlending();
             
-            ofRectangle rect = gmFontStash.getBBox(dummyString, tempFontSize, 0, 0);
+            ofRectangle rect = gmFontStashUbuntu.getBBox(dummyString, tempFontSize, 0, 0);
             if (grabbedStill[i].gsManipulated) {
                 ofSetColor(FAK_ORANGECOLOR, 200*_alpha);
             } else {
@@ -1001,7 +977,7 @@ public:
             } else {
                 ofSetColor(255, 255 * _alpha);
             }
-            gmFontStash.drawMultiLine(dummyString, tempFontSize, x + rect.width*0.015, y+rect.height + rect.height*0.15);
+            gmFontStashUbuntu.drawMultiLine(dummyString, tempFontSize, x + rect.width*0.015, y+rect.height + rect.height*0.15);
             
             ofPopStyle();
             
@@ -1094,15 +1070,9 @@ public:
     ofImage updatingStill;
     ofImage headerImage;
     
-    ofFbo fboHeaderInformation;
-    
-    ofTrueTypeFont	franchiseBold110;
-    ofTrueTypeFont	ubuntuLight24;
-    ofTrueTypeFont helveticaThin08;
-    
     ofxFontStash gmFontStashHelveticaLight;
     ofxFontStash gmFontStashHelveticaMedium;
-    ofxFontStash gmFontStash;
+    ofxFontStash gmFontStashUbuntu;
     ofxFontStash gmFontStashFranchise;
     int tempFontSize[24] = {6, 10, 14, 18, 22, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 80, 92, 108, 128, 256, 300};
 
