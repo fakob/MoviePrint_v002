@@ -110,8 +110,8 @@ public:
         gmFontStashFranchise.setup("Franchise-Bold.ttf", 0.9);
         gmFontStashHelvetica.setup("HelveticaNeueLTCom-Lt.ttf");
         
-        franchiseBold30.loadFont("Franchise-Bold.ttf", 30, true, true);
-        helveticaThin24.loadFont("HelveticaNeueLTCom-Lt.ttf", 24, true, true);
+        franchiseBold14.loadFont("Franchise-Bold.ttf", 14, true, true);
+        helveticaThin08.loadFont("HelveticaNeueLTCom-Lt.ttf", 8, true, true);
         ubuntuLight24.loadFont("Ubuntu-Light.ttf", 24, true, true);
         
         franchiseFontRightSize = 0;
@@ -868,7 +868,7 @@ public:
         
     }
     
-    void drawMoviePrint(float _x, float _y, int _gridColumns, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder, float _printHeaderHeight, bool _printDisplayVideoAudioInfo){
+    void drawMoviePrint(float _x, float _y, int _gridColumns, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder, float _printHeaderHeight, bool _printDisplayVideoAudioInfo, bool _drawPreview){
         
         // draw all frames
         ofPushStyle();
@@ -899,17 +899,22 @@ public:
                         ofSetColor(FAK_ORANGE5);
                         break;
                     default:
+                        ofSetColor(255, 255, 255, 255);
                         break;
                 }
                 ofRect((_x + _gridMargin + (gmThumbWidth+_gridMargin) * i) * _scaleFactor, (_y + 20.0 + _gridMargin) * _scaleFactor, gmThumbWidth * _scaleFactor, 6.0 * _scaleFactor);
             }
             
-//            headerImage.draw(_x, _y, ((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin), headerImage.getHeight() * _scaleFactor);
-//            drawTitle(_x, _y, ((gmThumbWidth+_gridMargin)* _gridColumns - _gridMargin) * _scaleFactor, _printHeaderHeight * _scaleFactor, _scaleFactor);
-//          gmFontStashFranchise.draw("name",20, 5, 28 - 5);
-//          gmFontStashHelvetica.draw(gmMIFilePath,34, 5*2 + 100, 28 - 5);
-            
-            
+            if (_drawPreview) { // draw Info fake for preview
+                ofSetColor(255, 255, 255, 255);
+                ofRect((int)((_x + _gridMargin) * _scaleFactor), (int)((_y + 17.0 + _gridMargin - 16.0) * _scaleFactor), (gmThumbWidth/4.0 - _gridMargin/4.0) * _scaleFactor, 16.0 * _scaleFactor);
+                ofRect((int)((_x + _gridMargin + gmThumbWidth/4.0) * _scaleFactor), (int)((_y + 17.0 + _gridMargin - 12.0) * _scaleFactor), ((gmThumbWidth/4)*3) * _scaleFactor, 12.0 * _scaleFactor);
+            } else { // draw Info text
+                ofSetColor(255, 255, 255, 255);
+                franchiseBold14.drawString("name", (int)((_x + _gridMargin) * _scaleFactor), (int)((_y + 17.0 + _gridMargin) * _scaleFactor));
+                helveticaThin08.drawString(ofToString(gmMovie.getMoviePath()), (int)((_x + _gridMargin) * _scaleFactor + 45), (int)((_y + 17.0 + _gridMargin) * _scaleFactor));
+            }
+
             ofPopMatrix();
             ofPopStyle();
             
@@ -932,31 +937,16 @@ public:
         ofPushStyle();
         ofPushMatrix();
         ofEnableAlphaBlending();
-        ofSetColor(255, 255, 255, 255); // draw stills
-        
-        headerImage.draw(_x, _y, _width, _height);
-//        ofRect(_x, _y, _width, _height);
-        
-        fboHeaderInformation.begin();
-        ofSetColor(FAK_ORANGECOLOR);
-        ofRect(0, 0, ofGetWindowWidth(), fboHeaderInformation.getHeight());
-        ofSetColor(255, 255, 255);
-        ofRect(tempMargin, 28, ofGetWindowWidth(), 8);
 
-        ofRectangle tempRect1 = franchiseBold30.getStringBoundingBox("name", 0, 0);
-        ofRectangle tempRect2 = helveticaThin24.getStringBoundingBox(gmMIFilePath, 0, 0);
-//        franchiseBold30.drawString("name", tempMargin, fboHeaderInformation.getHeight() - tempMargin);
-//        helveticaThin24.drawString(gmMIFilePath, tempMargin*2 + tempRect1.getMaxX(), fboHeaderInformation.getHeight() - tempMargin);
-        gmFontStashFranchise.draw("name",20, tempMargin, 28 - tempMargin);
-        gmFontStashHelvetica.draw(gmMIFilePath,14, tempMargin*2 + tempRect1.getMaxX(), 28 - tempMargin);
+        fboHeaderInformation.begin();
+
         fboHeaderInformation.end();
-        float tempTypeWidth = tempMargin*3 + tempRect1.getMaxX() + tempRect2.getMaxX();
-        float tempScaleFactor = fmin(_height / (float)fboHeaderInformation.getHeight(), _width / tempTypeWidth);
-//        fboHeaderInformation.draw(0, 40, fboHeaderInformation.getWidth() * tempScaleFactor, fboHeaderInformation.getHeight() * tempScaleFactor);
+        
         fboHeaderInformation.draw(0, 0);
 
         ofPopMatrix();
         ofPopStyle();
+
     }
     
     void drawStillUI(int i, float x, float y, float w, float h, float _alpha){
@@ -1082,9 +1072,9 @@ public:
     
     ofFbo fboHeaderInformation;
     
-    ofTrueTypeFont	franchiseBold30;
+    ofTrueTypeFont	franchiseBold14;
     ofTrueTypeFont	ubuntuLight24;
-    ofTrueTypeFont helveticaThin24;
+    ofTrueTypeFont helveticaThin08;
     
     ofxFontStash gmFontStashHelvetica;
     ofxFontStash gmFontStash;

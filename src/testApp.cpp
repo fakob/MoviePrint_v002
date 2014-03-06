@@ -2047,7 +2047,7 @@ void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
     ofTranslate(tempX, tempY);
     ofSetColor(255);
     ofRect(0, 0, _scaleFactor * printGridWidth, _scaleFactor * printGridHeight);
-    loadedMovie.drawMoviePrint(0, 0, printGridColumns, printGridMargin, _scaleFactor, 1, _showPlaceHolder, printHeaderHeight, printDisplayVideoAudioInfo);
+    loadedMovie.drawMoviePrint(0, 0, printGridColumns, printGridMargin, _scaleFactor, 1, _showPlaceHolder, printHeaderHeight, printDisplayVideoAudioInfo, true);
     
     // drawing frame
     float tempFrameWidth = 3;
@@ -2182,7 +2182,7 @@ void testApp::printImageToPNG(int _printSizeWidth){
         ofBackground(0, 0, 0, 0);
         ofSetColor(255, 255, 255, 255);
 
-        loadedMovie.drawMoviePrint(0, 0, printGridColumns, printGridMargin, _newScaleFactor, 1, showPlaceHolder, printHeaderHeight, printDisplayVideoAudioInfo);
+        loadedMovie.drawMoviePrint(0, 0, printGridColumns, printGridMargin, _newScaleFactor, 1, showPlaceHolder, printHeaderHeight, printDisplayVideoAudioInfo, false);
 
 //        loadedMovie.drawGridOfStills(printGridMargin, printGridMargin, printGridColumns, printGridMargin, 0, _newScaleFactor, 1, TRUE, TRUE, superKeyPressed, shiftKeyPressed, showPlaceHolder, printHeaderHeight);
         fboToSave.end();
