@@ -879,7 +879,30 @@ public:
             ofPushStyle();
             ofPushMatrix();
             ofSetColor(FAK_GRAY);
-            ofRect(_x, _y, ((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor, (_printHeaderHeight - _gridMargin) * _scaleFactor);
+            ofRect(_x * _scaleFactor, _y * _scaleFactor, (_gridMargin + (gmThumbWidth+_gridMargin) * _gridColumns) * _scaleFactor, _printHeaderHeight * _scaleFactor);
+            for(int i=0; i<_gridColumns; i++)
+            {
+                switch (i%5) {
+                    case 0:
+                        ofSetColor(FAK_ORANGE1);
+                        break;
+                    case 1:
+                        ofSetColor(FAK_ORANGE2);
+                        break;
+                    case 2:
+                        ofSetColor(FAK_ORANGE3);
+                        break;
+                    case 3:
+                        ofSetColor(FAK_ORANGE4);
+                        break;
+                    case 4:
+                        ofSetColor(FAK_ORANGE5);
+                        break;
+                    default:
+                        break;
+                }
+                ofRect((_x + _gridMargin + (gmThumbWidth+_gridMargin) * i) * _scaleFactor, (_y + 20.0 + _gridMargin) * _scaleFactor, gmThumbWidth * _scaleFactor, 6.0 * _scaleFactor);
+            }
             
 //            headerImage.draw(_x, _y, ((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin), headerImage.getHeight() * _scaleFactor);
 //            drawTitle(_x, _y, ((gmThumbWidth+_gridMargin)* _gridColumns - _gridMargin) * _scaleFactor, _printHeaderHeight * _scaleFactor, _scaleFactor);
@@ -895,8 +918,8 @@ public:
 
         for(int i=0; i<gmNumberOfStills; i++)
         {
-            float tempX = _x + (gmThumbWidth+_gridMargin)*(i%_gridColumns) * _scaleFactor;
-            float tempY = _y + (gmThumbHeight+_gridMargin)*(i/_gridColumns) * _scaleFactor;
+            float tempX = (_x + _gridMargin + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor;
+            float tempY = (_y + _gridMargin + (gmThumbHeight+_gridMargin)*(i/_gridColumns)) * _scaleFactor;
             printStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, _drawPlaceHolder);
         }
         ofPopMatrix();

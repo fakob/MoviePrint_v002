@@ -2040,24 +2040,27 @@ void testApp::drawLoadMovieScreen(){
 //--------------------------------------------------------------
 void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
     ofPushStyle();
+    ofPushMatrix();
     _scaleFactor = _scaleFactor * 0.95;
     float tempX = (fboToPreviewWidth - _scaleFactor * printGridWidth) / 2;
     float tempY = (fboToPreviewHeight - _scaleFactor * printGridHeight) / 2;
+    ofTranslate(tempX, tempY);
     ofSetColor(255);
-    ofRect(tempX, tempY, _scaleFactor * printGridWidth, _scaleFactor * printGridHeight);
-
-    loadedMovie.drawMoviePrint(tempX + printGridMargin * _scaleFactor, tempY + printGridMargin * _scaleFactor, printGridColumns, printGridMargin, _scaleFactor, 1, _showPlaceHolder, printHeaderHeight, printDisplayVideoAudioInfo);
+    ofRect(0, 0, _scaleFactor * printGridWidth, _scaleFactor * printGridHeight);
+    loadedMovie.drawMoviePrint(0, 0, printGridColumns, printGridMargin, _scaleFactor, 1, _showPlaceHolder, printHeaderHeight, printDisplayVideoAudioInfo);
+    
     // drawing frame
     float tempFrameWidth = 3;
     ofSetColor(220);
-    ofRect(tempX, tempY - tempFrameWidth, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
-    ofRect(tempX - tempFrameWidth, tempY - tempFrameWidth, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth);
-    ofRect(tempX + _scaleFactor * printGridWidth, tempY, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth);
-    ofRect(tempX - tempFrameWidth, tempY + _scaleFactor * printGridHeight, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
+    ofRect(0, 0 - tempFrameWidth, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
+    ofRect(0 - tempFrameWidth, 0 - tempFrameWidth, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth);
+    ofRect(0 + _scaleFactor * printGridWidth, 0, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth);
+    ofRect(0 - tempFrameWidth, 0 + _scaleFactor * printGridHeight, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
     // drawing shadow
     ofSetColor(0,200);
-    ofRect(tempX + _scaleFactor * printGridWidth + tempFrameWidth, tempY, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth*2);
-    ofRect(tempX, tempY + _scaleFactor * printGridHeight + tempFrameWidth, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
+    ofRect(0 + _scaleFactor * printGridWidth + tempFrameWidth, 0, tempFrameWidth, _scaleFactor * printGridHeight + tempFrameWidth*2);
+    ofRect(0, 0 + _scaleFactor * printGridHeight + tempFrameWidth, _scaleFactor * printGridWidth + tempFrameWidth, tempFrameWidth);
+    ofPopMatrix();
     ofPopStyle();
 }
 
@@ -2179,7 +2182,7 @@ void testApp::printImageToPNG(int _printSizeWidth){
         ofBackground(0, 0, 0, 0);
         ofSetColor(255, 255, 255, 255);
 
-        loadedMovie.drawMoviePrint(printGridMargin * _newScaleFactor, printGridMargin * _newScaleFactor, printGridColumns, printGridMargin, _newScaleFactor, 1, showPlaceHolder, printHeaderHeight, printDisplayVideoAudioInfo);
+        loadedMovie.drawMoviePrint(0, 0, printGridColumns, printGridMargin, _newScaleFactor, 1, showPlaceHolder, printHeaderHeight, printDisplayVideoAudioInfo);
 
 //        loadedMovie.drawGridOfStills(printGridMargin, printGridMargin, printGridColumns, printGridMargin, 0, _newScaleFactor, 1, TRUE, TRUE, superKeyPressed, shiftKeyPressed, showPlaceHolder, printHeaderHeight);
         fboToSave.end();
