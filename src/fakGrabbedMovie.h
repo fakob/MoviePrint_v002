@@ -870,6 +870,9 @@ public:
     
     void drawMoviePrint(float _x, float _y, int _gridColumns, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder, float _printHeaderHeight, bool _printDisplayVideoAudioInfo, bool _drawPreview){
 
+        ofPushStyle();
+        ofPushMatrix();
+
         if (_printDisplayVideoAudioInfo) { // draw info header
             ofPushStyle();
             ofPushMatrix();
@@ -935,8 +938,6 @@ public:
         }
         
         // draw all frames
-        ofPushStyle();
-        ofPushMatrix();
         ofEnableAlphaBlending();
         ofSetColor(255, 255, 255, 255);
         for(int i=0; i<gmNumberOfStills; i++)

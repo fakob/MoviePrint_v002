@@ -324,7 +324,7 @@ void testApp::setGUISettingsMoviePrint(){
 	guiSettingsMoviePrint->addIntSlider("PrintColumns", 1, 10, &printGridColumns, length-xInit,dim);
 	guiSettingsMoviePrint->addIntSlider("PrintRows", 1, 20, &printGridRows, length-xInit,dim);
    	guiSettingsMoviePrint->addIntSlider("PrintNumber", 4, 200, &printNumberOfThumbs, length-xInit,dim);
-   	guiSettingsMoviePrint->addIntSlider("PrintMargin", 0, 100, &printGridMargin, length-xInit,dim);
+   	guiSettingsMoviePrint->addIntSlider("PrintMargin", 0, 30, &printGridMargin, length-xInit,dim);
     uiSliderPrintColumns = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintColumns");
     uiSliderPrintRows = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintRows");
     uiSliderNumberOfThumbs = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintNumber");
@@ -2422,7 +2422,12 @@ void testApp::updateAllStills(){
 
     
     for (int i=0; i<numberOfStills; i++) {
-        gridTimeArray[i] = ofMap(float(i)/(numberOfStills - 1), 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
+        if (numberOfStills == 1) {
+            gridTimeArray[i] = ofMap(0.5, 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
+
+        } else {
+            gridTimeArray[i] = ofMap(float(i)/(numberOfStills - 1), 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
+        }
     }
     loadedMovie.updateAllFrameNumbers(gridTimeArray);
     movieIsBeingGrabbed = TRUE;
