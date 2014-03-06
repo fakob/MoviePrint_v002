@@ -637,7 +637,7 @@ void testApp::calculateNewPrintGrid(){
 //--------------------------------------------------------------
 void testApp::updateDisplayGrid(){
     
-    gridColumns = (ofGetWindowWidth() - leftMargin - scrollBarWidth + displayGridMargin) / (thumbWidth + displayGridMargin);
+    gridColumns = fmax(1, (int)(ofGetWindowWidth() - leftMargin - scrollBarWidth + displayGridMargin) / (thumbWidth + displayGridMargin));
     
     displayGridWidth = (gridColumns * (thumbWidth + displayGridMargin) - displayGridMargin);
     gridRows = ceil(numberOfStills/(float)gridColumns);
