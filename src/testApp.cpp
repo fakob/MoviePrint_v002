@@ -720,7 +720,7 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
     int tempMoveX = 0;
     gmMIFileName->setTextString(loadedMovie.gmMIFileName);
     tempMoveX = gmMIFileName->getTextHeightMinusOne();
-    gmMIFilePath->setTextString(loadedMovie.gmMIFilePath);
+    gmMIFilePath->setTextString("FilePath: " + loadedMovie.gmMIFilePathOhne);
     gmMIFilePath->setYOffset(tempMoveX);
     tempMoveX += gmMIFilePath->getTextHeightMinusOne();
     gmMIFormat->setLabel(ofToString(loadedMovie.gmMIFormat));
@@ -1105,13 +1105,20 @@ void testApp::draw(){
         
     } else if(showPlaceHolder){ // test
         
-        ofPushStyle();
-        ofSetColor(FAK_LIGHTGRAY);
-        ofRect(0, 0, ofGetWidth(), ofGetHeight());
-        ofPopStyle();
-        drawDisplayGrid(1, FALSE, FALSE, scrollAmountRel, showPlaceHolder);
-        scrollBar.draw();
-        drawUI(1, false);
+//        ofPushStyle();
+//        ofSetColor(FAK_LIGHTGRAY);
+//        ofRect(0, 0, ofGetWidth(), ofGetHeight());
+//        ofPopStyle();
+//        drawDisplayGrid(1, FALSE, FALSE, scrollAmountRel, showPlaceHolder);
+//        scrollBar.draw();
+//        drawUI(1, false);
+        
+//        loadedMovie.drawTitle(1.0);
+//        ofPushMatrix();
+//        ofTranslate(100, 100);
+//        ofScale(0.2,0.2);
+//        loadedMovie.fboHeaderInformation.draw(0,0);
+//        ofPopMatrix();
     
     } else {
         

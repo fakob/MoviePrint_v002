@@ -108,9 +108,10 @@ public:
         
         gmFontStash.setup("Ubuntu-Light.ttf", 1.03);
         gmFontStashFranchise.setup("Franchise-Bold.ttf", 0.9);
-        gmFontStashHelvetica.setup("HelveticaNeueLTCom-Lt.ttf");
+        gmFontStashHelveticaLight.setup("HelveticaNeueLTCom-Lt.ttf");
+        gmFontStashHelveticaMedium.setup("HelveticaNeueLTCom-Md.ttf");
         
-        franchiseBold14.loadFont("Franchise-Bold.ttf", 14, true, true);
+        franchiseBold110.loadFont("Franchise-Bold.ttf", 110, true, true);
         helveticaThin08.loadFont("HelveticaNeueLTCom-Lt.ttf", 8, true, true);
         ubuntuLight24.loadFont("Ubuntu-Light.ttf", 24, true, true);
         
@@ -124,10 +125,7 @@ public:
         gmSetupFinished = TRUE;
         gmShowFramesUI = TRUE;
         
-        fboHeaderInformation.allocate(3600, 40, GL_RGBA );
-        fboHeaderInformation.begin();
-        ofClear(255,255,255, 0);
-        fboHeaderInformation.end();
+        fboHeaderInformation.allocate(4000, 400, GL_RGBA );
         
     }
     
@@ -195,8 +193,14 @@ public:
     }
     
     void getMovieInformation(string _vfMovieName){
+
+        gmMIFilePath = ofToString(gmMovie.getMoviePath());
+        vector<string> tempVectorString = ofSplitString(gmMIFilePath, "/");
+        tempVectorString.pop_back();
+        gmMIFilePathOhne = ofJoinString(tempVectorString, "/") + "/";
+        ofLog(OF_LOG_VERBOSE, "tempVectorString: " + ofToString(tempVectorString));
+        gmMIFilePath = "FilePath: " + gmMIFilePath;
         
-        gmMIFilePath = "FilePath : " + ofToString(gmMovie.getMoviePath());
         
         //Information about MediaInfo
         MediaInfo MI;
@@ -236,28 +240,29 @@ public:
         gmMIAChannelsString = MI.Get(Stream_Audio, 0, __T("Channel(s)/String"), Info_Text).c_str();
         gmMIASamplingRate = MI.Get(Stream_Audio, 0, __T("SamplingRate/String"), Info_Text).c_str();
 
-        gmMIFileName = "FileName : " + gmMIFileName + "." + gmMIFileExtension;
-        gmMIFormat = "Format : " + gmMIFormat;
-        gmMIFormatString = "Format/String : " + gmMIFormatString;
-        gmMIFileSizeString = "FileSize : " + gmMIFileSizeString;
-        gmMIDurationString1 = "Duration : " + gmMIDurationString1;
-        gmMIFrameCount = "FrameCount : " + gmMIFrameCount;
-        gmMIWidth = "Size : " + gmMIWidth;
-        gmMIDisplayAspectRatioString = "DisplayAspectRatio : " + gmMIDisplayAspectRatioString;
-        gmMIFrameRateString = "FrameRate : " + gmMIFrameRateString;
-        gmMIVFormat = "Codec : " + gmMIVFormat;
-        gmMIFormatInfo = "Codec/Info : " + gmMIFormatInfo;
-        gmMIBitRate = "BitRate : " + gmMIBitRate;
-        gmMIPixelAspectRatio = "PixelAspectRatio : " + gmMIPixelAspectRatio;
-        gmMIDisplayAspectRatio = "DisplayAspectRatio : " + gmMIDisplayAspectRatio;
-        gmMIFrameRate_ModeString = "FrameRate_Mode : " + gmMIFrameRate_ModeString;
-        gmMIColorSpace = "ColorSpace : " + gmMIColorSpace;
-        gmMIChromaSubsampling = "ChromaSubsampling : " + gmMIChromaSubsampling;
-        gmMIBitDepthString = "BitDepth : " + gmMIBitDepthString;
-        gmMIInterlacementString = "Interlacement : " + gmMIInterlacementString;
-        gmMIAFormat = "AudioCodec : " + gmMIAFormat;
-        gmMIAChannelsString = "Channels : " + gmMIAChannelsString;
-        gmMIASamplingRate = "SamplingRate : " + gmMIASamplingRate;
+        gmMIFileNameClean = gmMIFileName + "." + gmMIFileExtension;
+        gmMIFileName = "FileName: " + gmMIFileName + "." + gmMIFileExtension;
+        gmMIFormat = "Format: " + gmMIFormat;
+        gmMIFormatString = "Format/String: " + gmMIFormatString;
+        gmMIFileSizeString = "FileSize: " + gmMIFileSizeString;
+        gmMIDurationString1 = "Duration: " + gmMIDurationString1;
+        gmMIFrameCount = "FrameCount: " + gmMIFrameCount;
+        gmMIWidth = "Size: " + gmMIWidth;
+        gmMIDisplayAspectRatioString = "DisplayAspectRatio: " + gmMIDisplayAspectRatioString;
+        gmMIFrameRateString = "FrameRate: " + gmMIFrameRateString;
+        gmMIVFormat = "Codec: " + gmMIVFormat;
+        gmMIFormatInfo = "Codec/Info: " + gmMIFormatInfo;
+        gmMIBitRate = "BitRate: " + gmMIBitRate;
+        gmMIPixelAspectRatio = "PixelAspectRatio: " + gmMIPixelAspectRatio;
+        gmMIDisplayAspectRatio = "DisplayAspectRatio: " + gmMIDisplayAspectRatio;
+        gmMIFrameRate_ModeString = "FrameRate_Mode: " + gmMIFrameRate_ModeString;
+        gmMIColorSpace = "ColorSpace: " + gmMIColorSpace;
+        gmMIChromaSubsampling = "ChromaSubsampling: " + gmMIChromaSubsampling;
+        gmMIBitDepthString = "BitDepth: " + gmMIBitDepthString;
+        gmMIInterlacementString = "Interlacement: " + gmMIInterlacementString;
+        gmMIAFormat = "AudioCodec: " + gmMIAFormat;
+        gmMIAChannelsString = "Channels: " + gmMIAChannelsString;
+        gmMIASamplingRate = "SamplingRate: " + gmMIASamplingRate;
        
 //        MI.Option(__T("Inform"), __T("Video;Video\\r\\n:::Format : %Format%\\r\\n:::Format/Info : %Format/Info%\\r\\n:::Format/Version : %Format/Version%\\r\\n:::Format/Profile : %Format/Profile%\\r\\n:::Format/Compression : %Format/Compression%\\r\\n:::Format/Settings : %Format/Settings%\\r\\n:::CodecID/Info : %CodecID/Info%\\r\\n:::BitRate : %BitRate%\\r\\n:::BitRate/Mode : %BitRate/Mode%\\r\\n:::Width/String : %Width/String%\\r\\n:::Height/String : %Height/String%\\r\\n:::PixelAspectRatio : %PixelAspectRatio%\\r\\n:::PixelAspectRatio/String : %PixelAspectRatio/String%\\r\\n:::DisplayAspectRatio : %DisplayAspectRatio%\\r\\n:::DisplayAspectRatio/String : %DisplayAspectRatio/String%\\r\\n:::FrameRate_Mode/String : %FrameRate_Mode/String%\\r\\n:::FrameRate/String : %FrameRate/String%\\r\\n:::FrameCount : %FrameCount%\\r\\n:::ColorSpace : %ColorSpace%\\r\\n:::ChromaSubsampling : %ChromaSubsampling%\\r\\n:::BitDepth/String : %BitDepth/String%\\r\\n:::Interlacement : %Interlacement%\\r\\n:::Interlacement/String : %Interlacement/String%\\r\\n:::Channel(s)/String : %Channel(s)/String%\\r\\n:::ChannelPositons : %ChannelPositons%\\r\\n:::SamplingRate/String : %SamplingRate/String%"));
         MI.Option(__T("Inform"), __T("Video;Video\\r\\n:::Format : %Format%\\r\\n:::Format/Info : %Format/Info%\\r\\n:::BitRate : %BitRate%\\r\\n:::PixelAspectRatio : %PixelAspectRatio%\\r\\n:::DisplayAspectRatio : %DisplayAspectRatio%\\r\\n:::FrameRate_Mode/String : %FrameRate_Mode/String%\\r\\n:::ColorSpace : %ColorSpace%\\r\\n:::ChromaSubsampling : %ChromaSubsampling%\\r\\n:::BitDepth/String : %BitDepth/String%\\r\\n:::Interlacement/String : %Interlacement/String%"));
@@ -902,17 +907,33 @@ public:
                         ofSetColor(255, 255, 255, 255);
                         break;
                 }
-                ofRect((_x + _gridMargin + (gmThumbWidth+_gridMargin) * i) * _scaleFactor, (_y + 20.0 + _gridMargin) * _scaleFactor, gmThumbWidth * _scaleFactor, 6.0 * _scaleFactor);
+                // draw orange stripes
+                ofRect((_x + _gridMargin + (gmThumbWidth+_gridMargin) * i) * _scaleFactor, (_y + _printHeaderHeight*0.7) * _scaleFactor, gmThumbWidth * _scaleFactor, _printHeaderHeight* 0.15 * _scaleFactor);
             }
             
             if (_drawPreview) { // draw Info fake for preview
                 ofSetColor(255, 255, 255, 255);
-                ofRect((int)((_x + _gridMargin) * _scaleFactor), (int)((_y + 17.0 + _gridMargin - 16.0) * _scaleFactor), (gmThumbWidth/4.0 - _gridMargin/4.0) * _scaleFactor, 16.0 * _scaleFactor);
-                ofRect((int)((_x + _gridMargin + gmThumbWidth/4.0) * _scaleFactor), (int)((_y + 17.0 + _gridMargin - 12.0) * _scaleFactor), ((gmThumbWidth/4)*3) * _scaleFactor, 12.0 * _scaleFactor);
-            } else { // draw Info text
+                ofRect(((_x + _gridMargin) * _scaleFactor), ((_y +_printHeaderHeight*0.3) * _scaleFactor), (gmThumbWidth/4.0 - gmThumbWidth/40.0) * _scaleFactor, _printHeaderHeight*0.3 * _scaleFactor);
+                ofRect(((_x + _gridMargin + gmThumbWidth/4.0) * _scaleFactor), ((_y + _printHeaderHeight*0.45) * _scaleFactor), ((gmThumbWidth/4)*3) * _scaleFactor, _printHeaderHeight*0.15 * _scaleFactor);
+            } else {
+                // draw Info text
+                
+                // get Width of Type
+                float tempWidthOfName = gmFontStashFranchise.getBBox("name", 20 * _scaleFactor, 0, 0).getWidth();
+                float tempWidthOfPathName = gmFontStashHelveticaMedium.getBBox(ofToString(gmMovie.getMoviePath()), 12 * _scaleFactor, 0, 0).getWidth();
+                float tempWidthOfPath = gmFontStashHelveticaLight.getBBox(ofToString(gmMIFilePathOhne), 12 * _scaleFactor, 0, 0).getWidth();
+                float tempFontScale = _scaleFactor;
+                
+                // when PathName width bigger then display width then downscale the PathName
+                if ((((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName) <= tempWidthOfPathName) {
+                    tempFontScale = tempFontScale * (((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName)/tempWidthOfPathName*0.75;
+//                    ofLog(OF_LOG_VERBOSE, "_____________________tempFontScale: " + ofToString(tempFontScale));
+//                    ofLog(OF_LOG_VERBOSE, "_____________________scaleFactor: " + ofToString(_scaleFactor));
+                }
                 ofSetColor(255, 255, 255, 255);
-                franchiseBold14.drawString("name", (int)((_x + _gridMargin) * _scaleFactor), (int)((_y + 17.0 + _gridMargin) * _scaleFactor));
-                helveticaThin08.drawString(ofToString(gmMovie.getMoviePath()), (int)((_x + _gridMargin) * _scaleFactor + 45), (int)((_y + 17.0 + _gridMargin) * _scaleFactor));
+                gmFontStashFranchise.draw("name",20 * _scaleFactor, (int)((_x + _gridMargin) * _scaleFactor), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+                gmFontStashHelveticaLight.draw(ofToString(gmMIFilePathOhne), 12 * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+                gmFontStashHelveticaMedium.draw(ofToString(gmMIFileNameClean), 12 * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1 + tempWidthOfPath), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
             }
 
             ofPopMatrix();
@@ -932,18 +953,21 @@ public:
         
     }
     
-    void drawTitle(float _x, float _y, float _width, float _height, float _scaleFactor){
+    void drawTitle(float _scaleFactor){
         float tempMargin = 5;
         ofPushStyle();
         ofPushMatrix();
         ofEnableAlphaBlending();
 
         fboHeaderInformation.begin();
+        ofClear(255,255,255, 0);
+        ofSetColor(255, 255, 255);
+        franchiseBold110.drawString("name", 0,fboHeaderInformation.getHeight());
+        helveticaThin08.drawString("/Users/fakob/Movies/Daft Punk - Get Lucky by Shortology.mp4", 0 + 45, fboHeaderInformation.getHeight());
+//        helveticaThin08.drawString(ofToString(gmMovie.getMoviePath()), 0 + 45, fboHeaderInformation.getHeight());
 
         fboHeaderInformation.end();
         
-        fboHeaderInformation.draw(0, 0);
-
         ofPopMatrix();
         ofPopStyle();
 
@@ -1072,11 +1096,12 @@ public:
     
     ofFbo fboHeaderInformation;
     
-    ofTrueTypeFont	franchiseBold14;
+    ofTrueTypeFont	franchiseBold110;
     ofTrueTypeFont	ubuntuLight24;
     ofTrueTypeFont helveticaThin08;
     
-    ofxFontStash gmFontStashHelvetica;
+    ofxFontStash gmFontStashHelveticaLight;
+    ofxFontStash gmFontStashHelveticaMedium;
     ofxFontStash gmFontStash;
     ofxFontStash gmFontStashFranchise;
     int tempFontSize[24] = {6, 10, 14, 18, 22, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 80, 92, 108, 128, 256, 300};
@@ -1090,6 +1115,8 @@ public:
     string gmMIFileName, gmMIFileExtension, gmMIFormat, gmMIFormatString, gmMIFileSizeString, gmMIDurationString1, gmMIFrameCount, gmMIWidth, gmMIHeight, gmMIDisplayAspectRatioString, gmMIFrameRateString;
     string gmMIVFormat, gmMIFormatInfo, gmMIBitRate, gmMIPixelAspectRatio, gmMIDisplayAspectRatio, gmMIFrameRate_ModeString, gmMIColorSpace, gmMIChromaSubsampling, gmMIBitDepthString, gmMIInterlacementString;
     string gmMIAFormat, gmMIAChannelsString, gmMIASamplingRate, gmMIFilePath;
+    
+    string gmMIFileNameClean, gmMIFilePathOhne;
 
     // used for rounded corner mask
     ofShader shader;
