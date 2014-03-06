@@ -39,6 +39,18 @@ using namespace boost;
 #define FAK_GREENCOLOR ofColor(117, 130, 16, 255)
 #define FAK_LIGHTGRAY ofColor(205, 205, 205, 255)
 #define FAK_MIDDLEGRAY ofColor(195, 195, 195, 255)
+#define FAK_TRANSPARENT ofColor(0,0,0,0)
+
+#define FAK_ORANGE1 ofColor(255, 80, 6, 255)
+#define FAK_ORANGE2 ofColor(255, 183, 153, 255)
+#define FAK_ORANGE3 ofColor(255, 147, 101, 255)
+#define FAK_ORANGE4 ofColor(255, 168, 131, 255)
+#define FAK_ORANGE5 ofColor(255, 211, 193, 255)
+
+#define FAK_WHITE ofColor(255, 255, 255, 255)
+#define FAK_BLACK ofColor(0, 0, 0, 255)
+#define FAK_SHADOW ofColor(0, 0, 0, 32)
+#define FAK_GRAY ofColor(59, 59, 59, 255)
 
 class fakGrabbedMovie : public ofThread {
     
@@ -759,10 +771,6 @@ public:
     
     void drawGridOfStills(float _x, float _y, int _gridColumns, float _gridMargin, float _scrollAmount, float _scaleFactor, float _alpha, bool _isBeingPrinted, bool _isActive, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder, float _printHeaderHeight){
 
-        if (_isBeingPrinted) {
-            drawTitle((_x + (gmThumbWidth+_gridMargin)*0) * _scaleFactor, _y * _scaleFactor, gmThumbWidth * _scaleFactor, _printHeaderHeight * _scaleFactor, _scaleFactor);
-        }
-        
         // draw all frames
         ofPushStyle();
         ofEnableAlphaBlending();
@@ -860,22 +868,31 @@ public:
         
     }
     
-    void drawMoviePrintPreview(float _x, float _y, int _gridColumns, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder, float _printHeaderHeight){
+    void drawMoviePrint(float _x, float _y, int _gridColumns, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder, float _printHeaderHeight, bool _printDisplayVideoAudioInfo){
         
         // draw all frames
         ofPushStyle();
         ofPushMatrix();
         ofEnableAlphaBlending();
         ofSetColor(255, 255, 255, 255); // draw stills
-        
-//        drawTitle(_x, _y, ((gmThumbWidth+_gridMargin)* _gridColumns - _gridMargin) * _scaleFactor, _printHeaderHeight * _scaleFactor, _scaleFactor);
-        gmFontStashFranchise.draw("name",20, 5, 28 - 5);
-        gmFontStashHelvetica.draw(gmMIFilePath,34, 5*2 + 100, 28 - 5);
-
-        
-        if (_printHeaderHeight != 0) {
+        if (_printDisplayVideoAudioInfo) {
+            ofPushStyle();
+            ofPushMatrix();
+            ofSetColor(FAK_GRAY);
+            ofRect(_x, _y, ((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor, (_printHeaderHeight - _gridMargin) * _scaleFactor);
+            
+//            headerImage.draw(_x, _y, ((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin), headerImage.getHeight() * _scaleFactor);
+//            drawTitle(_x, _y, ((gmThumbWidth+_gridMargin)* _gridColumns - _gridMargin) * _scaleFactor, _printHeaderHeight * _scaleFactor, _scaleFactor);
+//          gmFontStashFranchise.draw("name",20, 5, 28 - 5);
+//          gmFontStashHelvetica.draw(gmMIFilePath,34, 5*2 + 100, 28 - 5);
+            
+            
+            ofPopMatrix();
+            ofPopStyle();
+            
             ofTranslate(0, (_printHeaderHeight) * _scaleFactor);
         }
+
         for(int i=0; i<gmNumberOfStills; i++)
         {
             float tempX = _x + (gmThumbWidth+_gridMargin)*(i%_gridColumns) * _scaleFactor;
