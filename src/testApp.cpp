@@ -1311,6 +1311,29 @@ void testApp::keyPressed(int key){
             
         }
 			break;
+            
+        case 'w':
+        {
+            if (setupFinished) {
+                
+                loadNewMovie("", FALSE, TRUE, FALSE);
+                
+                printListNotImage = FALSE;
+                showDroppedList = FALSE;
+                finishedLoadingMovie = FALSE;
+                showLoadMovieScreen = TRUE;
+                    loadNewMovie("/Users/fakob/Movies/Daft Punk - Get Lucky by Shortology.mp4", TRUE, FALSE, TRUE);
+                    if (loadedMovie.isMovieLoaded) {
+                        moveToMovie();
+                    }
+                    updateMovieFromDrop = FALSE;
+                
+                
+            }
+            
+        }
+			break;
+
         default:
             break;
     }
