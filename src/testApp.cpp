@@ -299,16 +299,14 @@ void testApp::setGUISettings(){
 void testApp::setGUISettingsMoviePrint(){
 	
 	float dim = 16;
-	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
+	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING*3;
     float length = menuWidth-xInit;
     
     guiSettingsMoviePrint = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
     guiSettingsMoviePrint->setFont("HelveticaNeueLTCom-LtCn.ttf");
+    guiSettingsMoviePrint->setWidgetSpacing(10);
     
-    guiSettingsMoviePrint->addLabel("MOVIEPRINT SETTINGS", OFX_UI_FONT_LARGE);
-    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
-    
-    guiSettingsMoviePrint->addButton("Select Output Folder", false);
+    guiSettingsMoviePrint->addButton("Select Output Folder", false,dim*1.5,dim);
     guiSettingsMoviePrint->addLabel("SelectedOutputFolder", saveMoviePrintPath, OFX_UI_FONT_SMALL);
     uiLabelOutputFolder = (ofxUILabel *) guiSettingsMoviePrint->getWidget("SelectedOutputFolder");
     uiLabelOutputFolder->setLabel(cropFrontOfString(saveMoviePrintPath, 40, "..."));
@@ -330,8 +328,8 @@ void testApp::setGUISettingsMoviePrint(){
     uiSliderPrintMargin = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintMargin");
 
 //    guiSettingsMoviePrint->addToggle("ShowMoviePrintPreview", &showMoviePrintPreview);
-    guiSettingsMoviePrint->addToggle("DisplayVideoAudioInfo", &printDisplayVideoAudioInfo);
-    guiSettingsMoviePrint->addToggle("PrintSaveSingleFrames", printSingleFrames);
+    guiSettingsMoviePrint->addToggle("DisplayVideoAudioInfo", &printDisplayVideoAudioInfo, dim*1.5, dim);
+    guiSettingsMoviePrint->addToggle("PrintSaveSingleFrames", printSingleFrames, dim*1.5, dim);
     
     vector<string> names;
 	names.push_back("Frames");
@@ -339,7 +337,7 @@ void testApp::setGUISettingsMoviePrint(){
 	names.push_back("off");
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
     guiSettingsMoviePrint->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
-    ofxUIRadio *uiRadioSetFrameDisplay = guiSettingsMoviePrint->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
+    ofxUIRadio *uiRadioSetFrameDisplay = guiSettingsMoviePrint->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
     uiRadioSetFrameDisplay->activateToggle("TimeCode");
     
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
@@ -349,7 +347,7 @@ void testApp::setGUISettingsMoviePrint(){
     names3.push_back("png with alpha");
     names3.push_back("jpg");
 //    names3.push_back("gif");
-    guiSettingsMoviePrint->addRadio("Choose Output Format", names3, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
+    guiSettingsMoviePrint->addRadio("Choose Output Format", names3, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
     uiRadioPrintOutputFormat =(ofxUIRadio *) guiSettingsMoviePrint->getWidget("Choose Output Format");
     
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
@@ -360,7 +358,7 @@ void testApp::setGUISettingsMoviePrint(){
     names4.push_back("2048px wide");
     names4.push_back("3072px wide");
     names4.push_back("4096px wide");
-    guiSettingsMoviePrint->addRadio("MoviePrint Width", names4, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
+    guiSettingsMoviePrint->addRadio("MoviePrint Width", names4, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
     uiRadioPrintOutputFormat =(ofxUIRadio *) guiSettingsMoviePrint->getWidget("MoviePrint Width");
     
     guiSettingsMoviePrint->setColorBack(FAK_TRANSPARENT);
@@ -880,7 +878,6 @@ void testApp::update(){
     
     // calculate rollout of ofxUI pos, scal
     guiMovieInfo->setPosition(menuMovieInfo.getPositionX(), menuMovieInfo.getPositionY()+headerHeight);
-    guiMovieInfo->setWidth(menuMovieInfo.getSizeW());
     guiMovieInfo->setHeight(menuMovieInfo.getSizeH()-headerHeight);
 
 //    guiSettings1->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY()+headerHeight);
@@ -892,7 +889,6 @@ void testApp::update(){
 //    guiMoviePrintPreview->setHeight(menuMoviePrintPreview.getSizeH()-headerHeight);
     
     guiSettingsMoviePrint->setPosition(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY()+headerHeight);
-    guiSettingsMoviePrint->setWidth(menuMoviePrintSettings.getSizeW());
     guiSettingsMoviePrint->setHeight(menuMoviePrintSettings.getSizeH()-headerHeight);
     
     guiTimeline->setPosition(leftMargin - OFX_UI_GLOBAL_WIDGET_SPACING, ofGetWindowHeight() - footerHeight/2 +1 - (footerHeight/4) * menuTimeline.getRelSizeH());
