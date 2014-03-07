@@ -70,6 +70,7 @@ public:
     void updateTheListScrollBar();
     void updateAllLimits();
     void writeFboToPreview(float _scaleFactor, bool _showPlaceHolder);
+    void writeFboToMovieData(float _scaleFactor);
     void processOpenFileSelection(ofFileDialogResult openFileResult);
     void toggleMoviePrintPreview();
     void setVisibilityMoviePrintPreview(bool _visibility);
@@ -95,6 +96,9 @@ public:
     
     // Movie
     fakGrabbedMovie loadedMovie;
+    vector<string> stringMovieInfo;
+    vector<string> stringMovieData;
+    ofFbo fboMovieData;
     
     int * gridTimeArray;
 
@@ -265,6 +269,10 @@ public:
     fakMenu menuMoviePrintSettings;
     fakMenu menuHelp;
     fakMenu menuTimeline;
+    
+    ofxFontStash fontStashHelveticaLight;
+    ofxFontStash fontStashHelveticaMedium;
+
     
     // Printing
     float printScale;

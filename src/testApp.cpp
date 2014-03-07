@@ -116,9 +116,10 @@ void testApp::setup(){
     fboToPreviewHeight = 660 - headerHeight - footerHeight;
     
     fboToPreview.allocate(fboToPreviewWidth, fboToPreviewHeight, GL_RGBA );
-    fboToPreview.begin();
-	ofClear(255,255,255, 0);
-    fboToPreview.end();
+//    fboToPreview.begin();
+//	ofClear(255,255,255, 0);
+//    fboToPreview.end();
+    fboMovieData.allocate(thumbWidth, (thumbHeight + displayGridMargin)*3, GL_RGBA );
     
     counterToUpdate = 0;
     counterToLoad = 0;
@@ -139,6 +140,10 @@ void testApp::setup(){
     outPointImage.loadImage("MoviePrint_OutPoint_v001_00000.png");
     printListImage.loadImage("MoviePrint_PrintList_v001_00000.png");
     layoutHeaderImage.loadImage("MoviePrint_Layout_Header_v001_00000.png");
+    
+    fontStashHelveticaLight.setup("HelveticaNeueLTCom-Lt.ttf");
+    fontStashHelveticaMedium.setup("HelveticaNeueLTCom-Md.ttf");
+
     
     // load standard movie
     loadedFile = "Nothing";
@@ -462,30 +467,6 @@ void testApp::setGUIMovieInfo(){
     guiMovieInfo->addWidgetDown(new ofxUILabel("gmMIASamplingRate", "gmMIASamplingRate", OFX_UI_FONT_SMALL));
     gmMIASamplingRate = (ofxUILabel *) guiMovieInfo->getWidget("gmMIASamplingRate");
     
-    
-    ofLog(OF_LOG_VERBOSE, "getColorBack" + ofToString(guiMovieInfo->getColorBack()));
-    ofLog(OF_LOG_VERBOSE, "getDrawBack" + ofToString(guiMovieInfo->getDrawBack()));
-    ofLog(OF_LOG_VERBOSE, "getColorFill" + ofToString(guiMovieInfo->getColorFill()));
-    ofLog(OF_LOG_VERBOSE, "getDrawFill" + ofToString(guiMovieInfo->getDrawFill()));
-    ofLog(OF_LOG_VERBOSE, "getColorFillHighlight" + ofToString(guiMovieInfo->getColorFillHighlight()));
-    ofLog(OF_LOG_VERBOSE, "getDrawFillHighLight" + ofToString(guiMovieInfo->getDrawFillHighLight()));
-    ofLog(OF_LOG_VERBOSE, "getColorOutline" + ofToString(guiMovieInfo->getColorOutline()));
-    ofLog(OF_LOG_VERBOSE, "getDrawOutline" + ofToString(guiMovieInfo->getDrawOutline()));
-    ofLog(OF_LOG_VERBOSE, "getColorOutlineHighlight" + ofToString(guiMovieInfo->getColorOutlineHighlight()));
-    ofLog(OF_LOG_VERBOSE, "getDrawOutlineHighLight" + ofToString(guiMovieInfo->getDrawOutlineHighLight()));
-    ofLog(OF_LOG_VERBOSE, "getColorPadded" + ofToString(guiMovieInfo->getColorPadded()));
-    ofLog(OF_LOG_VERBOSE, "getDrawPadding" + ofToString(guiMovieInfo->getDrawPadding()));
-    ofLog(OF_LOG_VERBOSE, "getColorPaddedOutline" + ofToString(guiMovieInfo->getColorPaddedOutline()));
-    ofLog(OF_LOG_VERBOSE, "getDrawPaddingOutline" + ofToString(guiMovieInfo->getDrawPaddingOutline()));
-    
-    ofxUIColor cb = ofxUIColor(FAK_LIGHTERMIDDLEDARKORANGECOLOR); // OFX_UI_COLOR_BACK
-    ofxUIColor co = ofxUIColor( 255, 255, 255, 200); // OFX_UI_COLOR_OUTLINE
-    ofxUIColor coh = ofxUIColor( 255, 255, 255, 255 ); // OFX_UI_COLOR_OUTLINE_HIGHLIGHT
-    ofxUIColor cf = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_FILL
-    ofxUIColor cfh = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_FILL_HIGHLIGHT
-    ofxUIColor cp = ofxUIColor( 255, 255, 255, 100 ); // OFX_UI_COLOR_PADDED
-    ofxUIColor cpo = ofxUIColor( 255, 255, 255, 200 ); // OFX_UI_COLOR_PADDED_OUTLINE
-    
     guiMovieInfo->setColorBack(FAK_TRANSPARENT);
 
 }
@@ -720,55 +701,55 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
         scrollBar.unregisterMouseEvents();
         loadedMovie.disableMouseEvents();
     }
-    int tempMoveX = 0;
-    gmMIFileName->setTextString(loadedMovie.gmMIFileName);
-    tempMoveX = gmMIFileName->getTextHeightMinusOne();
-    gmMIFilePath->setTextString("FilePath: " + loadedMovie.gmMIFilePathOhne);
-    gmMIFilePath->setYOffset(tempMoveX);
-    tempMoveX += gmMIFilePath->getTextHeightMinusOne();
-    gmMIFormat->setLabel(ofToString(loadedMovie.gmMIFormat));
-    gmMIFormat->setYOffset(tempMoveX);
-    gmMIFormatString->setLabel(ofToString(loadedMovie.gmMIFormatString));
-    gmMIFormatString->setYOffset(tempMoveX);
-    gmMIFileSizeString->setLabel(ofToString(loadedMovie.gmMIFileSizeString));
-    gmMIFileSizeString->setYOffset(tempMoveX);
-    gmMIDurationString1->setLabel(ofToString(loadedMovie.gmMIDurationString1));
-    gmMIDurationString1->setYOffset(tempMoveX);
-    gmMIFrameCount->setLabel(ofToString(loadedMovie.gmMIFrameCount));
-    gmMIFrameCount->setYOffset(tempMoveX);
-    gmMIWidth->setLabel(ofToString(loadedMovie.gmMIWidth));
-    gmMIWidth->setYOffset(tempMoveX);
-    gmMIDisplayAspectRatioString->setLabel(ofToString(loadedMovie.gmMIDisplayAspectRatioString));
-    gmMIDisplayAspectRatioString->setYOffset(tempMoveX);
-    gmMIFrameRateString->setLabel(ofToString(loadedMovie.gmMIFrameRateString));
-    gmMIFrameRateString->setYOffset(tempMoveX);
-    gmMIVFormat->setLabel(ofToString(loadedMovie.gmMIVFormat));
-    gmMIVFormat->setYOffset(tempMoveX);
-    gmMIFormatInfo->setLabel(ofToString(loadedMovie.gmMIFormatInfo));
-    gmMIFormatInfo->setYOffset(tempMoveX);
-    gmMIBitRate->setLabel(ofToString(loadedMovie.gmMIBitRate));
-    gmMIBitRate->setYOffset(tempMoveX);
-    gmMIPixelAspectRatio->setLabel(ofToString(loadedMovie.gmMIPixelAspectRatio));
-    gmMIPixelAspectRatio->setYOffset(tempMoveX);
-    gmMIDisplayAspectRatio->setLabel(ofToString(loadedMovie.gmMIDisplayAspectRatio));
-    gmMIDisplayAspectRatio->setYOffset(tempMoveX);
-    gmMIFrameRate_ModeString->setLabel(ofToString(loadedMovie.gmMIFrameRate_ModeString));
-    gmMIFrameRate_ModeString->setYOffset(tempMoveX);
-    gmMIColorSpace->setLabel(ofToString(loadedMovie.gmMIColorSpace));
-    gmMIColorSpace->setYOffset(tempMoveX);
-    gmMIChromaSubsampling->setLabel(ofToString(loadedMovie.gmMIChromaSubsampling));
-    gmMIChromaSubsampling->setYOffset(tempMoveX);
-    gmMIBitDepthString->setLabel(ofToString(loadedMovie.gmMIBitDepthString));
-    gmMIBitDepthString->setYOffset(tempMoveX);
-    gmMIInterlacementString->setLabel(ofToString(loadedMovie.gmMIInterlacementString));
-    gmMIInterlacementString->setYOffset(tempMoveX);
-    gmMIAFormat->setLabel(ofToString(loadedMovie.gmMIAFormat));
-    gmMIAFormat->setYOffset(tempMoveX);
-    gmMIAChannelsString->setLabel(ofToString(loadedMovie.gmMIAChannelsString));
-    gmMIAChannelsString->setYOffset(tempMoveX);
-    gmMIASamplingRate->setLabel(ofToString(loadedMovie.gmMIASamplingRate));
-    gmMIASamplingRate->setYOffset(tempMoveX);
+
     
+    stringMovieInfo.clear();
+    stringMovieInfo.push_back("Format: ");
+    stringMovieInfo.push_back("Format/String: ");
+    stringMovieInfo.push_back("FileSize: ");
+    stringMovieInfo.push_back("Duration: ");
+    stringMovieInfo.push_back("FrameCount: ");
+    stringMovieInfo.push_back("Size: ");
+    stringMovieInfo.push_back("DisplayAspectRatio: ");
+    stringMovieInfo.push_back("FrameRate: ");
+    stringMovieInfo.push_back("Codec: ");
+    stringMovieInfo.push_back("Codec/Info: ");
+    stringMovieInfo.push_back("BitRate: ");
+    stringMovieInfo.push_back("PixelAspectRatio: ");
+    stringMovieInfo.push_back("DisplayAspectRatio: ");
+    stringMovieInfo.push_back("FrameRate_Mode: ");
+    stringMovieInfo.push_back("ColorSpace: ");
+    stringMovieInfo.push_back("ChromaSubsampling: ");
+    stringMovieInfo.push_back("BitDepth: ");
+    stringMovieInfo.push_back("Interlacement: ");
+    stringMovieInfo.push_back("AudioCodec: ");
+    stringMovieInfo.push_back("Channels: ");
+    stringMovieInfo.push_back("SamplingRate: ");
+    
+    stringMovieData.clear();
+    stringMovieData.push_back(loadedMovie.gmMIFormat);
+    stringMovieData.push_back(loadedMovie.gmMIFormatString);
+    stringMovieData.push_back(loadedMovie.gmMIFileSizeString);
+    stringMovieData.push_back(loadedMovie.gmMIDurationString1);
+    stringMovieData.push_back(loadedMovie.gmMIFrameCount);
+    stringMovieData.push_back(loadedMovie.gmMIWidth);
+    stringMovieData.push_back(loadedMovie.gmMIDisplayAspectRatioString);
+    stringMovieData.push_back(loadedMovie.gmMIFrameRateString);
+    stringMovieData.push_back(loadedMovie.gmMIVFormat);
+    stringMovieData.push_back(loadedMovie.gmMIFormatInfo);
+    stringMovieData.push_back(loadedMovie.gmMIBitRate);
+    stringMovieData.push_back(loadedMovie.gmMIPixelAspectRatio);
+    stringMovieData.push_back(loadedMovie.gmMIDisplayAspectRatio);
+    stringMovieData.push_back(loadedMovie.gmMIFrameRate_ModeString);
+    stringMovieData.push_back(loadedMovie.gmMIColorSpace);
+    stringMovieData.push_back(loadedMovie.gmMIChromaSubsampling);
+    stringMovieData.push_back(loadedMovie.gmMIBitDepthString);
+    stringMovieData.push_back(loadedMovie.gmMIInterlacementString);
+    stringMovieData.push_back(loadedMovie.gmMIAFormat);
+    stringMovieData.push_back(loadedMovie.gmMIAChannelsString);
+    stringMovieData.push_back(loadedMovie.gmMIASamplingRate);
+    
+    writeFboToMovieData(1.0);
 }
 
 //--------------------------------------------------------------
@@ -1305,7 +1286,6 @@ void testApp::keyPressed(int key){
         case 'z':
         {
             showPlaceHolder = !showPlaceHolder;
-            
         }
 			break;
             
@@ -1980,6 +1960,8 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     fboToPreview.draw((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*(gridColumns/2) + thumbWidth/2), headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin, tweenMoviePrintPreview.update() * fboToPreviewWidth, tweenMoviePrintPreview.update() * fboToPreviewHeight);
     ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
     
+//    fboMovieData.draw(0,0);
+    
     ofPopStyle;
 }
 
@@ -2039,6 +2021,31 @@ void testApp::drawList(float _scrollAmountRel){
     ofPopStyle();
     
     droppedList.draw(leftMargin + menuWidth * tweenListInOut.update(), topMargin, ofGetWidth() - scrollBarWidth - rightMargin - leftMargin, _scrollAmount);
+
+    
+}
+
+//--------------------------------------------------------------
+void testApp::writeFboToMovieData(float _scaleFactor){
+    float tempFontHeightSmall = 14 * _scaleFactor;
+    
+    fboMovieData.begin();
+    ofClear(255,255,255, 0);
+    
+    ofPushStyle();
+    ofEnableAlphaBlending();
+    ofSetColor(255, 255, 255, 255);
+    
+    
+    for (int i=0; i<stringMovieInfo.size(); i++) {
+        float tempWidthOfPath = fontStashHelveticaLight.getBBox(stringMovieInfo[i], tempFontHeightSmall, 0, 0).getWidth();
+        fontStashHelveticaLight.draw(stringMovieInfo[i],tempFontHeightSmall, 0, (int)(i * tempFontHeightSmall*1.2));
+        fontStashHelveticaMedium.draw(stringMovieData[i], tempFontHeightSmall, (int)(tempWidthOfPath), (int)(i * tempFontHeightSmall*1.2));
+    }
+    
+    ofPopStyle();
+    fboMovieData.end();
+    
 
     
 }
