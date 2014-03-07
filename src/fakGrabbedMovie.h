@@ -163,7 +163,6 @@ public:
         updatingStill.resize(gmThumbWidth, gmThumbHeight);
         
         getMovieInformation(vfMovieName);
-//        getMovieInfo();
 
         gmSetTitleInfo = TRUE;
         
@@ -197,7 +196,6 @@ public:
         MediaInfo MI;
         MI.Open(__T(_vfMovieName));
         
-//        MI.Option(__T("Inform"), __T("General;General\\r\\n:::CompleteName : %CompleteName%\\r\\n:::FolderName : %FolderName%\\r\\n:::FileName : %FileName%\\r\\n:::FileExtension : %FileExtension%\\r\\n:::Format : %Format%\\r\\n:::Format/Info : %Format/Info%\\r\\n:::FileSize : %FileSize%\\r\\n:::Duration : %Duration%\\r\\n:::Duration/String3 : %Duration/String3%"));
         MI.Option(__T("Inform"), __T("General;Name : %FileName%.%FileExtension%\\r\\n:::Format : %Format%\\r\\n:::Format/String : %Format/String%\\r\\n:::FileSize : %FileSize/String%\\r\\n:::Duration : %Duration/String1%\\r\\n:::\nVideo;FrameCount : %FrameCount%\\r\\n:::Size : %Width%x%Height%\\r\\n:::DisplayAspectRatio : %DisplayAspectRatio/String%\\r\\n:::FrameRate : %FrameRate/String%"));
         
         gmInfCol1 = MI.Inform();
@@ -232,36 +230,12 @@ public:
         gmMIASamplingRate = MI.Get(Stream_Audio, 0, __T("SamplingRate/String"), Info_Text).c_str();
 
         gmMIFileNameClean = gmMIFileName + "." + gmMIFileExtension;
-        gmMIFileName = "FileName: " + gmMIFileName + "." + gmMIFileExtension;
-//        gmMIFormat = "Format: " + gmMIFormat;
-//        gmMIFormatString = "Format/String: " + gmMIFormatString;
-//        gmMIFileSizeString = "FileSize: " + gmMIFileSizeString;
-//        gmMIDurationString1 = "Duration: " + gmMIDurationString1;
-//        gmMIFrameCount = "FrameCount: " + gmMIFrameCount;
-//        gmMIWidth = "Size: " + gmMIWidth;
-//        gmMIDisplayAspectRatioString = "DisplayAspectRatio: " + gmMIDisplayAspectRatioString;
-//        gmMIFrameRateString = "FrameRate: " + gmMIFrameRateString;
-//        gmMIVFormat = "Codec: " + gmMIVFormat;
-//        gmMIFormatInfo = "Codec/Info: " + gmMIFormatInfo;
-//        gmMIBitRate = "BitRate: " + gmMIBitRate;
-//        gmMIPixelAspectRatio = "PixelAspectRatio: " + gmMIPixelAspectRatio;
-//        gmMIDisplayAspectRatio = "DisplayAspectRatio: " + gmMIDisplayAspectRatio;
-//        gmMIFrameRate_ModeString = "FrameRate_Mode: " + gmMIFrameRate_ModeString;
-//        gmMIColorSpace = "ColorSpace: " + gmMIColorSpace;
-//        gmMIChromaSubsampling = "ChromaSubsampling: " + gmMIChromaSubsampling;
-//        gmMIBitDepthString = "BitDepth: " + gmMIBitDepthString;
-//        gmMIInterlacementString = "Interlacement: " + gmMIInterlacementString;
-//        gmMIAFormat = "AudioCodec: " + gmMIAFormat;
-//        gmMIAChannelsString = "Channels: " + gmMIAChannelsString;
-//        gmMIASamplingRate = "SamplingRate: " + gmMIASamplingRate;
-       
-//        MI.Option(__T("Inform"), __T("Video;Video\\r\\n:::Format : %Format%\\r\\n:::Format/Info : %Format/Info%\\r\\n:::Format/Version : %Format/Version%\\r\\n:::Format/Profile : %Format/Profile%\\r\\n:::Format/Compression : %Format/Compression%\\r\\n:::Format/Settings : %Format/Settings%\\r\\n:::CodecID/Info : %CodecID/Info%\\r\\n:::BitRate : %BitRate%\\r\\n:::BitRate/Mode : %BitRate/Mode%\\r\\n:::Width/String : %Width/String%\\r\\n:::Height/String : %Height/String%\\r\\n:::PixelAspectRatio : %PixelAspectRatio%\\r\\n:::PixelAspectRatio/String : %PixelAspectRatio/String%\\r\\n:::DisplayAspectRatio : %DisplayAspectRatio%\\r\\n:::DisplayAspectRatio/String : %DisplayAspectRatio/String%\\r\\n:::FrameRate_Mode/String : %FrameRate_Mode/String%\\r\\n:::FrameRate/String : %FrameRate/String%\\r\\n:::FrameCount : %FrameCount%\\r\\n:::ColorSpace : %ColorSpace%\\r\\n:::ChromaSubsampling : %ChromaSubsampling%\\r\\n:::BitDepth/String : %BitDepth/String%\\r\\n:::Interlacement : %Interlacement%\\r\\n:::Interlacement/String : %Interlacement/String%\\r\\n:::Channel(s)/String : %Channel(s)/String%\\r\\n:::ChannelPositons : %ChannelPositons%\\r\\n:::SamplingRate/String : %SamplingRate/String%"));
+
         MI.Option(__T("Inform"), __T("Video;Video\\r\\n:::Format : %Format%\\r\\n:::Format/Info : %Format/Info%\\r\\n:::BitRate : %BitRate%\\r\\n:::PixelAspectRatio : %PixelAspectRatio%\\r\\n:::DisplayAspectRatio : %DisplayAspectRatio%\\r\\n:::FrameRate_Mode/String : %FrameRate_Mode/String%\\r\\n:::ColorSpace : %ColorSpace%\\r\\n:::ChromaSubsampling : %ChromaSubsampling%\\r\\n:::BitDepth/String : %BitDepth/String%\\r\\n:::Interlacement/String : %Interlacement/String%"));
         
         gmInfCol2 = MI.Inform().c_str();
         gmInfCol2 = ReplaceString(gmInfCol2, ":::", "\n");
         
-//        MI.Option(__T("Inform"), __T("Audio;Audio\\r\\n:::Format : %Format%\\r\\n:::Format/Info : %Format/Info%\\r\\n:::Format/Version : %Format/Version%\\r\\n:::Format/Profile : %Format/Profile%\\r\\n:::Format/Compression : %Format/Compression%\\r\\n:::Format/Settings : %Format/Settings%\\r\\n:::BitRate : %BitRate%\\r\\n:::BitRate/Mode : %BitRate/Mode%\\r\\n:::Channel(s)/String : %Channel(s)/String%\\r\\n:::ChannelPositons : %ChannelPositons%\\r\\n:::SamplingRate/String : %SamplingRate/String%"));
         MI.Option(__T("Inform"), __T("Audio;Audio\\r\\n:::Format : %Format%\\r\\n:::Format/Info : %Format/Info%\\r\\n:::BitRate : %BitRate%\\r\\n:::Channel(s)/String : %Channel(s)/String%\\r\\n:::ChannelPositons : %ChannelPositons%\\r\\n:::SamplingRate/String : %SamplingRate/String%"));
         
         gmInfCol3 = MI.Inform().c_str();
@@ -360,32 +334,7 @@ public:
         return c;
     }
 
-    void getMovieInfo(){
-        
-        string pathName = gmMovie.getMoviePath();
-        pathName = gmLoadedFilePath.getFileName(pathName, TRUE);
-        gmInfCollected = pathName + "\n" +
-        gmMIFileName + "\n" +
-        gmMIFormat + "\n" +
-        gmMIFormatString + "\n" +
-        gmMIFileSizeString + "\n" +
-        gmMIDurationString1 + "\n" +
-        gmMIFrameCount + "\n" +
-        gmMIWidth + "\n" +
-        gmMIDisplayAspectRatioString + "\n" +
-        gmMIFrameRateString + "\n" +
-        gmMIVFormat + "\n" +
-        gmMIPixelAspectRatio + "\n" +
-
-        
-        "\nENDE"
-        ;
-        
-        ofLog(OF_LOG_VERBOSE, gmInfCollected);
-        
-    }
-    
-    void scrubMovie(int & i){
+     void scrubMovie(int & i){
         if (isMovieLoaded) {
             gmScrubID = i;
 //            ofLog(OF_LOG_VERBOSE, "rollOverMovieID" + ofToString(gmRollOverMovieID) + "gmRollOverMovieButtonID" + ofToString(gmRollOverMovieButtonID));
