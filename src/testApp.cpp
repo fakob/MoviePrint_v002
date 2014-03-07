@@ -182,17 +182,17 @@ void testApp::setup(){
     menuMovieInfo.setupMenu(1,0,0,0,0,headerHeight, true, true, false);
     menuMovieInfo.registerMouseEvents();
     
-    menuSettings.setupMenu(4,0,0,0,0,headerHeight, false, true, false);
-    menuSettings.registerMouseEvents();
+//    menuSettings.setupMenu(4,0,0,0,0,headerHeight, false, true, false);
+//    menuSettings.registerMouseEvents();
     
-    menuMoviePrintPreview.setupMenu(3,0,0,0,0,headerHeight, true, true, true);
-    menuMoviePrintPreview.registerMouseEvents();
+//    menuMoviePrintPreview.setupMenu(3,0,0,0,0,headerHeight, true, true, true);
+//    menuMoviePrintPreview.registerMouseEvents();
     
     menuMoviePrintSettings.setupMenu(5,0,0,0,0,headerHeight, true, true, false);
     menuMoviePrintSettings.registerMouseEvents();
     
-    menuHelp.setupMenu(2,0,0,0,0,headerHeight, false, true, false);
-    menuHelp.registerMouseEvents();
+//    menuHelp.setupMenu(2,0,0,0,0,headerHeight, false, true, false);
+//    menuHelp.registerMouseEvents();
     
     menuTimeline.setupMenu(0,0,0,0,0,footerHeight/2, true, false, false);
     menuTimeline.registerMouseEvents();
@@ -1923,35 +1923,63 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     ofPopStyle();
     
     layoutHeaderImage.draw(0, 0, ofGetWindowWidth() * _scaleFactor, layoutHeaderImage.getHeight() * _scaleFactor);
-
+    
+    ofPushStyle();
+    for(int i=0; i<gridColumns; i++)
+    {
+        switch (i%5) {
+            case 0:
+                ofSetColor(FAK_ORANGE1);
+                break;
+            case 1:
+                ofSetColor(FAK_ORANGE2);
+                break;
+            case 2:
+                ofSetColor(FAK_ORANGE3);
+                break;
+            case 3:
+                ofSetColor(FAK_ORANGE4);
+                break;
+            case 4:
+                ofSetColor(FAK_ORANGE5);
+                break;
+            default:
+                ofSetColor(255, 255, 255, 255);
+                break;
+        }
+        // draw orange stripes
+        ofRect((0 + displayGridMargin + (thumbWidth+displayGridMargin) * i) * _scaleFactor, (0 + headerHeight*0.7) * _scaleFactor, thumbWidth * _scaleFactor, headerHeight* 0.2 * _scaleFactor);
+    }
+    ofPopStyle();
+    
     float tempY = 0;
     int tempXPos = 0;
     int menuHeightInRows = 4;
     
-    tempXPos = gridColumns/2;
-    menuMoviePrintPreview.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuMoviePrintPreview.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
-    menuMoviePrintPreview.drawMenu();
+//    tempXPos = gridColumns/2;
+//    menuMoviePrintPreview.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+//    menuMoviePrintPreview.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
+//    menuMoviePrintPreview.drawMenu();
 
     tempXPos = 0;
     menuMovieInfo.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMovieInfo.drawMenu();
 
-    tempXPos = 1;
-    menuSettings.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
-    menuSettings.drawMenu();
+//    tempXPos = 1;
+//    menuSettings.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+//    menuSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
+//    menuSettings.drawMenu();
     
     tempXPos = gridColumns-1;
     menuMoviePrintSettings.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMoviePrintSettings.drawMenu();
     
-    tempXPos = gridColumns-2;
-    menuHelp.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuHelp.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
-    menuHelp.drawMenu();
+//    tempXPos = gridColumns-2;
+//    menuHelp.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+//    menuHelp.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
+//    menuHelp.drawMenu();
 
     menuTimeline.setPosition(0, ofGetWindowHeight());
     menuTimeline.setSize(ofGetWindowWidth(), footerHeight/2);
