@@ -70,7 +70,7 @@ public:
     void updateTheListScrollBar();
     void updateAllLimits();
     void writeFboToPreview(float _scaleFactor, bool _showPlaceHolder);
-    void writeFboToMovieData(float _scaleFactor);
+    void drawMovieInfo(float _x, float _y, float _fade);
     void processOpenFileSelection(ofFileDialogResult openFileResult);
     void toggleMoviePrintPreview();
     void setVisibilityMoviePrintPreview(bool _visibility);
@@ -98,7 +98,6 @@ public:
     fakGrabbedMovie loadedMovie;
     vector<string> stringMovieInfo;
     vector<string> stringMovieData;
-    ofFbo fboMovieData;
     
     int * gridTimeArray;
 

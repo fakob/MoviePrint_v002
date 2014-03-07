@@ -116,10 +116,6 @@ void testApp::setup(){
     fboToPreviewHeight = 660 - headerHeight - footerHeight;
     
     fboToPreview.allocate(fboToPreviewWidth, fboToPreviewHeight, GL_RGBA );
-//    fboToPreview.begin();
-//	ofClear(255,255,255, 0);
-//    fboToPreview.end();
-    fboMovieData.allocate(thumbWidth, (thumbHeight + displayGridMargin)*3, GL_RGBA );
     
     counterToUpdate = 0;
     counterToLoad = 0;
@@ -176,7 +172,7 @@ void testApp::setup(){
     scrollBarList.registerTouchEvents();
     
     setGUITimeline();
-    setGUIMovieInfo();
+//    setGUIMovieInfo();
     setGUISettings();
     setGUIMoviePrintPreview();
     guiSettings1->loadSettings("guiSettings1.xml");
@@ -749,7 +745,6 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
     stringMovieData.push_back(loadedMovie.gmMIAChannelsString);
     stringMovieData.push_back(loadedMovie.gmMIASamplingRate);
     
-    writeFboToMovieData(1.0);
 }
 
 //--------------------------------------------------------------
@@ -849,8 +844,8 @@ void testApp::update(){
     }
     
     // calculate rollout of ofxUI pos, scal
-    guiMovieInfo->setPosition(menuMovieInfo.getPositionX(), menuMovieInfo.getPositionY()+headerHeight);
-    guiMovieInfo->setHeight(menuMovieInfo.getSizeH()-headerHeight);
+//    guiMovieInfo->setPosition(menuMovieInfo.getPositionX(), menuMovieInfo.getPositionY()+headerHeight);
+//    guiMovieInfo->setHeight(menuMovieInfo.getSizeH()-headerHeight);
     
     guiSettingsMoviePrint->setPosition(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY()+headerHeight);
     guiSettingsMoviePrint->setHeight(menuMoviePrintSettings.getSizeH()-headerHeight);
@@ -1936,6 +1931,7 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     menuMovieInfo.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMovieInfo.drawMenu();
+    drawMovieInfo((leftMargin + menuWidth * tweenListInOut.update() + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuMovieInfo.getRelSizeH());
 
 //    tempXPos = 1;
 //    menuSettings.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
@@ -1959,8 +1955,6 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
     fboToPreview.draw((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*(gridColumns/2) + thumbWidth/2), headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin, tweenMoviePrintPreview.update() * fboToPreviewWidth, tweenMoviePrintPreview.update() * fboToPreviewHeight);
     ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
-    
-//    fboMovieData.draw(0,0);
     
     ofPopStyle;
 }
@@ -2026,25 +2020,20 @@ void testApp::drawList(float _scrollAmountRel){
 }
 
 //--------------------------------------------------------------
-void testApp::writeFboToMovieData(float _scaleFactor){
-    float tempFontHeightSmall = 14 * _scaleFactor;
-    
-    fboMovieData.begin();
-    ofClear(255,255,255, 0);
+void testApp::drawMovieInfo(float _x, float _y, float _fade){
+    float tempFontHeightSmall = 14;
     
     ofPushStyle();
     ofEnableAlphaBlending();
-    ofSetColor(255, 255, 255, 255);
-    
+    ofSetColor(255, 255, 255, _fade * 255);
     
     for (int i=0; i<stringMovieInfo.size(); i++) {
         float tempWidthOfPath = fontStashHelveticaLight.getBBox(stringMovieInfo[i], tempFontHeightSmall, 0, 0).getWidth();
-        fontStashHelveticaLight.draw(stringMovieInfo[i],tempFontHeightSmall, 0, (int)(i * tempFontHeightSmall*1.2));
-        fontStashHelveticaMedium.draw(stringMovieData[i], tempFontHeightSmall, (int)(tempWidthOfPath), (int)(i * tempFontHeightSmall*1.2));
+        fontStashHelveticaLight.draw(stringMovieInfo[i],tempFontHeightSmall, _x, (int)((i * tempFontHeightSmall*1.2)*_fade + _y));
+        fontStashHelveticaMedium.draw(stringMovieData[i], tempFontHeightSmall, (int)(_x + tempWidthOfPath), (int)((i * tempFontHeightSmall*1.2)*_fade + _y));
     }
     
     ofPopStyle();
-    fboMovieData.end();
     
 
     
