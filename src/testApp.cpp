@@ -329,7 +329,7 @@ void testApp::setGUISettingsMoviePrint(){
 
 //    guiSettingsMoviePrint->addToggle("ShowMoviePrintPreview", &showMoviePrintPreview);
     guiSettingsMoviePrint->addToggle("DisplayVideoAudioInfo", &printDisplayVideoAudioInfo, dim*1.5, dim);
-    guiSettingsMoviePrint->addToggle("PrintSaveSingleFrames", printSingleFrames, dim*1.5, dim);
+    guiSettingsMoviePrint->addToggle("Save Individual Frames", &printSingleFrames, dim*1.5, dim);
     
     vector<string> names;
 	names.push_back("Frames");
@@ -1764,6 +1764,16 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         }
         calculateNewPrintSize();
 	}
+    else if(name == "Save Individual Frames")
+	{
+        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+        bool val = toggle->getValue();
+        if (val) {
+            printSingleFrames = true;
+        } else {
+            printSingleFrames = false;
+        }
+	}
     else if(name == "TEXT INPUT")
     {
         ofxUITextInput *textinput = (ofxUITextInput *) e.widget;
@@ -1853,7 +1863,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             printFormat = OF_IMAGE_FORMAT_JPEG;
         }
 	}
-    else if(name == "png")
+    else if(name == "png with alpha")
 	{
         ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
         bool val = toggle->getValue();
@@ -2280,15 +2290,30 @@ void testApp::printImageToPNG(int _printSizeWidth){
         ofPopMatrix();
 
         string pathName = loadedMovie.gmMovie.getMoviePath();
-        pathName = loadedFilePath.getFileName(pathName, TRUE);
+        string fileName = loadedFilePath.getFileName(pathName, TRUE);
         string formatExtension;
         if (printFormat == OF_IMAGE_FORMAT_JPEG) {
             formatExtension = "jpg";
         } else {
             formatExtension = "png";
         }
-        string imageName = pathName + "_MoviePrint." + formatExtension;
+        string imageName = fileName + "_MoviePrint." + formatExtension;
         imageName = saveMoviePrintPath + imageName;
+        
+        if (printSingleFrames) {
+            string singleImagePath = saveMoviePrintPath+fileName+"/";
+            ofDirectory dir2(singleImagePath);
+            if(!dir2.exists()){
+                dir2.create(true);
+            }
+            for (int i=0; i<loadedMovie.gmNumberOfStills; i++) {
+                string singleImageName = fileName + "_" + ofToString(i, 3, '0') + "." + formatExtension;
+                singleImageName = singleImagePath + singleImageName;
+                ofSaveImage(loadedMovie.grabbedStill[i].gsImage, singleImageName, OF_IMAGE_QUALITY_HIGH);
+            }
+        }
+        
+        
         ofSaveImage(gmPixToSave, imageName, OF_IMAGE_QUALITY_HIGH);
         ofLog(OF_LOG_VERBOSE, "Finished saving" + ofToString(imageName) );
     }
