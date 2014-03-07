@@ -142,6 +142,7 @@ void testApp::setup(){
     
     // load standard movie
     loadedFile = "Nothing";
+    saveMoviePrintPath = "";
 
     loadedMovie.gmUpperLimitY = headerHeight;
     loadedMovie.gmLowerLimitY = ofGetHeight() - footerHeight;
@@ -301,39 +302,38 @@ void testApp::setGUISettingsMoviePrint(){
 	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
     float length = menuWidth-xInit;
     
-    vector<string> names2;
-	names2.push_back("Set Columns and Rows");
-	names2.push_back("Set Number of Frames");
-    
-    vector<string> names;
-	names.push_back("Frames");
-	names.push_back("TimeCode");
-	names.push_back("off");
-    
     guiSettingsMoviePrint = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
     guiSettingsMoviePrint->setFont("HelveticaNeueLTCom-LtCn.ttf");
     
     guiSettingsMoviePrint->addLabel("MOVIEPRINT SETTINGS", OFX_UI_FONT_LARGE);
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
+    
+    guiSettingsMoviePrint->addButton("Select Output Folder", &saveMoviePrintPath);
+    
     guiSettingsMoviePrint->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
-    
-    guiSettingsMoviePrint->addRadio("Grid-Number", names2, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
-    uiRadioSetFitManually = (ofxUIRadio *) guiSettingsMoviePrint->getWidget("Grid-Number");
-    uiRadioSetFitManually->activateToggle("Set Columns and Rows");
-    
+//    vector<string> names2;
+//	names2.push_back("Set Columns and Rows");
+//	names2.push_back("Set Number of Frames");
+//    guiSettingsMoviePrint->addRadio("Grid-Number", names2, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
+//    uiRadioSetFitManually = (ofxUIRadio *) guiSettingsMoviePrint->getWidget("Grid-Number");
+//    uiRadioSetFitManually->activateToggle("Set Columns and Rows");
 	guiSettingsMoviePrint->addIntSlider("PrintColumns", 1, 10, &printGridColumns, length-xInit,dim);
 	guiSettingsMoviePrint->addIntSlider("PrintRows", 1, 20, &printGridRows, length-xInit,dim);
-   	guiSettingsMoviePrint->addIntSlider("PrintNumber", 4, 200, &printNumberOfThumbs, length-xInit,dim);
+//   	guiSettingsMoviePrint->addIntSlider("PrintNumber", 4, 200, &printNumberOfThumbs, length-xInit,dim);
    	guiSettingsMoviePrint->addIntSlider("PrintMargin", 0, 30, &printGridMargin, length-xInit,dim);
     uiSliderPrintColumns = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintColumns");
     uiSliderPrintRows = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintRows");
     uiSliderNumberOfThumbs = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintNumber");
     uiSliderPrintMargin = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintMargin");
 
-    guiSettingsMoviePrint->addToggle("ShowMoviePrintPreview", &showMoviePrintPreview);
+//    guiSettingsMoviePrint->addToggle("ShowMoviePrintPreview", &showMoviePrintPreview);
     guiSettingsMoviePrint->addToggle("DisplayVideoAudioInfo", &printDisplayVideoAudioInfo);
     guiSettingsMoviePrint->addToggle("PrintSaveSingleFrames", printSingleFrames);
     
+    vector<string> names;
+	names.push_back("Frames");
+	names.push_back("TimeCode");
+	names.push_back("off");
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
     guiSettingsMoviePrint->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
     ofxUIRadio *uiRadioSetFrameDisplay = guiSettingsMoviePrint->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
@@ -343,7 +343,7 @@ void testApp::setGUISettingsMoviePrint(){
 
     guiSettingsMoviePrint->addLabel("Choose Output Format", OFX_UI_FONT_MEDIUM);
     vector<string> names3;
-    names3.push_back("png");
+    names3.push_back("png with alpha");
     names3.push_back("jpg");
 //    names3.push_back("gif");
     guiSettingsMoviePrint->addRadio("Choose Output Format", names3, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
@@ -1210,7 +1210,6 @@ void testApp::draw(){
     ofxNotify::draw(drawNotify);
 }
 
-
 //--------------------------------------------------------------
 void testApp::writeFboToPreview(float _scaleFactor, bool _showPlaceHolder){
     fboToPreview.begin();
@@ -1338,6 +1337,20 @@ void testApp::keyPressed(int key){
                 
             }
             
+        }
+            break;
+
+        case ' ':
+        {
+            ofFileDialogResult saveFileResult = ofSystemSaveDialog(ofGetTimestampString() + "." + ofToLower("EXT"), "Select a Folder");
+            if (saveFileResult.bSuccess){
+                ofLogVerbose("getName(): "  + saveFileResult.getName());
+                ofLogVerbose("getPath(): "  + saveFileResult.getPath());
+                saveMoviePrintPath = loadedMovie.getMoviePathName();
+                ofLogVerbose("saveMoviePrintPath: "  + ofToString(saveMoviePrintPath));
+            } else {
+                ofLogVerbose("User hit cancel");
+            }
         }
 			break;
 
@@ -1657,6 +1670,32 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofLog(OF_LOG_VERBOSE, "ThumbWidth " + ofToString(slider->getScaledValue()));
 		thumbWidth = possStillResWidth169[(int)slider->getScaledValue()];
         calculateNewPrintGrid();
+	}
+	else if(name == "Select Output Folder")
+	{
+        ofxUIButton *button = (ofxUIButton *) e.widget;
+        if (button->getValue()) {
+            
+            string movieFileName = loadedMovie.gmMovie.getMoviePath();
+            movieFileName = loadedFilePath.getFileName(movieFileName, TRUE) + "_MoviePrint";
+
+            string formatExtension;
+            if (printFormat == OF_IMAGE_FORMAT_JPEG) {
+                formatExtension = "jpg";
+            } else {
+                formatExtension = "png";
+            }
+            
+            ofFileDialogResult saveFileResult = ofSystemSaveDialog(movieFileName + "." + formatExtension, "Select a Folder");
+            if (saveFileResult.bSuccess){
+                vector<string> tempVectorString = ofSplitString(saveFileResult.getPath(), "/");
+                tempVectorString.pop_back();
+                saveMoviePrintPath = ofJoinString(tempVectorString, "/") + "/";
+                ofLogVerbose("User selected saveMoviePrintPath: "  + ofToString(saveMoviePrintPath));
+            } else {
+                ofLogVerbose("User hit cancel");
+            }
+        }
 	}
 	else if(name == "PrintScale")
 	{
@@ -2137,11 +2176,16 @@ void testApp::moveInOutTimeline(){
 //--------------------------------------------------------------
 void testApp::printImageToPNG(int _printSizeWidth){
     
-    string newPrintPath = appPathUpStr + "/MoviePrints";
-    ofDirectory dir(newPrintPath);
-    if(!dir.exists()){
-        dir.create(true);
+    // if folder doesnt exist, create standard
+    ofDirectory dir(saveMoviePrintPath);
+    if((saveMoviePrintPath == "") || !dir.exists()){
+        saveMoviePrintPath = appPathUpStr + "/MoviePrints/";
+        dir.open(saveMoviePrintPath);
+        if(!dir.exists()){
+            dir.create(true);
+        }
     }
+
     //now you can be sure that path exists
     ofLog(OF_LOG_VERBOSE, dir.getOriginalDirectory() );
     
@@ -2207,7 +2251,7 @@ void testApp::printImageToPNG(int _printSizeWidth){
             formatExtension = "png";
         }
         string imageName = pathName + "_MoviePrint." + formatExtension;
-        imageName = newPrintPath + "/" + imageName;
+        imageName = saveMoviePrintPath + imageName;
         ofSaveImage(gmPixToSave, imageName, OF_IMAGE_QUALITY_HIGH);
         ofLog(OF_LOG_VERBOSE, "Finished saving" + ofToString(imageName) );
     }

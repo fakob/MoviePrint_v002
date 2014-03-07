@@ -189,11 +189,7 @@ public:
     
     void getMovieInformation(string _vfMovieName){
 
-        gmMIFilePath = ofToString(gmMovie.getMoviePath());
-        vector<string> tempVectorString = ofSplitString(gmMIFilePath, "/");
-        tempVectorString.pop_back();
-        gmMIFilePathOhne = ofJoinString(tempVectorString, "/") + "/";
-        ofLog(OF_LOG_VERBOSE, "tempVectorString: " + ofToString(tempVectorString));
+        gmMIFilePathOhne = getMoviePathName();
         gmMIFilePath = "FilePath: " + gmMIFilePath;
         
         
@@ -345,6 +341,13 @@ public:
     string StringToUpper(string strToConvert){
         std::transform(strToConvert.begin(), strToConvert.end(), strToConvert.begin(), ::toupper);
         return strToConvert;
+    }
+
+    string getMoviePathName(){
+        gmMIFilePath = ofToString(gmMovie.getMoviePath());
+        vector<string> tempVectorString = ofSplitString(gmMIFilePath, "/");
+        tempVectorString.pop_back();
+        return ofJoinString(tempVectorString, "/") + "/";
     }
     
     int CountNewlines(string s){

@@ -70,6 +70,8 @@ public:
     void updateTheListScrollBar();
     void updateAllLimits();
     void writeFboToPreview(float _scaleFactor, bool _showPlaceHolder);
+    void processOpenFileSelection(ofFileDialogResult openFileResult);
+
 
     void updateTimeSlider(bool _wholeRange);
     void drawPrintScreen();
@@ -85,7 +87,6 @@ public:
   
     string wrapString(string _tempString, int _tempWidth, int _tempHeight);
     string StringToUpper(string strToConvert);
-
     
     
     // Movie
@@ -326,6 +327,7 @@ public:
     
     string appPathStr;
     string appPathUpStr;
+    string saveMoviePrintPath;
     
     bool devTurnOffMovieSwitch = FALSE;
     
