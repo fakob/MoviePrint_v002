@@ -1709,7 +1709,6 @@ void testApp::menuIsClosed(int &e){
 //--------------------------------------------------------------
 void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     
-    
     ofPushStyle();
     ofSetColor(255);
 
@@ -1827,8 +1826,9 @@ void testApp::drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeing
         _scrollAmount = 0;
     }
     float tempX = (leftMargin + menuWidth * tweenListInOut.update()) * _scaleFactor;
-    float tempY = _scrollAmount * _scaleFactor + topMargin + headerHeight;
-    loadedMovie.drawGridOfStills(tempX, tempY, gridColumns, displayGridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder, printHeaderHeight);
+    float tempY = (_scrollAmount + headerHeight + topMargin)  * _scaleFactor;
+    ofLog(OF_LOG_VERBOSE, "_scrollAmount:"+ ofToString(_scrollAmount) +  " tempY:"+ ofToString(tempY) +  "_scrollAmount:"+ ofToString(_scrollAmount));
+    loadedMovie.drawGridOfStills(tempX, tempY, gridColumns, displayGridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
     ofPopStyle();
 }
 
@@ -2156,7 +2156,6 @@ void testApp::printImageToPNG(int _printSizeWidth){
 
         loadedMovie.drawMoviePrint(0, 0, printGridColumns, printGridMargin, _newScaleFactor, 1, showPlaceHolder, printHeaderHeight, printDisplayVideoAudioInfo, false);
 
-//        loadedMovie.drawGridOfStills(printGridMargin, printGridMargin, printGridColumns, printGridMargin, 0, _newScaleFactor, 1, TRUE, TRUE, superKeyPressed, shiftKeyPressed, showPlaceHolder, printHeaderHeight);
         fboToSave.end();
         fboToSave.readToPixels(gmPixToSave);
                 ofLog(OF_LOG_VERBOSE, "gmPixToSave:getImageType" + ofToString(gmPixToSave.getImageType()));
