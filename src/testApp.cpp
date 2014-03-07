@@ -101,7 +101,7 @@ void testApp::setup(){
     gridRows = 6;
     displayGridSetWithColumnsAndRows = false;
     printGridSetWithColumnsAndRows = true;
-    showMoviePrintPreview = false;
+    showMoviePrintPreview = true;
     
     thumbWidth = 256;
     thumbHeight = 144;
@@ -142,7 +142,7 @@ void testApp::setup(){
     
     // load standard movie
     loadedFile = "Nothing";
-    saveMoviePrintPath = "";
+    saveMoviePrintPath = appPathUpStr + "/MoviePrints/";
 
     loadedMovie.gmUpperLimitY = headerHeight;
     loadedMovie.gmLowerLimitY = ofGetHeight() - footerHeight;
@@ -308,8 +308,11 @@ void testApp::setGUISettingsMoviePrint(){
     guiSettingsMoviePrint->addLabel("MOVIEPRINT SETTINGS", OFX_UI_FONT_LARGE);
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
     
-    guiSettingsMoviePrint->addButton("Select Output Folder", &saveMoviePrintPath);
-    
+    guiSettingsMoviePrint->addButton("Select Output Folder", false);
+    guiSettingsMoviePrint->addLabel("SelectedOutputFolder", saveMoviePrintPath, OFX_UI_FONT_SMALL);
+    uiLabelOutputFolder = (ofxUILabel *) guiSettingsMoviePrint->getWidget("SelectedOutputFolder");
+    uiLabelOutputFolder->setLabel(cropFrontOfString(saveMoviePrintPath, 40, "..."));
+
     guiSettingsMoviePrint->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
 //    vector<string> names2;
 //	names2.push_back("Set Columns and Rows");
@@ -768,7 +771,15 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
     
 }
 
-
+//--------------------------------------------------------------
+string testApp::cropFrontOfString(string _inputString, int _length, string _substitute){
+    if (((_length + _substitute.length()) >= _inputString.length()) || (_length <= _substitute.length())) {
+        return _inputString;
+    } else {
+        ofLog(OF_LOG_VERBOSE, "crop String to length:" + ofToString(_inputString.length()));
+        return _substitute + _inputString.substr(_inputString.length()-_length - _substitute.length());
+    }
+}
 
 //--------------------------------------------------------------
 void testApp::update(){
@@ -1696,6 +1707,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
                 ofLogVerbose("User hit cancel");
             }
         }
+        uiLabelOutputFolder->setLabel(cropFrontOfString(saveMoviePrintPath, 40, "..."));
 	}
 	else if(name == "PrintScale")
 	{
@@ -2180,6 +2192,7 @@ void testApp::printImageToPNG(int _printSizeWidth){
     ofDirectory dir(saveMoviePrintPath);
     if((saveMoviePrintPath == "") || !dir.exists()){
         saveMoviePrintPath = appPathUpStr + "/MoviePrints/";
+        uiLabelOutputFolder->setLabel(cropFrontOfString(saveMoviePrintPath, 40, "..."));
         dir.open(saveMoviePrintPath);
         if(!dir.exists()){
             dir.create(true);

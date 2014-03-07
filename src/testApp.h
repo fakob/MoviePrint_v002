@@ -87,7 +87,8 @@ public:
   
     string wrapString(string _tempString, int _tempWidth, int _tempHeight);
     string StringToUpper(string strToConvert);
-    
+    string cropFrontOfString(string _inputString, int _length, string _substitute = "");
+
     
     // Movie
     fakGrabbedMovie loadedMovie;
@@ -199,6 +200,7 @@ public:
     ofxUIDropDownList *uiDropDownlistPrintOutputWidth;
     ofxUIRadio *uiRadioPrintOutputFormat;
     ofxUIRadio *uiRadioPrintOutputWidth;
+    ofxUILabel *uiLabelOutputFolder;
 
 
     
