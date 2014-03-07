@@ -69,17 +69,17 @@ public:
                 mMenuImage.loadImage("MoviePrint_Layout_Menu1_v001_00001.png");
                 mBackgroundColor = FAK_ORANGE1;
                 break;
-            case 2:
+            case 4:
                 mMenuImage.loadImage("MoviePrint_Layout_Menu2_v001_00001.png");
-                mBackgroundColor = FAK_ORANGE2;
+                mBackgroundColor = FAK_ORANGE5;
                 break;
             case 3:
                 mMenuImage.loadImage("MoviePrint_Layout_Menu3_v001_00001.png");
                 mBackgroundColor = FAK_ORANGE3;
                 break;
-            case 4:
+            case 2:
                 mMenuImage.loadImage("MoviePrint_Layout_Menu4_v001_00001.png");
-                mBackgroundColor = FAK_ORANGE5;
+                mBackgroundColor = FAK_ORANGE2;
                 break;
             case 5:
                 mMenuImage.loadImage("MoviePrint_Layout_Menu5_v001_00001.png");

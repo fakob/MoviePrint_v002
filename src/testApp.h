@@ -71,6 +71,7 @@ public:
     void updateAllLimits();
     void writeFboToPreview(float _scaleFactor, bool _showPlaceHolder);
     void drawMovieInfo(float _x, float _y, float _fade);
+    void drawHelp(float _x, float _y, float _fade);
     void processOpenFileSelection(ofFileDialogResult openFileResult);
     void toggleMoviePrintPreview();
     void setVisibilityMoviePrintPreview(bool _visibility);
@@ -111,6 +112,7 @@ public:
     ofImage inPointImage;
     ofImage outPointImage;
     ofImage layoutHeaderImage;
+    ofImage helpMenuImage;
 
     bool superKeyPressed = FALSE;
     bool shiftKeyPressed = FALSE;

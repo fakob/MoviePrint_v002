@@ -136,6 +136,7 @@ void testApp::setup(){
     outPointImage.loadImage("MoviePrint_OutPoint_v001_00000.png");
     printListImage.loadImage("MoviePrint_PrintList_v001_00000.png");
     layoutHeaderImage.loadImage("MoviePrint_Layout_Header_v001_00000.png");
+    helpMenuImage.loadImage("HelpMenu_v001.png");
     
     fontStashHelveticaLight.setup("HelveticaNeueLTCom-Lt.ttf");
     fontStashHelveticaMedium.setup("HelveticaNeueLTCom-Md.ttf");
@@ -191,8 +192,8 @@ void testApp::setup(){
     menuMoviePrintSettings.setupMenu(5,0,0,0,0,headerHeight, true, true, false);
     menuMoviePrintSettings.registerMouseEvents();
     
-//    menuHelp.setupMenu(2,0,0,0,0,headerHeight, false, true, false);
-//    menuHelp.registerMouseEvents();
+    menuHelp.setupMenu(2,0,0,0,0,headerHeight, true, true, false);
+    menuHelp.registerMouseEvents();
     
     menuTimeline.setupMenu(0,0,0,0,0,footerHeight/2, true, false, false);
     menuTimeline.registerMouseEvents();
@@ -383,61 +384,6 @@ void testApp::setGUIMoviePrintPreview(){
     guiMoviePrintPreview->setColorBack(FAK_ORANGE3);
     guiMoviePrintPreview->setColorBack(FAK_TRANSPARENT);
 	ofAddListener(guiMoviePrintPreview->newGUIEvent,this,&testApp::guiEvent);
-}
-
-//--------------------------------------------------------------
-void testApp::setGUIHelp1(){
-	
-	float dim = 16;
-	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
-    float length = menuWidth-xInit;
-
-    guiHelp1 = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
-    guiHelp1->setFont("HelveticaNeueLTCom-LtCn.ttf");
-    guiHelp1->setColorBack(FAK_ORANGECOLOR);
-    
-    guiHelp1->addLabel("MOVIE INFO", OFX_UI_FONT_LARGE);
-    
- 	guiHelp1->addWidgetDown(new ofxUILabel("HELP", OFX_UI_FONT_LARGE));
-    guiHelp1->addSpacer(length-xInit, 1);
-    guiHelp1->addWidgetDown(new ofxUILabel("Drop in one or more movies", OFX_UI_FONT_SMALL));
-    //    guiHelp1->addSpacer(10, 1);
-    guiHelp1->addWidgetDown(new ofxUILabel("Set the desired In- and Outpoints", OFX_UI_FONT_SMALL));
-    //    guiHelp1->addSpacer(10, 1);
-    guiHelp1->addWidgetDown(new ofxUILabel("Press P to make a MoviePrint", OFX_UI_FONT_SMALL));
-    //    guiHelp1->addSpacer(10, 1);
-    guiHelp1->addWidgetDown(new ofxUILabel("Press Esc to quit MoviePrint", OFX_UI_FONT_SMALL));
-    guiHelp1->addSpacer(length-xInit, 1);
-    guiHelp1->addWidgetDown(new ofxUILabel("Prints are saved as PNGs in a folder", OFX_UI_FONT_SMALL));
-    guiHelp1->addWidgetDown(new ofxUILabel("named MoviePrints on the same level", OFX_UI_FONT_SMALL));
-    guiHelp1->addSpacer(10, 1);
-        guiHelp1->addWidgetDown(new ofxUILabel("Hovering over a Still one can", OFX_UI_FONT_SMALL));
-    guiHelp1->addWidgetDown(new ofxUILabel("-jump 1/10/100 (Shift/Cmd) frames", OFX_UI_FONT_SMALL));
-    guiHelp1->addWidgetDown(new ofxUILabel(" forward or backward", OFX_UI_FONT_SMALL));
-    guiHelp1->addWidgetDown(new ofxUILabel("-set this Still as In- or Outpoint", OFX_UI_FONT_SMALL));
-    guiHelp1->addWidgetDown(new ofxUILabel("-scrub the Still using the mouse", OFX_UI_FONT_SMALL));
-    guiHelp1->addSpacer(10, 1);
-    guiHelp1->addWidgetDown(new ofxUILabel("Set In- and Outpoints using the", OFX_UI_FONT_SMALL));
-    guiHelp1->addWidgetDown(new ofxUILabel("timeline on the bottom", OFX_UI_FONT_SMALL));
-    guiHelp1->addSpacer(10, 1);
-    guiHelp1->addWidgetDown(new ofxUILabel("With Multiple movies", OFX_UI_FONT_SMALL));
-    //    guiHelp1->addSpacer(10, 1);
-    guiHelp1->addWidgetDown(new ofxUILabel("Press P to make MoviePrints of all", OFX_UI_FONT_SMALL));
-    //    guiHelp1->addSpacer(10, 1);
-    guiHelp1->addWidgetDown(new ofxUILabel("Press L to switch to ListView", OFX_UI_FONT_SMALL));
-    guiHelp1->addSpacer(length-xInit, 1);
-    guiHelp1->addWidgetDown(new ofxUILabel("Press H to view Settings and Help", OFX_UI_FONT_SMALL));
-    guiHelp1->addSpacer(10, 1);
-    guiHelp1->addWidgetDown(new ofxUILabel("Choose between >Set rows manually<", OFX_UI_FONT_SMALL));
-    guiHelp1->addWidgetDown(new ofxUILabel("and >Fit to Screen<", OFX_UI_FONT_SMALL));
-    //    guiHelp1->addSpacer(10, 1);
-    guiHelp1->addWidgetDown(new ofxUILabel("Set >Columns< and >Rows<", OFX_UI_FONT_SMALL));
-    //    guiHelp1->addSpacer(10, 1);
-    guiHelp1->addWidgetDown(new ofxUILabel("Show >Frames< or >TimeCode<", OFX_UI_FONT_SMALL));
-    //    guiHelp1->addSpacer(10, 1);
-    guiHelp1->addWidgetDown(new ofxUILabel("Choose >MoviePrint width<", OFX_UI_FONT_SMALL));
-
-    
 }
 
 //--------------------------------------------------------------
@@ -1449,7 +1395,6 @@ void testApp::exit(){
     loadedMovie.stop(false);
     
     delete guiTimeline;
-    delete guiHelp1;
     
     guiSettings1->saveSettings("guiSettings1.xml");
 	delete guiSettings1;
@@ -1786,16 +1731,16 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
                 ofSetColor(FAK_ORANGE1);
                 break;
             case 1:
-                ofSetColor(FAK_ORANGE2);
+                ofSetColor(FAK_ORANGE5);
                 break;
             case 2:
                 ofSetColor(FAK_ORANGE3);
                 break;
             case 3:
-                ofSetColor(FAK_ORANGE4);
+                ofSetColor(FAK_ORANGE2);
                 break;
             case 4:
-                ofSetColor(FAK_ORANGE5);
+                ofSetColor(FAK_ORANGE4);
                 break;
             default:
                 ofSetColor(255, 255, 255, 255);
@@ -1833,11 +1778,15 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMoviePrintSettings.drawMenu();
     
-//    tempXPos = gridColumns-2;
-//    menuHelp.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
-//    menuHelp.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
-//    menuHelp.drawMenu();
-
+    tempXPos = gridColumns-2;
+    menuHelp.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuHelp.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
+    menuHelp.drawMenu();
+//    drawHelp((leftMargin + menuWidth * tweenListInOut.update() + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuHelp.getRelSizeH());
+    ofSetColor(255, 255, 255, menuHelp.getRelSizeH() * 255);
+    helpMenuImage.draw((leftMargin + menuWidth * tweenListInOut.update() + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*1, helpMenuImage.getWidth(), helpMenuImage.getHeight() * menuHelp.getRelSizeH());
+    ofSetColor(255, 255, 255, 255);
+    
     menuTimeline.setPosition(0, ofGetWindowHeight());
     menuTimeline.setSize(ofGetWindowWidth(), footerHeight/2);
     menuTimeline.drawMenu();
@@ -1926,6 +1875,47 @@ void testApp::drawMovieInfo(float _x, float _y, float _fade){
     ofPopStyle();
     
 
+    
+}
+
+//--------------------------------------------------------------
+void testApp::drawHelp(float _x, float _y, float _fade){
+    float tempFontHeightSmall = 14;
+    
+    ofPushStyle();
+    ofEnableAlphaBlending();
+    ofSetColor(255, 255, 255, _fade * 255);
+    
+    string tempHelpString;
+    tempHelpString = (string)"" +
+    "Drop in one or more movies\n\n" +
+    "Set the desired In- and Outpoints\n\n" +
+    "Press P to make a MoviePrint\n\n" +
+    "Press Esc to quit MoviePrint\n" +
+    "Prints are saved as PNGs in a folder\n" +
+    "named MoviePrints on the same level\n" +
+    "Hovering over a Still one can\n" +
+    "-jump 1/10/100 (Shift/Cmd) frames\n" +
+    " forward or backward\n" +
+    "-set this Still as In- or Outpoint\n" +
+    "-scrub the Still using the mouse\n" +
+    "Set In- and Outpoints using the\n" +
+    "timeline on the bottom\n" +
+    "With Multiple movies\n" +
+    "Press P to make MoviePrints of all\n" +
+    "Press L to switch to ListView\n" +
+    "Press H to view Settings and Help\n" +
+    "Choose between >Set rows manually<\n" +
+    "and >Fit to Screen<\n" +
+    "Set >Columns< and >Rows<\n" +
+    "Show >Frames< or >TimeCode<\n" +
+    "Choose >MoviePrint width<\n";
+    fontStashHelveticaLight.setLineHeight(1.4*_fade);
+    fontStashHelveticaLight.drawMultiLine(tempHelpString,tempFontHeightSmall, (int)_x, (int)_y);
+    
+    ofPopStyle();
+    
+    
     
 }
 
