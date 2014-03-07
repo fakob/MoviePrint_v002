@@ -73,6 +73,8 @@ public:
     void processOpenFileSelection(ofFileDialogResult openFileResult);
     void toggleMoviePrintPreview();
     void setVisibilityMoviePrintPreview(bool _visibility);
+    void menuIsOpened(int &e);
+    void menuIsClosed(int &e);
 
     void updateTimeSlider(bool _wholeRange);
     void drawPrintScreen();

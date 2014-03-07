@@ -62,8 +62,9 @@ public:
         mTopMenu = _mTopMenu;
         mNoBackground = _mNoBackground;
         mIsOpenManually = false;
+        mMenuID = _ID;
         
-        switch (_ID) {
+        switch (mMenuID) {
             case 1:
                 mMenuImage.loadImage("MoviePrint_Layout_Menu1_v001_00001.png");
                 mBackgroundColor = FAK_ORANGE1;
@@ -94,11 +95,13 @@ public:
     void setTweenIn(){
         tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,500,0);
         tweenMenuInOut2.setParameters(1,easingexpo,ofxTween::easeOut,0.0,1.0,300,0);
+        ofNotifyEvent(mMenuIsBeingOpened, mMenuID, this);
     }
     
     void setTweenOut(){
         tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,500,0);
         tweenMenuInOut2.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,300,0);
+        ofNotifyEvent(mMenuIsBeingClosed, mMenuID, this);
     }
     
     bool insideMenuHead(float _x, float _y ){
@@ -248,6 +251,10 @@ public:
     
     // Properties
     
+    ofEvent<int> mMenuIsBeingOpened;
+    ofEvent<int> mMenuIsBeingClosed;
+
+    int mMenuID;
     bool mInsideMenuHead;
     bool mMenuActive;
     bool mTopMenu;

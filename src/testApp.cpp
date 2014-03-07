@@ -101,7 +101,7 @@ void testApp::setup(){
     gridRows = 6;
     displayGridSetWithColumnsAndRows = false;
     printGridSetWithColumnsAndRows = true;
-    showMoviePrintPreview = true;
+    showMoviePrintPreview = false;
     
     thumbWidth = 256;
     thumbHeight = 144;
@@ -196,6 +196,9 @@ void testApp::setup(){
     
     menuTimeline.setupMenu(0,0,0,0,0,footerHeight/2, true, false, false);
     menuTimeline.registerMouseEvents();
+    
+    ofAddListener(menuMoviePrintSettings.mMenuIsBeingOpened, this, &testApp::menuIsOpened);
+    ofAddListener(menuMoviePrintSettings.mMenuIsBeingClosed, this, &testApp::menuIsClosed);
     
     moveInOutTimeline();
     
@@ -851,19 +854,8 @@ void testApp::update(){
     
     // check if one of the topMenus is active and in this case turn of the mouseEvents for the thumbs
     if (menuMovieInfo.getMenuActivated() || menuSettings.getMenuActivated() || menuMoviePrintPreview.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated()) {
-        
         if (loadedMovie.getMouseEventsEnabled()) {
             loadedMovie.disableMouseEvents();
-        }
-        
-        // Preview gets closed when menuMoviePrintSettings is not active
-        if (!menuMoviePrintSettings.getMenuActivated()) {
-            setVisibilityMoviePrintPreview(false);
-        }
-        
-        // Preview gets opened when menuMoviePrintSettings is active
-        if (menuMoviePrintSettings.getMenuActivated()){
-            setVisibilityMoviePrintPreview(true);
         }
     } else {
         if (!loadedMovie.getMouseEventsEnabled()) {
@@ -1880,13 +1872,29 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 }
 
 //--------------------------------------------------------------
-void testApp::scrollEvent(ofVec2f & e){
+void testApp::scrollEvent(ofVec2f &e){
     if (!updateScrub) {
         if (showDroppedList) {
             scrollList = TRUE;
         } else {
             scrollGrid = TRUE;
         }
+    }
+}
+
+//--------------------------------------------------------------
+void testApp::menuIsOpened(int &e){
+    ofLog(OF_LOG_VERBOSE, "menuIsOpened:" + ofToString(e));
+    if (e == 5) {
+        setVisibilityMoviePrintPreview(true);
+    }
+}
+
+//--------------------------------------------------------------
+void testApp::menuIsClosed(int &e){
+    ofLog(OF_LOG_VERBOSE, "menuIsClosed:" + ofToString(e));
+    if (e == 5) {
+        setVisibilityMoviePrintPreview(false);
     }
 }
 
@@ -1970,7 +1978,6 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     
     ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
     fboToPreview.draw((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*(gridColumns/2) + thumbWidth/2), headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin, tweenMoviePrintPreview.update() * fboToPreviewWidth, tweenMoviePrintPreview.update() * fboToPreviewHeight);
-    ofLog(OF_LOG_VERBOSE, "tweenMoviePrintPreview.update()" + ofToString(tweenMoviePrintPreview.update()));
     ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
     
     ofPopStyle;
@@ -1980,9 +1987,9 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
 void testApp::toggleMoviePrintPreview(){
     showMoviePrintPreview = !showMoviePrintPreview;
     if (showMoviePrintPreview) {
-        tweenMoviePrintPreview.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,300,0);
-    } else {
         tweenMoviePrintPreview.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,300,0);
+    } else {
+        tweenMoviePrintPreview.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,300,0);
     }
 }
 
