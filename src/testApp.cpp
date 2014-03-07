@@ -327,7 +327,6 @@ void testApp::setGUISettingsMoviePrint(){
     uiSliderNumberOfThumbs = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintNumber");
     uiSliderPrintMargin = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintMargin");
 
-//    guiSettingsMoviePrint->addToggle("ShowMoviePrintPreview", &showMoviePrintPreview);
     guiSettingsMoviePrint->addToggle("DisplayVideoAudioInfo", &printDisplayVideoAudioInfo, dim*1.5, dim);
     guiSettingsMoviePrint->addToggle("Save Individual Frames", &printSingleFrames, dim*1.5, dim);
     
@@ -858,13 +857,13 @@ void testApp::update(){
         }
         
         // Preview gets closed when menuMoviePrintSettings is not active
-        if (menuMoviePrintPreview.getMenuActivated() && !menuMoviePrintSettings.getMenuActivated() && !menuMoviePrintPreview.getInsideMenuHead()) {
-            menuMoviePrintPreview.closeMenuManually();
+        if (!menuMoviePrintSettings.getMenuActivated()) {
+            setVisibilityMoviePrintPreview(false);
         }
         
-        // Preview gets opened when menuMoviePrintSettings is active and showMoviePrintPreview is true
-        if (menuMoviePrintSettings.getMenuActivated() && showMoviePrintPreview && !menuMoviePrintPreview.getMenuActivated()){
-            menuMoviePrintPreview.openMenuManually();
+        // Preview gets opened when menuMoviePrintSettings is active
+        if (menuMoviePrintSettings.getMenuActivated()){
+            setVisibilityMoviePrintPreview(true);
         }
     } else {
         if (!loadedMovie.getMouseEventsEnabled()) {
@@ -872,26 +871,19 @@ void testApp::update(){
         }
     }
     
-    if (menuMoviePrintPreview.getMenuActivated()){
+    if (showMoviePrintPreview){
         writeFboToPreview(fmin(fboToPreview.getWidth()/(float)printGridWidth, fboToPreview.getHeight()/(float)printGridHeight), false);
     }
     
     // calculate rollout of ofxUI pos, scal
     guiMovieInfo->setPosition(menuMovieInfo.getPositionX(), menuMovieInfo.getPositionY()+headerHeight);
     guiMovieInfo->setHeight(menuMovieInfo.getSizeH()-headerHeight);
-
-//    guiSettings1->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY()+headerHeight);
-//    guiSettings1->setWidth(menuSettings.getSizeW());
-//    guiSettings1->setHeight(menuSettings.getSizeH()-headerHeight);
-    
-//    guiMoviePrintPreview->setPosition(menuMoviePrintPreview.getPositionX()-(thumbWidth + displayGridMargin)*1, menuMoviePrintPreview.getPositionY()+headerHeight);
-//    guiMoviePrintPreview->setWidth(menuMoviePrintPreview.getSizeW() + (thumbWidth + displayGridMargin)*1);
-//    guiMoviePrintPreview->setHeight(menuMoviePrintPreview.getSizeH()-headerHeight);
     
     guiSettingsMoviePrint->setPosition(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY()+headerHeight);
     guiSettingsMoviePrint->setHeight(menuMoviePrintSettings.getSizeH()-headerHeight);
     
     guiTimeline->setPosition(leftMargin - OFX_UI_GLOBAL_WIDGET_SPACING, ofGetWindowHeight() - footerHeight/2 +1 - (footerHeight/4) * menuTimeline.getRelSizeH());
+    
     
     if (loadedMovie.isMovieLoaded) { // if no movie is loaded or we are in dev mode then only draw rects
         
@@ -1349,15 +1341,7 @@ void testApp::keyPressed(int key){
 
         case ' ':
         {
-            ofFileDialogResult saveFileResult = ofSystemSaveDialog(ofGetTimestampString() + "." + ofToLower("EXT"), "Select a Folder");
-            if (saveFileResult.bSuccess){
-                ofLogVerbose("getName(): "  + saveFileResult.getName());
-                ofLogVerbose("getPath(): "  + saveFileResult.getPath());
-                saveMoviePrintPath = loadedMovie.getMoviePathName();
-                ofLogVerbose("saveMoviePrintPath: "  + ofToString(saveMoviePrintPath));
-            } else {
-                ofLogVerbose("User hit cancel");
-            }
+            toggleMoviePrintPreview();
         }
 			break;
 
@@ -1742,17 +1726,6 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		printNumberOfThumbs = (int)slider->getScaledValue();
         calculateNewPrintGrid();
 	}
-    else if(name == "ShowMoviePrintPreview")
-	{
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        bool val = toggle->getValue();
-        if (val) {
-            menuMoviePrintPreview.openMenuManually();
-        } else {
-            menuMoviePrintPreview.closeMenuManually();
-        }
-        
-	}
     else if(name == "DisplayVideoAudioInfo")
 	{
         ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
@@ -1927,7 +1900,7 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     // overlay von MoviePrintPreview
     ofPushStyle();
     ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
-    ofSetColor(0, 0, 0, menuMoviePrintPreview.getRelSizeH2() * 100);
+    ofSetColor(0, 0, 0, tweenMoviePrintPreview.update() * 100);
     ofRect(ofGetWindowWidth()/2, (ofGetWindowHeight()-headerHeight-footerHeight/2)/2 + headerHeight, ofGetWindowWidth(), (ofGetWindowHeight()-headerHeight-footerHeight/2));
     ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
     ofPopStyle();
@@ -1996,10 +1969,28 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     menuTimeline.drawMenu();
     
     ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
-    fboToPreview.draw((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*(gridColumns/2) + thumbWidth/2), headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin, menuMoviePrintPreview.getRelSizeH2() * fboToPreviewWidth, menuMoviePrintPreview.getRelSizeH2() * fboToPreviewHeight);
+    fboToPreview.draw((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*(gridColumns/2) + thumbWidth/2), headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin, tweenMoviePrintPreview.update() * fboToPreviewWidth, tweenMoviePrintPreview.update() * fboToPreviewHeight);
+    ofLog(OF_LOG_VERBOSE, "tweenMoviePrintPreview.update()" + ofToString(tweenMoviePrintPreview.update()));
     ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
     
     ofPopStyle;
+}
+
+//--------------------------------------------------------------
+void testApp::toggleMoviePrintPreview(){
+    showMoviePrintPreview = !showMoviePrintPreview;
+    if (showMoviePrintPreview) {
+        tweenMoviePrintPreview.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,300,0);
+    } else {
+        tweenMoviePrintPreview.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,300,0);
+    }
+}
+
+//--------------------------------------------------------------
+void testApp::setVisibilityMoviePrintPreview(bool _visibility){
+    if (showMoviePrintPreview != _visibility) {
+        toggleMoviePrintPreview();
+    }
 }
 
 //--------------------------------------------------------------

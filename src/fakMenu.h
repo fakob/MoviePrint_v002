@@ -61,6 +61,7 @@ public:
         mMenuActive = _mButtonActive;
         mTopMenu = _mTopMenu;
         mNoBackground = _mNoBackground;
+        mIsOpenManually = false;
         
         switch (_ID) {
             case 1:

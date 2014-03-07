@@ -71,7 +71,8 @@ public:
     void updateAllLimits();
     void writeFboToPreview(float _scaleFactor, bool _showPlaceHolder);
     void processOpenFileSelection(ofFileDialogResult openFileResult);
-
+    void toggleMoviePrintPreview();
+    void setVisibilityMoviePrintPreview(bool _visibility);
 
     void updateTimeSlider(bool _wholeRange);
     void drawPrintScreen();
@@ -210,6 +211,7 @@ public:
     
     ofxTween tweenTimelineInOut;
     ofxTween tweenListInOut;
+    ofxTween tweenMoviePrintPreview;
     
     ofxEasingBack 	easingback;
     ofxEasingBounce 	easingbounce;
