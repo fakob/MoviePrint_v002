@@ -259,6 +259,7 @@ public:
     int gridNumber;
     int numberOfStills;
     int menuWidth;
+    int listWidth;
     float scrubWindowW, scrubWindowH;
     int printHeaderHeight;
     

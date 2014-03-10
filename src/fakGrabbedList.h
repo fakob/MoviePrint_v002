@@ -42,7 +42,7 @@ public:
     
     // Functions
     
-    void unregisterEvents(int _oldDroppedListSize){
+    void disableMouseEvents(int _oldDroppedListSize){
         if (_oldDroppedListSize > glDroppedItem.size()) {
             _oldDroppedListSize = glDroppedItem.size();
         }
@@ -51,23 +51,10 @@ public:
             glDroppedItem[i].unregisterKeyEvents();
             ofRemoveListener(glDroppedItem[i].glRolledOver, this, &fakGrabbedList::rolledOver);
             ofRemoveListener(glDroppedItem[i].glClickedInside, this, &fakGrabbedList::listClick);
-//            ofLog(OF_LOG_VERBOSE, "ofRemoveOldListener:" + ofToString(i));
-
         }
     }
     
-    void unregisterEvents(){
-        int _oldDroppedListSize = glDroppedItem.size();
-        for (int i=0; i<_oldDroppedListSize; i++) {
-            glDroppedItem[i].unregisterMouseEvents();
-            glDroppedItem[i].unregisterKeyEvents();
-            ofRemoveListener(glDroppedItem[i].glRolledOver, this, &fakGrabbedList::rolledOver);
-            ofRemoveListener(glDroppedItem[i].glClickedInside, this, &fakGrabbedList::listClick);
-//            ofLog(OF_LOG_VERBOSE, "ofRemoveListener:" + ofToString(i));
-        }
-    }
-     
-    void registerEvents(){
+    void enableMouseEvents(){
         for (int i=0; i<glDroppedItem.size(); i++) {
             glDroppedItem[i].registerMouseEvents();
             glDroppedItem[i].registerKeyEvents();
@@ -90,7 +77,7 @@ public:
             glDroppedItem[i].gliPadding = glListItemPadding;
         }
         setAllLimits(glUpperLimitY, glLowerLimitY, glLeftLimitX, glRightLimitX);
-        registerEvents();
+        enableMouseEvents();
     }
     
     float getListHeight(){

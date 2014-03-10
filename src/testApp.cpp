@@ -73,7 +73,8 @@ void testApp::setup(){
     printGridColumns = 4;
     printGridRows = 5;
     printNumberOfThumbs = 20;
-    menuWidth = 1320;
+    menuWidth = 255;
+    listWidth = 1320;
     
     threadIsRunning = FALSE;
     
@@ -148,7 +149,7 @@ void testApp::setup(){
 
     loadedMovie.gmUpperLimitY = headerHeight;
     loadedMovie.gmLowerLimitY = ofGetHeight() - footerHeight;
-    loadedMovie.gmLeftLimitX = menuWidth;
+    loadedMovie.gmLeftLimitX = leftMargin;
     loadedMovie.gmRightLimitX = ofGetWidth() - rightMargin;
     calculateNewPrintGrid();
     loadedMovie.setup(loadedFile, numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
@@ -168,9 +169,9 @@ void testApp::setup(){
     ofAddListener(scrollBar.sbScrollingGoingOn, this, &testApp::scrollEvent);
 
     scrollBarList.setup(0, ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, footerHeight/2 + bottomMargin, scrollBarWidth, 16, scrollMultiplier, scrollBarMargin);
-    scrollBarList.setScrollHeight(0.5);
     scrollBarList.registerMouseEvents();
     scrollBarList.registerTouchEvents();
+    ofAddListener(scrollBarList.sbScrollingGoingOn, this, &testApp::scrollEvent);
     
     setGUITimeline();
     setGUISettings();
@@ -670,15 +671,21 @@ void testApp::update(){
     if (menuMovieInfo.getMenuActivated() || menuSettings.getMenuActivated() || menuMoviePrintPreview.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated()) {
         if (loadedMovie.getMouseEventsEnabled()) {
             loadedMovie.disableMouseEvents();
+            droppedList.disableMouseEvents(droppedFiles.size());
         }
     } else {
         if (!loadedMovie.getMouseEventsEnabled()) {
             loadedMovie.enableMouseEvents();
+            droppedList.enableMouseEvents();
         }
     }
     
     if (showMoviePrintPreview){
-        writeFboToPreview(fmin(fboToPreview.getWidth()/(float)printGridWidth, fboToPreview.getHeight()/(float)printGridHeight), false);
+        if (showDroppedList) {
+            writeFboToPreview(fmin(fboToPreview.getWidth()/(float)printGridWidth, fboToPreview.getHeight()/(float)printGridHeight), true);
+        } else {
+            writeFboToPreview(fmin(fboToPreview.getWidth()/(float)printGridWidth, fboToPreview.getHeight()/(float)printGridHeight), false);
+        }
     }
     
     // calculate rollout of ofxUI pos, scal
@@ -845,12 +852,12 @@ void testApp::update(){
     }
     
     if (scrollBarList.sbActive) {
+//        ofLog(OF_LOG_VERBOSE, "scrollBarList Active:" + ofToString(scrollListAmountRel) );
         if (scrollList) {
-            if (!scrollBarList.sbCalculateScrollInertia && !scrollBar.sbScrollBarDrag) {
+//            ofLog(OF_LOG_VERBOSE, "scrollList True:" + ofToString(scrollListAmountRel) );
+            if (!scrollBarList.sbCalculateScrollInertia && !scrollBarList.sbScrollBarDrag) {
                 scrollList = false;
             } else {
-//            scrollBarList.dragUpdate(mouseX, mouseY);
-//            scrollListAmountRel = scrollBarList.getRelativePos();
             scrollBarList.update();
             scrollListAmountRel = scrollBarList.getRelativePos();
 //            ofLog(OF_LOG_VERBOSE, "scrollBarAmount:" + ofToString(scrollListAmountRel) );
@@ -923,6 +930,7 @@ void testApp::draw(){
             
             drawList(scrollListAmountRel);
             scrollBarList.draw();
+            drawUI(1, FALSE);
             
         } else {
             
@@ -957,20 +965,20 @@ void testApp::draw(){
                     ofRect(0, 0, ofGetWidth(), ofGetHeight());
                     ofSetColor(255,255,255,(int)scrubFade);
 
-                    loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
-                    loadedMovie.drawStillUI(scrubWindowGridNumber, ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (scrubFade/255));
+                    loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+                    loadedMovie.drawStillUI(scrubWindowGridNumber, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (scrubFade/255));
                     
                     ofSetColor(255, 255, 255, (int)(scrubFade/255)*255);
                     
                     if (uiRangeSliderTimeline->hitLow) {
-                        inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-inPointImage.getHeight()/2);
+                        inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-inPointImage.getHeight()/2);
                     }
                     if (uiRangeSliderTimeline->hitHigh) {
-                        outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-outPointImage.getHeight()/2);
+                        outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-outPointImage.getHeight()/2);
                     }
                     if (uiRangeSliderTimeline->hitCenter) {
-                        inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-inPointImage.getHeight()/2);
-                        outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-outPointImage.getHeight()/2);
+                        inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-inPointImage.getHeight()/2);
+                        outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-outPointImage.getHeight()/2);
                     }
                     
                     if(scrubFade < 5){
@@ -1223,29 +1231,21 @@ void testApp::mousePressed(int x, int y, int button){
 
             
             if (!showDroppedList) {
-                
-                if (loadedMovie.grabbedStill[loadedMovie.gmRollOverMovieID].gsRollOver){
-                    
-                    rollOverMovieID = loadedMovie.gmRollOverMovieID;
-                    rollOverMovieButtonID = loadedMovie.gmRollOverMovieButtonID;
-                    rollOverClicked = TRUE;
-                    ofLog(OF_LOG_VERBOSE, "clicked in rolloverstate ID =" + ofToString(loadedMovie.gmRollOverMovieID));
-                    
-//                    // set Mouse to middle of screen so one can scrub
-//                    if (loadedMovie.gmRollOverMovieButtonID == 0) {
-//                        CGPoint point;
-//                        point.x = ofGetWidth() / 2;
-//                        point.y = ofGetHeight() / 2;
-////                        CGSetLocalEventsSuppressionInterval(0);
-//                        CGWarpMouseCursorPosition(point);
-//                    }
+                if (!(menuMovieInfo.getMenuActivated() || menuSettings.getMenuActivated() || menuMoviePrintPreview.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated())) {
+                    if (loadedMovie.grabbedStill[loadedMovie.gmRollOverMovieID].gsRollOver){
+                        
+                        rollOverMovieID = loadedMovie.gmRollOverMovieID;
+                        rollOverMovieButtonID = loadedMovie.gmRollOverMovieButtonID;
+                        rollOverClicked = TRUE;
+                        ofLog(OF_LOG_VERBOSE, "clicked in rolloverstate ID =" + ofToString(loadedMovie.gmRollOverMovieID));
+                        
+                    }
+                    updateInOut = FALSE;
+                    ofLog(OF_LOG_VERBOSE, "the mouse was clicked" );
+                    Tweener.removeTween(scrubFade);
+                    scrubFade = 255;
                     
                 }
-                updateInOut = FALSE;
-                ofLog(OF_LOG_VERBOSE, "the mouse was clicked" );
-                Tweener.removeTween(scrubFade);
-                scrubFade = 255;
-                
             }
         }
     }
@@ -1300,7 +1300,7 @@ void testApp::mouseScrolled(double x, double y){
 
 //--------------------------------------------------------------
 void testApp::windowResized(int w, int h){
-    menuWidth = w;
+    listWidth = w;
     if (!currPrintingList) {
         updateDisplayGrid();
 //        windowWasResized = true;
@@ -1359,7 +1359,7 @@ void testApp::dragEvent(ofDragInfo dragInfo){
             
             loadNewMovie("", FALSE, TRUE, FALSE);
 
-            droppedList.unregisterEvents(droppedFiles.size());
+            droppedList.disableMouseEvents(droppedFiles.size());
             droppedFiles.clear();
             for (int i=0; i<dragInfo.files.size(); i++) {
                 ofFile testFile(dragInfo.files[i]);
@@ -1750,36 +1750,24 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     int tempXPos = 0;
     int menuHeightInRows = 4;
     
-//    tempXPos = gridColumns/2;
-//    menuMoviePrintPreview.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
-//    menuMoviePrintPreview.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
-//    menuMoviePrintPreview.drawMenu();
-
     tempXPos = 0;
-    menuMovieInfo.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuMovieInfo.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMovieInfo.drawMenu();
-    drawMovieInfo((leftMargin + menuWidth * tweenListInOut.update() + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuMovieInfo.getRelSizeH());
+    drawMovieInfo((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuMovieInfo.getRelSizeH());
     fontStashHelveticaMedium.draw(loadedMovie.gmMIFileName, 10, (int)(leftMargin + 33 * _scaleFactor), (int)((0 + headerHeight*0.6) * _scaleFactor));
-
-
-//    tempXPos = 1;
-//    menuSettings.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
-//    menuSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
-//    menuSettings.drawMenu();
     
     tempXPos = gridColumns-1;
-    menuMoviePrintSettings.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuMoviePrintSettings.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMoviePrintSettings.drawMenu();
     
     tempXPos = gridColumns-2;
-    menuHelp.setPosition((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuHelp.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuHelp.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuHelp.drawMenu();
-//    drawHelp((leftMargin + menuWidth * tweenListInOut.update() + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuHelp.getRelSizeH());
     ofSetColor(255, 255, 255, menuHelp.getRelSizeH() * 255);
-    helpMenuImage.draw((leftMargin + menuWidth * tweenListInOut.update() + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*1, helpMenuImage.getWidth(), helpMenuImage.getHeight() * menuHelp.getRelSizeH());
+    helpMenuImage.draw((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*1, helpMenuImage.getWidth(), helpMenuImage.getHeight() * menuHelp.getRelSizeH());
     ofSetColor(255, 255, 255, 255);
     
     menuTimeline.setPosition(0, ofGetWindowHeight());
@@ -1787,7 +1775,8 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     menuTimeline.drawMenu();
     
     ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
-    fboToPreview.draw((leftMargin + menuWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*(gridColumns/2) + thumbWidth/2), headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin, tweenMoviePrintPreview.update() * fboToPreviewWidth, tweenMoviePrintPreview.update() * fboToPreviewHeight);
+    fboToPreview.draw((leftMargin + (thumbWidth + displayGridMargin)*(gridColumns/2) + thumbWidth/2), headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin, tweenMoviePrintPreview.update() * fboToPreviewWidth, tweenMoviePrintPreview.update() * fboToPreviewHeight);
+//    fboToPreview.draw((leftMargin + listWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*(gridColumns/2) + thumbWidth/2), headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin, tweenMoviePrintPreview.update() * fboToPreviewWidth, tweenMoviePrintPreview.update() * fboToPreviewHeight);
     ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
     
     ofPopStyle;
@@ -1821,7 +1810,7 @@ void testApp::drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeing
     if (isnan(_scrollAmount)) {
         _scrollAmount = 0;
     }
-    float tempX = (leftMargin + menuWidth * tweenListInOut.update()) * _scaleFactor;
+    float tempX = (leftMargin + listWidth * tweenListInOut.update()) * _scaleFactor;
     float tempY = (_scrollAmount + headerHeight + topMargin)  * _scaleFactor;
     ofLog(OF_LOG_VERBOSE, "_scrollAmount:"+ ofToString(_scrollAmount) +  " tempY:"+ ofToString(tempY) +  "_scrollAmount:"+ ofToString(_scrollAmount));
     loadedMovie.drawGridOfStills(tempX, tempY, gridColumns, displayGridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
@@ -1849,7 +1838,7 @@ void testApp::drawList(float _scrollAmountRel){
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
     ofPopStyle();
     
-    droppedList.draw(leftMargin - menuWidth + menuWidth * tweenListInOut.update(), topMargin + headerHeight, ofGetWidth() - scrollBarWidth - rightMargin - leftMargin, _scrollAmount);
+    droppedList.draw(leftMargin - listWidth + listWidth * tweenListInOut.update(), topMargin + headerHeight, ofGetWidth() - scrollBarWidth - rightMargin - leftMargin, _scrollAmount);
 
     
 }
@@ -1883,9 +1872,9 @@ void testApp::drawPrintScreen(){
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
     ofSetColor(255, 255, 255, 255);
     if (currPrintingList) {
-        printListImage.draw(ofGetWidth()/2-printImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-printImage.getHeight()/2);
+        printListImage.draw(ofGetWidth()/2-printImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-printImage.getHeight()/2);
     } else {
-        printImage.draw(ofGetWidth()/2-printImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-printImage.getHeight()/2);
+        printImage.draw(ofGetWidth()/2-printImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-printImage.getHeight()/2);
 
     }
     ofPopStyle();
@@ -1898,7 +1887,7 @@ void testApp::drawStartScreen(){
     ofPushStyle();
     ofSetColor(255, 255, 255, 255);
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
-    startImage.draw(ofGetWidth()/2-startImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-startImage.getHeight()/2);
+    startImage.draw(ofGetWidth()/2-startImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-startImage.getHeight()/2);
     ofPopStyle();
     
 }
@@ -1931,7 +1920,7 @@ void testApp::drawUpdateScreen(){
     int tempLoaderBarWidth = 262;
     int tempLoaderBarHeight = 20;
     int tempOffsetY = 155;
-    float tempX = ofGetWidth()/2 - tempLoaderBarWidth/2 + menuWidth * tweenListInOut.update();
+    float tempX = ofGetWidth()/2 - tempLoaderBarWidth/2 + listWidth * tweenListInOut.update();
     float tempY = ofGetHeight()/2 - tempLoaderBarHeight/2;
         // draw the percentage loaded bar
         // the background
@@ -1942,7 +1931,7 @@ void testApp::drawUpdateScreen(){
         ofRect(tempX, tempY + tempOffsetY, tempLoaderBarWidth*loadValue, tempLoaderBarHeight);
 
     ofSetColor(255, 255, 255, 255);
-    updatingImage.draw(ofGetWidth()/2-updatingImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-updatingImage.getHeight()/2);
+    updatingImage.draw(ofGetWidth()/2-updatingImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-updatingImage.getHeight()/2);
     ofPopStyle();
     
 }
@@ -1953,7 +1942,7 @@ void testApp::drawLoadMovieScreen(){
     ofPushStyle();
     ofSetColor(255, 255, 255, 255);
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
-    loadMovieImage.draw(ofGetWidth()/2-loadMovieImage.getWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-loadMovieImage.getHeight()/2);
+    loadMovieImage.draw(ofGetWidth()/2-loadMovieImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-loadMovieImage.getHeight()/2);
     ofPopStyle();
     
 }
@@ -1995,11 +1984,11 @@ void testApp::drawScrubScreen(float _scaleFactor){
     // draw the scrubMovie
     ofSetColor(255,(int)scrubFade);
     int j = loadedMovie.gmScrubID;
-    loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
-    loadedMovie.drawStillUI(j, ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (float)(scrubFade/255));
+    loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+    loadedMovie.drawStillUI(j, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (float)(scrubFade/255));
     
     // drawing frame
-    float tempX = ofGetWidth()/2-scrubWindowW/2 + menuWidth * tweenListInOut.update();
+    float tempX = ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update();
     float tempY = ofGetHeight()/2-scrubWindowH/2;
     float tempFrameWidth = 3;
     ofSetColor(220,(int)scrubFade);
@@ -2014,7 +2003,7 @@ void testApp::drawScrubScreen(float _scaleFactor){
 
     // draw the scrubSpeed
     ofSetColor(FAK_ORANGECOLOR,(int)scrubFade);
-    ofRect(ofGetWidth()/2 + menuWidth * tweenListInOut.update(), ofGetHeight()/2+scrubWindowH/2+tempFrameWidth*3, scrubDelta*30.0, loaderBarHeight/2);
+    ofRect(ofGetWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2+scrubWindowH/2+tempFrameWidth*3, scrubDelta*30.0, loaderBarHeight/2);
     ofSetColor(255,255,255,(int)scrubFade);
     
     ofDisableAlphaBlending();
@@ -2158,7 +2147,7 @@ void testApp::printListToFile(){
     
     if (!droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint && itemToPrint == 0 && !movieIsBeingGrabbed && !currPrintingList) {
         currPrintingList = TRUE;
-        droppedList.unregisterEvents(droppedFiles.size());
+        droppedList.disableMouseEvents(droppedFiles.size());
         droppedList.setActiveItem(itemToPrint);
         loadNewMovie(droppedList.glDroppedItem[itemToPrint].gliFile.path(), TRUE, TRUE, FALSE);
     }
@@ -2376,10 +2365,12 @@ void testApp::moveToMovie(){
     
     showDroppedList = FALSE;
     
-    droppedList.unregisterEvents(droppedFiles.size());
+    droppedList.disableMouseEvents(droppedFiles.size());
     loadedMovie.enableMouseEvents();
     scrollBarList.unregisterMouseEvents();
+    scrollBarList.unregisterTouchEvents();
     scrollBar.registerMouseEvents();
+    scrollBar.registerTouchEvents();
     guiTimeline->setVisible(TRUE);
     printListNotImage = FALSE;
     
@@ -2394,11 +2385,13 @@ void testApp::moveToList(){
     
     showDroppedList = TRUE;
     scrollBar.unregisterMouseEvents();
+    scrollBar.unregisterTouchEvents();
     scrollBarList.registerMouseEvents();
+    scrollBarList.registerTouchEvents();
     loadedMovie.stop(TRUE);
     loadedMovie.disableMouseEvents();
     guiTimeline->setVisible(FALSE);
-    droppedList.registerEvents();
+    droppedList.enableMouseEvents();
     printListNotImage = TRUE;
     
     tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,ofRandom(600, 1000),0);

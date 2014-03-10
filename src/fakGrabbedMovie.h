@@ -700,15 +700,13 @@ public:
             ofSetColor(255);
         } else if (_drawPlaceHolder){
           
-            ofPushMatrix();
             ofPushStyle();
             ofSetColor(FAK_MIDDLEGRAY);
             
             ofRect(_x, _y, _w, _h);
             
             ofPopStyle();
-            ofPopMatrix();
-
+            
         }
     }
     
