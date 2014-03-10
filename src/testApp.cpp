@@ -73,7 +73,7 @@ void testApp::setup(){
     printGridColumns = 4;
     printGridRows = 5;
     printNumberOfThumbs = 20;
-    menuWidth = 255;
+    menuWidth = 1320;
     
     threadIsRunning = FALSE;
     
@@ -797,11 +797,6 @@ void testApp::update(){
         }
     }
     
-    if (showDroppedList) {
-        guiTimeline->setVisible(FALSE);
-        loadedMovie.disableMouseEvents();
-    }
-    
     if (droppedList.glUpdateMovieFromList) {
         printListNotImage = FALSE;
         showDroppedList = FALSE;
@@ -868,7 +863,7 @@ void testApp::update(){
     if (currPrintingList) {
         updateScrub = FALSE;
         updateInOut = FALSE;
-        printListToPNG();
+        printListToFile();
     }
 
     if (showPrintScreen && !finishedPrinting) {
@@ -879,10 +874,10 @@ void testApp::update(){
                 ofLog(OF_LOG_VERBOSE, "Start Printing List-------------------------------------------");
                 itemToPrint = 0;
                 resetItemsToPrint();
-                printListToPNG();
+                printListToFile();
             } else {
                 ofLog(OF_LOG_VERBOSE, "Start Printing------------------------------------------------");
-                printImageToPNG(printSizeWidth);
+                printImageToFile(printSizeWidth);
             }
             counterToPrint = 0;
         }
@@ -1082,29 +1077,29 @@ void testApp::keyPressed(int key){
         }
             break;
             
-        case 'h':
-        case 'H':
-        {
-           
-            if (showMenu) {
-                tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),0);
-            } else {
-                tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,ofRandom(600, 1000),0);
-            }
-            
-            showMenu = !showMenu;
-
-            if (showMenu){
-                loadedMovie.setAllLimitsLeft(menuWidth);
-                droppedList.setAllLimitsLeft(menuWidth);
-            } else {
-                loadedMovie.setAllLimitsLeft(leftMargin);
-                droppedList.setAllLimitsLeft(leftMargin);
-            }
-
-        
-        }
-			break;
+//        case 'h':
+//        case 'H':
+//        {
+//           
+//            if (showMenu) {
+//                tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),0);
+//            } else {
+//                tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,ofRandom(600, 1000),0);
+//            }
+//            
+//            showMenu = !showMenu;
+//
+//            if (showMenu){
+//                loadedMovie.setAllLimitsLeft(menuWidth);
+//                droppedList.setAllLimitsLeft(menuWidth);
+//            } else {
+//                loadedMovie.setAllLimitsLeft(leftMargin);
+//                droppedList.setAllLimitsLeft(leftMargin);
+//            }
+//
+//        
+//        }
+//			break;
             
         case 'x':
         {
@@ -1305,6 +1300,7 @@ void testApp::mouseScrolled(double x, double y){
 
 //--------------------------------------------------------------
 void testApp::windowResized(int w, int h){
+    menuWidth = w;
     if (!currPrintingList) {
         updateDisplayGrid();
 //        windowWasResized = true;
@@ -1326,7 +1322,7 @@ void testApp::updateAllLimits(){
 
 //--------------------------------------------------------------
 void testApp::updateTheListScrollBar(){
-    scrollBarList.updateScrollBar(ofGetWindowWidth(), ofGetWindowHeight(), headerHeight, 0, droppedList.getListHeight());
+    scrollBarList.updateScrollBar(ofGetWindowWidth(), ofGetWindowHeight(), headerHeight + topMargin, 0, droppedList.getListHeight());
     scrollBarList.setToTop();
     scrollListAmountRel = scrollBarList.getRelativePos();
 }
@@ -1838,7 +1834,7 @@ void testApp::drawList(float _scrollAmountRel){
     float _scrollAmount = 0;
     if (scrollBarList.sbActive) {
 //        _scrollAmount = ((droppedList.getListHeight()-scrollBarList.sbAreaHeight)+(bottomMargin+topMargin)*2)*(1-_scrollAmountRel)+(ofGetHeight()/2 - droppedList.getListHeight()/2)-(bottomMargin+topMargin);
-        _scrollAmount = ((droppedList.getListHeight()-scrollBarList.sbScrollAreaHeight)+(bottomMargin+topMargin)*2)*-1*(_scrollAmountRel)+topMargin;
+        _scrollAmount = ((droppedList.getListHeight()-scrollBarList.sbScrollAreaHeight)+(bottomMargin+topMargin+headerHeight)*2)*-1*(_scrollAmountRel)+topMargin;
     }
     if (isnan(_scrollAmount)) {
         _scrollAmount = 0;
@@ -1853,7 +1849,7 @@ void testApp::drawList(float _scrollAmountRel){
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
     ofPopStyle();
     
-    droppedList.draw(leftMargin + menuWidth * tweenListInOut.update(), topMargin, ofGetWidth() - scrollBarWidth - rightMargin - leftMargin, _scrollAmount);
+    droppedList.draw(leftMargin - menuWidth + menuWidth * tweenListInOut.update(), topMargin + headerHeight, ofGetWidth() - scrollBarWidth - rightMargin - leftMargin, _scrollAmount);
 
     
 }
@@ -1875,47 +1871,6 @@ void testApp::drawMovieInfo(float _x, float _y, float _fade){
     ofPopStyle();
     
 
-    
-}
-
-//--------------------------------------------------------------
-void testApp::drawHelp(float _x, float _y, float _fade){
-    float tempFontHeightSmall = 14;
-    
-    ofPushStyle();
-    ofEnableAlphaBlending();
-    ofSetColor(255, 255, 255, _fade * 255);
-    
-    string tempHelpString;
-    tempHelpString = (string)"" +
-    "Drop in one or more movies\n\n" +
-    "Set the desired In- and Outpoints\n\n" +
-    "Press P to make a MoviePrint\n\n" +
-    "Press Esc to quit MoviePrint\n" +
-    "Prints are saved as PNGs in a folder\n" +
-    "named MoviePrints on the same level\n" +
-    "Hovering over a Still one can\n" +
-    "-jump 1/10/100 (Shift/Cmd) frames\n" +
-    " forward or backward\n" +
-    "-set this Still as In- or Outpoint\n" +
-    "-scrub the Still using the mouse\n" +
-    "Set In- and Outpoints using the\n" +
-    "timeline on the bottom\n" +
-    "With Multiple movies\n" +
-    "Press P to make MoviePrints of all\n" +
-    "Press L to switch to ListView\n" +
-    "Press H to view Settings and Help\n" +
-    "Choose between >Set rows manually<\n" +
-    "and >Fit to Screen<\n" +
-    "Set >Columns< and >Rows<\n" +
-    "Show >Frames< or >TimeCode<\n" +
-    "Choose >MoviePrint width<\n";
-    fontStashHelveticaLight.setLineHeight(1.4*_fade);
-    fontStashHelveticaLight.drawMultiLine(tempHelpString,tempFontHeightSmall, (int)_x, (int)_y);
-    
-    ofPopStyle();
-    
-    
     
 }
 
@@ -2091,10 +2046,8 @@ void testApp::moveInOutTimeline(){
     
 }
 
-
-
 //--------------------------------------------------------------
-void testApp::printImageToPNG(int _printSizeWidth){
+void testApp::printImageToFile(int _printSizeWidth){
     
     // if folder doesnt exist, create standard
     ofDirectory dir(saveMoviePrintPath);
@@ -2201,7 +2154,7 @@ void testApp::printImageToPNG(int _printSizeWidth){
 }
 
 //--------------------------------------------------------------
-void testApp::printListToPNG(){
+void testApp::printListToFile(){
     
     if (!droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint && itemToPrint == 0 && !movieIsBeingGrabbed && !currPrintingList) {
         currPrintingList = TRUE;
@@ -2210,10 +2163,10 @@ void testApp::printListToPNG(){
         loadNewMovie(droppedList.glDroppedItem[itemToPrint].gliFile.path(), TRUE, TRUE, FALSE);
     }
     if (!droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint && !movieIsBeingGrabbed && currPrintingList) {
-        ofLog(OF_LOG_VERBOSE, "printImageToPNG: " + ofToString(itemToPrint) );
+        ofLog(OF_LOG_VERBOSE, "printImageToFile: " + ofToString(itemToPrint) );
         if (loadedMovie.isMovieLoaded){
             calculateNewPrintGrid();
-            printImageToPNG(printSizeWidth);
+            printImageToFile(printSizeWidth);
             droppedList.glDroppedItem[itemToPrint].itemProperties.ipPrinted = TRUE;
         }
         droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint = TRUE;
@@ -2432,6 +2385,8 @@ void testApp::moveToMovie(){
     
     updateInOut = FALSE;
     manipulateSlider = FALSE;
+    tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),0);
+
 }
 
 //--------------------------------------------------------------
@@ -2445,6 +2400,9 @@ void testApp::moveToList(){
     guiTimeline->setVisible(FALSE);
     droppedList.registerEvents();
     printListNotImage = TRUE;
+    
+    tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,ofRandom(600, 1000),0);
+
 }
 
 

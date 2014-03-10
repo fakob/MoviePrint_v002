@@ -49,8 +49,8 @@ public:
     void drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder);
     void drawList(float _scrollAmountRel);
     void drawScrubScreen(float _scaleFactor);
-    void printImageToPNG(int _printSizeWidth);
-    void printListToPNG();
+    void printImageToFile(int _printSizeWidth);
+    void printListToFile();
     void listClick(int & i);
     void listEnter(int & i);
     void loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInBackground, bool _loadScrubMovie);
