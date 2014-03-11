@@ -140,6 +140,7 @@ void testApp::setup(){
     printListImage.loadImage("MoviePrint_PrintList_v001_00000.png");
     layoutHeaderImage.loadImage("MoviePrint_Layout_Header_v001_00000.png");
     helpMenuImage.loadImage("HelpMenu_v001.png");
+    backgroundImagePreview.loadImage("MoviePrint_PreviewBackground_v001_00000.png");
     
     fontStashHelveticaLight.setup("HelveticaNeueLTCom-Lt.ttf");
     fontStashHelveticaMedium.setup("HelveticaNeueLTCom-Md.ttf");
@@ -1845,7 +1846,7 @@ void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
     float tempY = (fboToPreviewHeight - _scaleFactor * printGridHeight) / 2;
     ofTranslate(tempX, tempY);
     ofSetColor(255);
-    ofRect(0, 0, _scaleFactor * printGridWidth, _scaleFactor * printGridHeight);
+    backgroundImagePreview.draw(0, 0, _scaleFactor * printGridWidth, _scaleFactor * printGridHeight);
     loadedMovie.drawMoviePrint(0, 0, printGridColumns, printGridRows, printGridMargin, _scaleFactor, 1, _showPlaceHolder, printHeaderHeight, printDisplayVideoAudioInfo, true);
     
     // drawing frame

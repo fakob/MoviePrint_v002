@@ -568,16 +568,20 @@ public:
                     grabbedStill[i].gsToBeUpdated = FALSE;
                 }
             }
-            // draw selection
-                if (grabbedStill[i].gsRollOver) {
-                    int tempSelectionWidth = 2;
-                    ofRect(grabbedStill[i].gsX - tempSelectionWidth/2, grabbedStill[i].gsY - tempSelectionWidth/2, grabbedStill[i].gsDrawWidth + tempSelectionWidth, grabbedStill[i].gsDrawHeight + tempSelectionWidth);
-                }
             
             shader.begin(); // draw still with rounded corners
             shader.setUniformTexture("maskTex", maskFbo.getTextureReference(), 1 );
             grabbedStill[i].gsTexture.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
             shader.end();
+
+            // draw selection
+            ofPushStyle();
+            ofSetColor(255, 255, 255, 30);
+            if (grabbedStill[i].gsRollOver) {
+                int tempSelectionWidth = 2;
+                ofRect(grabbedStill[i].gsX - tempSelectionWidth/2, grabbedStill[i].gsY - tempSelectionWidth/2, grabbedStill[i].gsDrawWidth + tempSelectionWidth, grabbedStill[i].gsDrawHeight + tempSelectionWidth);
+            }
+            ofPopStyle();
             
             // draw update image
             if (grabbedStill[i].gsToBeGrabbed) {

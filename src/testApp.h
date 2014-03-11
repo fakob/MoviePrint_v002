@@ -121,6 +121,7 @@ public:
     ofImage outPointImage;
     ofImage layoutHeaderImage;
     ofImage helpMenuImage;
+    ofImage backgroundImagePreview;
 
     bool superKeyPressed = FALSE;
     bool shiftKeyPressed = FALSE;
