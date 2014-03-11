@@ -913,23 +913,6 @@ void testApp::draw(){
     if(showLoadMovieScreen){
         
         drawLoadMovieScreen();
-        
-    } else if(showPlaceHolder){ // test
-        
-//        ofPushStyle();
-//        ofSetColor(FAK_LIGHTGRAY);
-//        ofRect(0, 0, ofGetWidth(), ofGetHeight());
-//        ofPopStyle();
-//        drawDisplayGrid(1, FALSE, FALSE, scrollAmountRel, showPlaceHolder);
-//        scrollBar.draw();
-//        drawUI(1, false);
-        
-//        loadedMovie.drawTitle(1.0);
-//        ofPushMatrix();
-//        ofTranslate(100, 100);
-//        ofScale(0.2,0.2);
-//        loadedMovie.fboHeaderInformation.draw(0,0);
-//        ofPopMatrix();
     
     } else {
         
@@ -937,7 +920,6 @@ void testApp::draw(){
             
             drawList(scrollListAmountRel);
             scrollBarList.draw();
-            drawUI(1, FALSE);
             
         } else {
             
@@ -1005,7 +987,6 @@ void testApp::draw(){
                 }
                 
                 scrollBar.draw();
-                drawUI(1, FALSE);
                 
             }
             
@@ -1017,6 +998,7 @@ void testApp::draw(){
                 drawUpdateScreen();
             }
         }
+        drawUI(1, FALSE);
     }
     
     ofxNotify::draw(drawNotify);
