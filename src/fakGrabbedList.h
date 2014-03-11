@@ -20,6 +20,21 @@
 #define FAK_MIDDLEDARKORANGECOLOR ofColor(170, 50, 0, 255)
 #define FAK_LIGHTERMIDDLEDARKORANGECOLOR ofColor(185, 55, 0, 255)
 
+#define FAK_GREENCOLOR ofColor(117, 130, 16, 255)
+#define FAK_LIGHTGRAY ofColor(205, 205, 205, 255)
+#define FAK_MIDDLEGRAY ofColor(195, 195, 195, 255)
+#define FAK_TRANSPARENT ofColor(0,0,0,0)
+
+#define FAK_ORANGE1 ofColor(255, 80, 6, 255)
+#define FAK_ORANGE2 ofColor(255, 183, 153, 255)
+#define FAK_ORANGE3 ofColor(255, 147, 101, 255)
+#define FAK_ORANGE4 ofColor(255, 168, 131, 255)
+#define FAK_ORANGE5 ofColor(255, 211, 193, 255)
+
+#define FAK_WHITE ofColor(255, 255, 255, 255)
+#define FAK_BLACK ofColor(0, 0, 0, 255)
+#define FAK_SHADOW ofColor(0, 0, 0, 32)
+#define FAK_GRAY ofColor(59, 59, 59, 255)
 
 class fakGrabbedList {
     
@@ -65,7 +80,7 @@ public:
     }
     
     void setup(vector<ofFile> _droppedFiles){
-        glFontStash.setup("Ubuntu-Light.ttf", 1.03);
+        glFontStash.setup("HelveticaNeueLTCom-Lt.ttf", 1.03);
         scrollValue = glMaxHeight;
         glDroppedItem.clear();
         glDroppedItem.resize(_droppedFiles.size());
@@ -119,14 +134,14 @@ public:
         ofPushStyle();
         
         float tempSize = 14;
-        ofSetColor(FAK_DARKORANGECOLOR);
+        ofSetColor(FAK_GRAY);
         ofRectRounded(_x, _y + _scrollAmount, _width, glDroppedItem[0].gliHeight, glDroppedItem[0].gliHeight/8);
         ofSetColor(255);
 
         glFontStash.drawMultiLine("ID", tempSize, _x + 2, _y + _scrollAmount + tempSize);
         glFontStash.drawMultiLine("Name", tempSize, _x + glDroppedItem[0].gliIDWidth + 2, _y + _scrollAmount + tempSize);
 //        glFontStash.drawMultiLine("Tried", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth - 5, _y + _scrollAmount + tempSize);
-        glFontStash.drawMultiLine("Printed", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth + glDroppedItem[0].gliPrintedWidth - 2 - glFontStash.getBBox("Printed", tempSize,0,0).getMaxY(), _y + _scrollAmount + tempSize);
+        glFontStash.drawMultiLine("Printed", tempSize, _x + glDroppedItem[0].gliIDWidth + glDroppedItem[0].gliNameWidth + 2 - glFontStash.getBBox("Printed", tempSize,0,0).getMaxY(), _y + _scrollAmount + tempSize);
 
         for(int k = 0; k < glDroppedItem.size(); k++){
             glDroppedItem[k].gliX = _x;

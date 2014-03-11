@@ -17,6 +17,21 @@
 #define FAK_MIDDLEDARKORANGECOLOR ofColor(170, 50, 0, 255)
 #define FAK_LIGHTERMIDDLEDARKORANGECOLOR ofColor(185, 55, 0, 255)
 
+#define FAK_GREENCOLOR ofColor(117, 130, 16, 255)
+#define FAK_LIGHTGRAY ofColor(205, 205, 205, 255)
+#define FAK_MIDDLEGRAY ofColor(195, 195, 195, 255)
+#define FAK_TRANSPARENT ofColor(0,0,0,0)
+
+#define FAK_ORANGE1 ofColor(255, 80, 6, 255)
+#define FAK_ORANGE2 ofColor(255, 183, 153, 255)
+#define FAK_ORANGE3 ofColor(255, 147, 101, 255)
+#define FAK_ORANGE4 ofColor(255, 168, 131, 255)
+#define FAK_ORANGE5 ofColor(255, 211, 193, 255)
+
+#define FAK_WHITE ofColor(255, 255, 255, 255)
+#define FAK_BLACK ofColor(0, 0, 0, 255)
+#define FAK_SHADOW ofColor(0, 0, 0, 32)
+#define FAK_GRAY ofColor(59, 59, 59, 255)
 
 struct fakItemProperties{
     int ipID;
@@ -112,7 +127,7 @@ public:
     }
     
     void setup(int _glID, int _glSize){
-        gliFontStash.setup("Ubuntu-Light.ttf", 1.03);
+        gliFontStash.setup("HelveticaNeueLTCom-Lt.ttf", 1.03);
         itemProperties.ipName = gliFile.getFileName();
         ofLog(OF_LOG_VERBOSE, itemProperties.ipName);
         itemProperties.ipID = _glID;
@@ -146,9 +161,9 @@ public:
             gliActive = FALSE;
         }
         if (gliActive) {
-            ofSetColor(FAK_ORANGECOLOR);
+            ofSetColor(FAK_ORANGE1);
         } else if(itemProperties.ipPrinted){
-            ofSetColor(FAK_MIDDLEDARKORANGECOLOR);
+            ofSetColor(FAK_ORANGE2);
         } else if(itemProperties.ipTriedToPrint && !itemProperties.ipPrinted){
             ofSetColor(0,0,255,255);
         } else {
@@ -198,7 +213,7 @@ public:
     int gliWidth = 700;
     int gliIDWidth = 25;
     int gliNameWidth = 625;
-    int gliPrintedWidth = 25;
+    int gliPrintedWidth = 60;
     int gliTriedToPrintWidth = 25;
     int gliPadding = 2;
     int gliX;
