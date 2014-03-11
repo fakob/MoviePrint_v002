@@ -166,6 +166,7 @@ xcuserdata
 #
 # ...none. Everything is now explained.
 bin/MoviePrintDebug.app/Contents/Resources/guiSettings2.xml
+bin/MoviePrintDebug.app
 
 *.png
 

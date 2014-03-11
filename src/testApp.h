@@ -173,8 +173,6 @@ public:
     
     // ofxUI Design
     ofxUICanvas *guiTimeline;
-    ofxUICanvas *guiSettings1;
-    ofxUICanvas *guiMoviePrintPreview;
     ofxUICanvas *guiSettingsMoviePrint;
     ofxUICanvas *guiHelp1;
     

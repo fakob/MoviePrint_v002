@@ -177,9 +177,9 @@ void testApp::setup(){
     ofAddListener(scrollBarList.sbScrollingGoingOn, this, &testApp::scrollEvent);
     
     setGUITimeline();
-    setGUISettings();
-    setGUIMoviePrintPreview();
-    guiSettings1->loadSettings("guiSettings1.xml");
+//    setGUISettings();
+//    setGUIMoviePrintPreview();
+//    guiSettings1->loadSettings("guiSettings1.xml");
     setGUISettingsMoviePrint();
     guiSettingsMoviePrint->loadSettings("guiMoviePrintSettings.xml");
 
@@ -252,55 +252,6 @@ void testApp::setGUITimeline(){
 }
 
 //--------------------------------------------------------------
-void testApp::setGUISettings(){
-	
-	float dim = 16;
-	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
-    float length = menuWidth-xInit;
-    
-//    vector<string> names2;
-//	names2.push_back("Set Columns and Rows");
-//	names2.push_back("Set Number of Frames");
-    
-    vector<string> names;
-	names.push_back("Frames");
-	names.push_back("TimeCode");
-	names.push_back("off");
-    
-    guiSettings1 = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
-    guiSettings1->setFont("HelveticaNeueLTCom-LtCn.ttf");
-
-    guiSettings1->addLabel("SETTINGS", OFX_UI_FONT_LARGE);
-    guiSettings1->addSpacer(length-xInit, 1);
-    guiSettings1->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
-
-//    guiSettings1->addRadio("Grid-Number", names2, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
-//    uiRadioSetFitManually = (ofxUIRadio *) guiSettings1->getWidget("Grid-Number");
-//    uiRadioSetFitManually->activateToggle("Set Columns and Rows");
-//    
-//	guiSettings1->addIntSlider("Columns", 4, 10, gridColumns, length-xInit,dim);
-//	guiSettings1->addIntSlider("Rows", 1, 20, gridRows, length-xInit,dim);
-//   	guiSettings1->addIntSlider("Number", 4, 200, gridNumber, length-xInit,dim);
-//   	guiSettings1->addIntSlider("ThumbWidth", 0, 18, 1, length-xInit,dim);
-//    uiSliderColumns = (ofxUIIntSlider *) guiSettings1->getWidget("Columns");
-//    uiSliderRows = (ofxUIIntSlider *) guiSettings1->getWidget("Rows");
-//    uiSliderNumberOfThumbs = (ofxUIIntSlider *) guiSettings1->getWidget("Number");
-//    uiSliderThumbWidth = (ofxUIIntSlider *) guiSettings1->getWidget("ThumbWidth");
-//    uiSliderThumbWidth->setVisible(FALSE);
-
-    guiSettings1->addSpacer(length-xInit, 1);
-    guiSettings1->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
-    ofxUIRadio *uiRadioSetFrameDisplay = guiSettings1->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
-//    uiRadioSetFrameDisplay = (ofxUIRadio *) guiSettings1->getWidget("RADIO HORIZONTAL");
-    uiRadioSetFrameDisplay->activateToggle("TimeCode");
-    
-    guiSettings1->setColorBack(FAK_TRANSPARENT);
-    
-    guiSettings1->setVisible(FALSE);
-//	ofAddListener(guiSettings1->newGUIEvent,this,&testApp::guiEvent);
-}
-
-//--------------------------------------------------------------
 void testApp::setGUISettingsMoviePrint(){
 	
 	float dim = 16;
@@ -311,39 +262,35 @@ void testApp::setGUISettingsMoviePrint(){
     guiSettingsMoviePrint->setFont("HelveticaNeueLTCom-LtCn.ttf");
     guiSettingsMoviePrint->setWidgetSpacing(10);
     
-    guiSettingsMoviePrint->addButton("Select Output Folder", false,dim*1.5,dim);
+    guiSettingsMoviePrint->addLabelButton("Select Output Folder", false,length-xInit,dim);
     guiSettingsMoviePrint->addLabel("SelectedOutputFolder", saveMoviePrintPath, OFX_UI_FONT_SMALL);
     uiLabelOutputFolder = (ofxUILabel *) guiSettingsMoviePrint->getWidget("SelectedOutputFolder");
     uiLabelOutputFolder->setLabel(cropFrontOfString(saveMoviePrintPath, 40, "..."));
 
+    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
     guiSettingsMoviePrint->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
-//    vector<string> names2;
-//	names2.push_back("Set Columns and Rows");
-//	names2.push_back("Set Number of Frames");
-//    guiSettingsMoviePrint->addRadio("Grid-Number", names2, OFX_UI_ORIENTATION_VERTICAL, dim, dim);
-//    uiRadioSetFitManually = (ofxUIRadio *) guiSettingsMoviePrint->getWidget("Grid-Number");
-//    uiRadioSetFitManually->activateToggle("Set Columns and Rows");
 	guiSettingsMoviePrint->addIntSlider("PrintColumns", 1, 10, &printGridColumns, length-xInit,dim);
 	guiSettingsMoviePrint->addIntSlider("PrintRows", 1, 20, &printGridRows, length-xInit,dim);
-//   	guiSettingsMoviePrint->addIntSlider("PrintNumber", 4, 200, &printNumberOfThumbs, length-xInit,dim);
-   	guiSettingsMoviePrint->addIntSlider("PrintMargin", 0, 30, &printGridMargin, length-xInit,dim);
     uiSliderPrintColumns = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintColumns");
     uiSliderPrintRows = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintRows");
-    uiSliderNumberOfThumbs = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintNumber");
+    
+    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
+    guiSettingsMoviePrint->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
+   	guiSettingsMoviePrint->addIntSlider("PrintMargin", 0, 30, &printGridMargin, length-xInit,dim);
     uiSliderPrintMargin = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintMargin");
 
     guiSettingsMoviePrint->addToggle("DisplayVideoAudioInfo", &printDisplayVideoAudioInfo, dim*1.5, dim);
-    guiSettingsMoviePrint->addToggle("Save Individual Frames", &printSingleFrames, dim*1.5, dim);
-    
     vector<string> names;
 	names.push_back("Frames");
 	names.push_back("TimeCode");
 	names.push_back("off");
-    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
-    guiSettingsMoviePrint->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
     ofxUIRadio *uiRadioSetFrameDisplay = guiSettingsMoviePrint->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
     uiRadioSetFrameDisplay->activateToggle("TimeCode");
-    
+
+    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
+
+    guiSettingsMoviePrint->addToggle("Save Individual Frames", &printSingleFrames, dim*1.5, dim);
+
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
 
     guiSettingsMoviePrint->addLabel("Choose Output Format", OFX_UI_FONT_MEDIUM);
@@ -353,38 +300,16 @@ void testApp::setGUISettingsMoviePrint(){
 //    names3.push_back("gif");
     guiSettingsMoviePrint->addRadio("Choose Output Format", names3, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
     uiRadioPrintOutputFormat =(ofxUIRadio *) guiSettingsMoviePrint->getWidget("Choose Output Format");
-    
-    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
-
-    guiSettingsMoviePrint->addLabel("MoviePrint Width", OFX_UI_FONT_MEDIUM);
     vector<string> names4;
-    names4.push_back("1024px wide");
-    names4.push_back("2048px wide");
-    names4.push_back("3072px wide");
-    names4.push_back("4096px wide");
+    names4.push_back("1024px width");
+    names4.push_back("2048px width");
+    names4.push_back("3072px width");
+    names4.push_back("4096px width");
     guiSettingsMoviePrint->addRadio("MoviePrint Width", names4, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
     uiRadioPrintOutputFormat =(ofxUIRadio *) guiSettingsMoviePrint->getWidget("MoviePrint Width");
     
     guiSettingsMoviePrint->setColorBack(FAK_TRANSPARENT);
 	ofAddListener(guiSettingsMoviePrint->newGUIEvent,this,&testApp::guiEvent);
-}
-
-//--------------------------------------------------------------
-void testApp::setGUIMoviePrintPreview(){
-	
-	float dim = 16;
-	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
-    float length = menuWidth-xInit + (thumbWidth + displayGridMargin)*1;
-    
-    guiMoviePrintPreview = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
-    guiMoviePrintPreview->setFont("HelveticaNeueLTCom-LtCn.ttf");
-    
-//    guiMoviePrintPreview->addButton("WriteMoviePrint", writeMoviePrint);
-//    guiMoviePrintPreview->addBaseDraws("IMAGE CAPTION", &fboToPreview, false);
-    
-    guiMoviePrintPreview->setColorBack(FAK_ORANGE3);
-    guiMoviePrintPreview->setColorBack(FAK_TRANSPARENT);
-	ofAddListener(guiMoviePrintPreview->newGUIEvent,this,&testApp::guiEvent);
 }
 
 //--------------------------------------------------------------
@@ -1005,11 +930,6 @@ void testApp::keyPressed(int key){
                 break;
         }
         
-        if(guiSettings1->hasKeyboardFocus())
-        {
-            return;
-        }
-        
         switch (key)
         {
                 
@@ -1281,7 +1201,6 @@ void testApp::updateTimeline(){
     if (loadedMovie.isMovieLoaded) {
         guiTimeline->setPosition(leftMargin - OFX_UI_GLOBAL_WIDGET_SPACING, ofGetWindowHeight()  - footerHeight/2 +1 - (footerHeight/4) * menuTimeline.getRelSizeH());
         guiTimeline->setWidth(ofGetWindowWidth());
-        guiSettings1->setHeight(ofGetWindowHeight());
         uiRangeSliderTimeline->setWidth(displayGridWidth);
         ofLog(OF_LOG_VERBOSE, "Timeslider Width:" + ofToString(uiRangeSliderTimeline->getWidth()));
     }
@@ -1338,8 +1257,6 @@ void testApp::exit(){
     
     delete guiTimeline;
     
-    guiSettings1->saveSettings("guiSettings1.xml");
-	delete guiSettings1;
     guiSettingsMoviePrint->saveSettings("guiMoviePrintSettings.xml");
 	delete guiSettingsMoviePrint;
 
@@ -1398,7 +1315,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         }
         else if(name == "Select Output Folder")
         {
-            ofxUIButton *button = (ofxUIButton *) e.widget;
+            ofxUILabelButton *button = (ofxUILabelButton *) e.widget;
             if (button->getValue()) {
                 
                 string movieFileName = loadedMovie.gmMovie.getMoviePath();
@@ -1549,7 +1466,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
                 printFormat = OF_IMAGE_FORMAT_PNG;
             }
         }
-        else if(name == "1024px wide")
+        else if(name == "1024px width")
         {
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
@@ -1557,7 +1474,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
                 printSizeWidth = 1024;
             }
         }
-        else if(name == "2048px wide")
+        else if(name == "2048px width")
         {
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
@@ -1565,7 +1482,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
                 printSizeWidth = 2048;
             }
         }
-        else if(name == "3072px wide")
+        else if(name == "3072px width")
         {
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
@@ -1573,7 +1490,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
                 printSizeWidth = 3072;
             }
         }
-        else if(name == "4096px wide")
+        else if(name == "4096px width")
         {
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
