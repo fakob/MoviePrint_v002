@@ -671,11 +671,15 @@ void testApp::update(){
     if (menuMovieInfo.getMenuActivated() || menuSettings.getMenuActivated() || menuMoviePrintPreview.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated()) {
         if (loadedMovie.getMouseEventsEnabled()) {
             loadedMovie.disableMouseEvents();
+        }
+        if (showDroppedList) {
             droppedList.disableMouseEvents(droppedFiles.size());
         }
     } else {
-        if (!loadedMovie.getMouseEventsEnabled()) {
+        if (!loadedMovie.getMouseEventsEnabled() && !showDroppedList) {
             loadedMovie.enableMouseEvents();
+        }
+        if (showDroppedList) {
             droppedList.enableMouseEvents();
         }
     }
@@ -798,8 +802,10 @@ void testApp::update(){
         Tweener.addTween(scrubFade, 0, 0.5);
         if(scrubFade < 5){
             updateNewPrintGrid = FALSE;
-            loadedMovie.allocateNewNumberOfStills(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
-            updateAllStills();
+            if (!showDroppedList) {
+                loadedMovie.allocateNewNumberOfStills(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
+                updateAllStills();
+            }
             devTurnOffMovieSwitch = FALSE;
         }
     }
@@ -877,6 +883,7 @@ void testApp::update(){
         // to ensure that print screen is showing before printing starts
         counterToPrint++;
         if (counterToPrint > 1) {
+            inactivateAllMenus();
             if (printListNotImage) {
                 ofLog(OF_LOG_VERBOSE, "Start Printing List-------------------------------------------");
                 itemToPrint = 0;
@@ -1284,13 +1291,11 @@ void testApp::mouseReleased(int x, int y, int button){
             }
         }
     }
-    
     manipulateSlider = FALSE;
     loadedMovie.gmScrubMovie = FALSE;
+    loadedMovie.gmRollOver = FALSE;
     scrollGrid = FALSE;
     scrollList = FALSE;
-    loadedMovie.gmRollOver = FALSE;
-    
 }
 
 //--------------------------------------------------------------
@@ -1812,7 +1817,7 @@ void testApp::drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeing
     }
     float tempX = (leftMargin + listWidth * tweenListInOut.update()) * _scaleFactor;
     float tempY = (_scrollAmount + headerHeight + topMargin)  * _scaleFactor;
-    ofLog(OF_LOG_VERBOSE, "_scrollAmount:"+ ofToString(_scrollAmount) +  " tempY:"+ ofToString(tempY) +  "_scrollAmount:"+ ofToString(_scrollAmount));
+//    ofLog(OF_LOG_VERBOSE, "_scrollAmount:"+ ofToString(_scrollAmount) +  " tempY:"+ ofToString(tempY) +  "_scrollAmount:"+ ofToString(_scrollAmount));
     loadedMovie.drawGridOfStills(tempX, tempY, gridColumns, displayGridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
     ofPopStyle();
 }
@@ -1957,7 +1962,7 @@ void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
     ofTranslate(tempX, tempY);
     ofSetColor(255);
     ofRect(0, 0, _scaleFactor * printGridWidth, _scaleFactor * printGridHeight);
-    loadedMovie.drawMoviePrint(0, 0, printGridColumns, printGridMargin, _scaleFactor, 1, _showPlaceHolder, printHeaderHeight, printDisplayVideoAudioInfo, true);
+    loadedMovie.drawMoviePrint(0, 0, printGridColumns, printGridRows, printGridMargin, _scaleFactor, 1, _showPlaceHolder, printHeaderHeight, printDisplayVideoAudioInfo, true);
     
     // drawing frame
     float tempFrameWidth = 3;
@@ -2096,7 +2101,7 @@ void testApp::printImageToFile(int _printSizeWidth){
         ofBackground(0, 0, 0, 0);
         ofSetColor(255, 255, 255, 255);
 
-        loadedMovie.drawMoviePrint(0, 0, printGridColumns, printGridMargin, _newScaleFactor, 1, showPlaceHolder, printHeaderHeight, printDisplayVideoAudioInfo, false);
+        loadedMovie.drawMoviePrint(0, 0, printGridColumns, printGridRows, printGridMargin, _newScaleFactor, 1, showPlaceHolder, printHeaderHeight, printDisplayVideoAudioInfo, false);
 
         fboToSave.end();
         fboToSave.readToPixels(gmPixToSave);
@@ -2137,7 +2142,7 @@ void testApp::printImageToFile(int _printSizeWidth){
         timer.setStartTime();
         finishedPrinting = TRUE;
     }
-    
+    activateAllMenus();
     ofLog(OF_LOG_VERBOSE, "Finished Printing-------------------------------------------- currPrintingList" + ofToString(currPrintingList));
     
 }
@@ -2180,8 +2185,10 @@ void testApp::printListToFile(){
     if (tempIterator >= droppedList.glDroppedItem.size()) {
         currPrintingList = FALSE;
         moveToList();
+        activateAllMenus();
         ofLog(OF_LOG_VERBOSE, "Finished Printing List-------------------------------------------");
     }
+
     timer.setStartTime();
     finishedPrinting = TRUE;
     
@@ -2329,33 +2336,31 @@ void testApp::updateTimeSlider(bool _wholeRange) {
 
 //--------------------------------------------------------------
 void testApp::updateAllStills(){
-    
-    ofLog(OF_LOG_VERBOSE, "Start Updating------------------------------------------------");
-    finishedUpdating = FALSE;
-    showUpdateScreen = TRUE;
-    
-    if (uiSliderValueLow < 0) {
-        uiSliderValueLow = 0;
-    }
-    if (uiSliderValueHigh > (totalFrames-1)) {
-        uiSliderValueHigh = (totalFrames-1);
-    }
-
-    
-    for (int i=0; i<numberOfStills; i++) {
-        if (numberOfStills == 1) {
-            gridTimeArray[i] = ofMap(0.5, 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
-
-        } else {
-            gridTimeArray[i] = ofMap(float(i)/(numberOfStills - 1), 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
+        ofLog(OF_LOG_VERBOSE, "Start Updating------------------------------------------------");
+        finishedUpdating = FALSE;
+        showUpdateScreen = TRUE;
+        
+        if (uiSliderValueLow < 0) {
+            uiSliderValueLow = 0;
         }
-    }
-    loadedMovie.updateAllFrameNumbers(gridTimeArray);
-    movieIsBeingGrabbed = TRUE;
-    loadedMovie.start();
-    
-    ofxNotify() << "Thread is started - " + ofToString(numberOfStills) + " Stills are being updated";
-
+        if (uiSliderValueHigh > (totalFrames-1)) {
+            uiSliderValueHigh = (totalFrames-1);
+        }
+        
+        
+        for (int i=0; i<numberOfStills; i++) {
+            if (numberOfStills == 1) {
+                gridTimeArray[i] = ofMap(0.5, 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
+                
+            } else {
+                gridTimeArray[i] = ofMap(float(i)/(numberOfStills - 1), 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
+            }
+        }
+        loadedMovie.updateAllFrameNumbers(gridTimeArray);
+        movieIsBeingGrabbed = TRUE;
+        loadedMovie.start();
+        
+        ofxNotify() << "Thread is started - " + ofToString(numberOfStills) + " Stills are being updated";
 }
 
 
@@ -2399,6 +2404,19 @@ void testApp::moveToList(){
 }
 
 
+//--------------------------------------------------------------
+void testApp::inactivateAllMenus(){
+    menuMoviePrintSettings.setMenuInactive();
+    menuMovieInfo.setMenuInactive();
+    menuHelp.setMenuInactive();
+}
+
+//--------------------------------------------------------------
+void testApp::activateAllMenus(){
+    menuMoviePrintSettings.setMenuActive();
+    menuMovieInfo.setMenuActive();
+    menuHelp.setMenuActive();
+}
 
 //--------------------------------------------------------------
 bool testApp::checkExtension(string _tempExtension){

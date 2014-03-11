@@ -667,7 +667,16 @@ public:
 
     void printStill(int i, float _x, float _y, float _w, float _h, bool _drawPlaceHolder){
         
-        if (isMovieLoaded) {
+        if (_drawPlaceHolder){
+            
+            ofPushStyle();
+            ofSetColor(FAK_MIDDLEGRAY);
+            
+            ofRect(_x, _y, _w, _h);
+            
+            ofPopStyle();
+            
+        } else if (isMovieLoaded) {
             
             ofPushStyle();
             ofEnableAlphaBlending();
@@ -698,15 +707,6 @@ public:
             
             ofPopStyle();
             ofSetColor(255);
-        } else if (_drawPlaceHolder){
-          
-            ofPushStyle();
-            ofSetColor(FAK_MIDDLEGRAY);
-            
-            ofRect(_x, _y, _w, _h);
-            
-            ofPopStyle();
-            
         }
     }
     
@@ -735,7 +735,7 @@ public:
         
     }
     
-    void drawMoviePrint(float _x, float _y, int _gridColumns, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder, float _printHeaderHeight, bool _printDisplayVideoAudioInfo, bool _drawPreview){
+    void drawMoviePrint(float _x, float _y, int _gridColumns, int _gridRows, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder, float _printHeaderHeight, bool _printDisplayVideoAudioInfo, bool _drawPreview){
 
         ofPushStyle();
         ofPushMatrix();
@@ -807,11 +807,18 @@ public:
         // draw all frames
         ofEnableAlphaBlending();
         ofSetColor(255, 255, 255, 255);
-        for(int i=0; i<gmNumberOfStills; i++)
+        int tempNumberOfThumbsToDisplay;
+        tempNumberOfThumbsToDisplay = _gridColumns * _gridRows;
+
+        for(int i=0; i<tempNumberOfThumbsToDisplay; i++)
         {
             float tempX = (_x + _gridMargin + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor;
             float tempY = (_y + _gridMargin + (gmThumbHeight+_gridMargin)*(i/_gridColumns)) * _scaleFactor;
-            printStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, _drawPlaceHolder);
+            if ((_gridColumns * _gridRows) > gmNumberOfStills) {
+                printStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, true);
+            } else {
+                printStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, _drawPlaceHolder);
+            }
         }
         ofPopMatrix();
         ofPopStyle();

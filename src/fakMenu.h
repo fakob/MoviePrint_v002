@@ -134,12 +134,16 @@ public:
     
     void openMenuManually(){
         mIsOpenManually = true;
-        setTweenIn();
+        if (tweenMenuInOut.update() != 1.0){
+            setTweenIn();
+        }
     }
     
     void closeMenuManually(){
         mIsOpenManually = false;
-        setTweenOut();
+        if (tweenMenuInOut.update() != 0.0){
+            setTweenOut();
+        }
     }
     
     void mouseMoved(ofMouseEventArgs & args){
@@ -220,6 +224,16 @@ public:
         return mInsideMenuHead || mIsOpenManually;
     }
 
+    
+    void setMenuActive(){
+        mMenuActive = true;
+    }
+    
+    void setMenuInactive(){
+        closeMenuManually();
+        mMenuActive = false;
+    }
+    
     bool getInsideMenuHead(){
         return mInsideMenuHead;
     }
