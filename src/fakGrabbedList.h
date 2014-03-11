@@ -60,7 +60,7 @@ public:
             glDroppedItem[i].registerKeyEvents();
             ofAddListener(glDroppedItem[i].glRolledOver, this, &fakGrabbedList::rolledOver);
             ofAddListener(glDroppedItem[i].glClickedInside, this, &fakGrabbedList::listClick);
-//            ofLog(OF_LOG_VERBOSE, "ofAddListener:" + ofToString(i));
+            ofLog(OF_LOG_VERBOSE, "ofAddListener:" + ofToString(i));
         }
     }
     

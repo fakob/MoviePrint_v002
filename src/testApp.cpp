@@ -34,8 +34,9 @@ void testApp::setup(){
     
     setupFinished = FALSE;
     updateNewPrintGrid = FALSE;
-    devTurnOffMovieSwitch = TRUE;
-    showDroppedList = FALSE;
+    showListView = FALSE;
+    lockedDueToInteraction = false;
+    lockedDueToPrinting = false;
     updateMovieFromList = FALSE;
     printListNotImage = FALSE;
     currPrintingList = FALSE;
@@ -57,7 +58,9 @@ void testApp::setup(){
     itemToPrint = 0;
     loadNewMovieToBeScrubbedBool = FALSE;
     windowWasResized = false;
-
+    allMenusAreClosed = true;
+    allMenusAreClosedOnce = 0;
+    
     // UI Values
     leftMargin = 5;
     rightMargin = 5;
@@ -78,7 +81,6 @@ void testApp::setup(){
     
     threadIsRunning = FALSE;
     
-    printScale = 2.0;
     printSizeWidth = 1024;
     showPrintScreen = FALSE;
     finishedPrinting = TRUE;
@@ -183,24 +185,21 @@ void testApp::setup(){
 
     menuMovieInfo.setupMenu(1,0,0,0,0,headerHeight, true, true, false);
     menuMovieInfo.registerMouseEvents();
-    
-//    menuSettings.setupMenu(4,0,0,0,0,headerHeight, false, true, false);
-//    menuSettings.registerMouseEvents();
-    
-//    menuMoviePrintPreview.setupMenu(3,0,0,0,0,headerHeight, true, true, true);
-//    menuMoviePrintPreview.registerMouseEvents();
+    ofAddListener(menuMovieInfo.mMenuIsBeingOpened, this, &testApp::menuIsOpened);
+    ofAddListener(menuMovieInfo.mMenuIsBeingClosed, this, &testApp::menuIsClosed);
     
     menuMoviePrintSettings.setupMenu(5,0,0,0,0,headerHeight, true, true, false);
     menuMoviePrintSettings.registerMouseEvents();
+    ofAddListener(menuMoviePrintSettings.mMenuIsBeingOpened, this, &testApp::menuIsOpened);
+    ofAddListener(menuMoviePrintSettings.mMenuIsBeingClosed, this, &testApp::menuIsClosed);
     
     menuHelp.setupMenu(2,0,0,0,0,headerHeight, true, true, false);
     menuHelp.registerMouseEvents();
+    ofAddListener(menuHelp.mMenuIsBeingOpened, this, &testApp::menuIsOpened);
+    ofAddListener(menuHelp.mMenuIsBeingClosed, this, &testApp::menuIsClosed);
     
     menuTimeline.setupMenu(0,0,0,0,0,footerHeight/2, true, false, false);
     menuTimeline.registerMouseEvents();
-    
-    ofAddListener(menuMoviePrintSettings.mMenuIsBeingOpened, this, &testApp::menuIsOpened);
-    ofAddListener(menuMoviePrintSettings.mMenuIsBeingClosed, this, &testApp::menuIsClosed);
     
     moveInOutTimeline();
     
@@ -509,10 +508,9 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
     }
     
     if (!_loadInBackground) {
-        showDroppedList = FALSE;
+        showListView = FALSE;
         droppedList.glUpdateMovieFromList = FALSE;
     }
-    devTurnOffMovieSwitch = FALSE;
     movieLoading = FALSE;
     if (movieProperlyLoaded){
         ofxNotify() << "Movie has finished to load";
@@ -609,6 +607,10 @@ void testApp::update(){
 
 //    loadedMovie.update();
     
+    if (tweenListInOut.update() == 0.0 || tweenListInOut.update() == 1.0) {
+        lockedDueToInteraction = false;
+    }
+    
     if (!finishedUpdating) {
         if (!threadIsRunning && !ofGetMousePressed()) {
             timer.setStartTime();
@@ -667,25 +669,10 @@ void testApp::update(){
         loadedMovie.gmMovieScrub.update();
     }
     
-    // check if one of the topMenus is active and in this case turn of the mouseEvents for the thumbs
-    if (menuMovieInfo.getMenuActivated() || menuSettings.getMenuActivated() || menuMoviePrintPreview.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated()) {
-        if (loadedMovie.getMouseEventsEnabled()) {
-            loadedMovie.disableMouseEvents();
-        }
-        if (showDroppedList) {
-            droppedList.disableMouseEvents(droppedFiles.size());
-        }
-    } else {
-        if (!loadedMovie.getMouseEventsEnabled() && !showDroppedList) {
-            loadedMovie.enableMouseEvents();
-        }
-        if (showDroppedList) {
-            droppedList.enableMouseEvents();
-        }
-    }
+    handlingEventOverlays();
     
     if (showMoviePrintPreview){
-        if (showDroppedList) {
+        if (showListView) {
             writeFboToPreview(fmin(fboToPreview.getWidth()/(float)printGridWidth, fboToPreview.getHeight()/(float)printGridHeight), true);
         } else {
             writeFboToPreview(fmin(fboToPreview.getWidth()/(float)printGridWidth, fboToPreview.getHeight()/(float)printGridHeight), false);
@@ -802,17 +789,16 @@ void testApp::update(){
         Tweener.addTween(scrubFade, 0, 0.5);
         if(scrubFade < 5){
             updateNewPrintGrid = FALSE;
-            if (!showDroppedList) {
+            if (!showListView) {
                 loadedMovie.allocateNewNumberOfStills(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
                 updateAllStills();
             }
-            devTurnOffMovieSwitch = FALSE;
         }
     }
     
     if (droppedList.glUpdateMovieFromList) {
         printListNotImage = FALSE;
-        showDroppedList = FALSE;
+        showListView = FALSE;
         finishedLoadingMovie = FALSE;
         showLoadMovieScreen = TRUE;
         moveToMovie();
@@ -826,7 +812,7 @@ void testApp::update(){
     
     if (updateMovieFromDrop) {
         printListNotImage = FALSE;
-        showDroppedList = FALSE;
+        showListView = FALSE;
         finishedLoadingMovie = FALSE;
         showLoadMovieScreen = TRUE;
         counterToUpdate++;
@@ -883,15 +869,10 @@ void testApp::update(){
         // to ensure that print screen is showing before printing starts
         counterToPrint++;
         if (counterToPrint > 1) {
-            inactivateAllMenus();
             if (printListNotImage) {
-                ofLog(OF_LOG_VERBOSE, "Start Printing List-------------------------------------------");
-                itemToPrint = 0;
-                resetItemsToPrint();
-                printListToFile();
+                startListPrinting();
             } else {
-                ofLog(OF_LOG_VERBOSE, "Start Printing------------------------------------------------");
-                printImageToFile(printSizeWidth);
+                startPrinting();
             }
             counterToPrint = 0;
         }
@@ -915,31 +896,23 @@ void testApp::draw(){
         drawLoadMovieScreen();
     
     } else {
-        
-        if (showDroppedList) {
+
+        if (!(tweenListInOut.update() == 0.0)) { // stop drawing when position is at showMovieView
             
             drawList(scrollListAmountRel);
             scrollBarList.draw();
             
-        } else {
+        }
+        
+        if (!(tweenListInOut.update() == 1.0)) { // stop drawing when position is at showListView
             
             if (!loadedMovie.isMovieLoaded) { // if no movie is loaded
-                if (!showDroppedList) {
+                if (!showListView) {
                     guiTimeline->setVisible(FALSE);
                     drawStartScreen();
                 }
-            } else if (devTurnOffMovieSwitch){// if we are in dev mode then only draw rects
-                // draw only rect
-                
-                drawResizeScreen();
                 
             } else {
-                
-                ofPushStyle();
-                ofSetColor(255, 255, 255, 255);
-                //            backgroundImage.draw(ofGetWidth()/2-backgroundImage.getWidth()/2, ofGetHeight()/2-backgroundImage.getHeight()/2, ofGetWidth(), ofGetHeight());
-                backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
-                ofPopStyle();
                 
                 // draw all frames
                 drawDisplayGrid(1, FALSE, FALSE, scrollAmountRel, showPlaceHolder);
@@ -991,6 +964,7 @@ void testApp::draw(){
             }
             
         }
+        
         if (showPrintScreen) {
             drawPrintScreen();
         } else {
@@ -1014,178 +988,153 @@ void testApp::writeFboToPreview(float _scaleFactor, bool _showPlaceHolder){
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
-    
-    currentKey = key;
-    ofLog(OF_LOG_VERBOSE, "currentKey:" + ofToString(currentKey));
-
-    switch (key) {
-        case OF_KEY_LEFT_SUPER:
-        case OF_KEY_RIGHT_SUPER:
-            superKeyPressed = TRUE;
-            break;
-        case OF_KEY_LEFT_SHIFT:
-        case OF_KEY_RIGHT_SHIFT:
-            shiftKeyPressed = TRUE;
-            break;
-        default:
-            break;
-    }
-    
-    if(guiSettings1->hasKeyboardFocus())
-    {
-        return;
-    }
-    
-    switch (key)
-    {
-//        case 'f':
-//        {
-//            if (loadedMovie.vfFramesToTimeSwitch) {
-//                loadedMovie.vfFramesToTimeSwitch = FALSE;
-//            } else {
-//                loadedMovie.vfFramesToTimeSwitch = TRUE;
-//            }
-//        }
-//            break;
-//            
-        case 'l':
+    if (!lockedDueToInteraction && !lockedDueToPrinting) {
+        
+        currentKey = key;
+        ofLog(OF_LOG_VERBOSE, "currentKey:" + ofToString(currentKey));
+        
+        switch (key) {
+            case OF_KEY_LEFT_SUPER:
+            case OF_KEY_RIGHT_SUPER:
+                superKeyPressed = TRUE;
+                break;
+            case OF_KEY_LEFT_SHIFT:
+            case OF_KEY_RIGHT_SHIFT:
+                shiftKeyPressed = TRUE;
+                break;
+            default:
+                break;
+        }
+        
+        if(guiSettings1->hasKeyboardFocus())
         {
-            if (droppedFiles.size() > 1) {
-                if (loadedMovie.isMovieLoaded) {
-                    showDroppedList = !showDroppedList;
-                    if (showDroppedList == FALSE) {
-                        moveToMovie();
-                    }
-                    if (showDroppedList == TRUE) {
-                        moveToList();
+            return;
+        }
+        
+        switch (key)
+        {
+                
+            case 'l':
+            {
+                if (droppedFiles.size() > 1) {
+                    if (loadedMovie.isMovieLoaded) {
+                        showListView = !showListView;
+                        if (showListView == FALSE) {
+                            moveToMovie();
+                        }
+                        if (showListView == TRUE) {
+                            moveToList();
+                        }
                     }
                 }
-            }
-            
-        }
-            break;
-            
-        case 'p':
-        {
-            if (loadedMovie.isMovieLoaded || showDroppedList) {
-                finishedPrinting = FALSE;
-                showPrintScreen = TRUE;
-            }
-        }
-            break;
-            
-//        case 'h':
-//        case 'H':
-//        {
-//           
-//            if (showMenu) {
-//                tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),0);
-//            } else {
-//                tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,ofRandom(600, 1000),0);
-//            }
-//            
-//            showMenu = !showMenu;
-//
-//            if (showMenu){
-//                loadedMovie.setAllLimitsLeft(menuWidth);
-//                droppedList.setAllLimitsLeft(menuWidth);
-//            } else {
-//                loadedMovie.setAllLimitsLeft(leftMargin);
-//                droppedList.setAllLimitsLeft(leftMargin);
-//            }
-//
-//        
-//        }
-//			break;
-            
-        case 'x':
-        {
-            showFBO = !showFBO;
-            
-        }
-			break;
-            
-        case 'z':
-        {
-            showPlaceHolder = !showPlaceHolder;
-        }
-			break;
-            
-        case 'w':
-        {
-            if (setupFinished) {
                 
-                loadNewMovie("", FALSE, TRUE, FALSE);
+            }
+                break;
                 
-                printListNotImage = FALSE;
-                showDroppedList = FALSE;
-                finishedLoadingMovie = FALSE;
-                showLoadMovieScreen = TRUE;
+            case 'p':
+            {
+                if (loadedMovie.isMovieLoaded || showListView) {
+                    finishedPrinting = FALSE;
+                    showPrintScreen = TRUE;
+                }
+            }
+                break;
+                
+            case 'x':
+            {
+                showFBO = !showFBO;
+                
+            }
+                break;
+                
+            case 'z':
+            {
+                showPlaceHolder = !showPlaceHolder;
+            }
+                break;
+                
+            case 'w':
+            {
+                if (setupFinished) {
+                    
+                    loadNewMovie("", FALSE, TRUE, FALSE);
+                    
+                    printListNotImage = FALSE;
+                    showListView = FALSE;
+                    finishedLoadingMovie = FALSE;
+                    showLoadMovieScreen = TRUE;
                     loadNewMovie("/Users/fakob/Movies/Daft Punk - Get Lucky by Shortology.mp4", TRUE, FALSE, TRUE);
                     if (loadedMovie.isMovieLoaded) {
                         moveToMovie();
                     }
                     updateMovieFromDrop = FALSE;
-                
+                    
+                    
+                }
                 
             }
-            
+                break;
+                
+            case ' ':
+            {
+                toggleMoviePrintPreview();
+            }
+                break;
+                
+            default:
+                break;
         }
-            break;
-
-        case ' ':
-        {
-            toggleMoviePrintPreview();
-        }
-			break;
-
-        default:
-            break;
+    } else {
+        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
     }
 }
 
 //--------------------------------------------------------------
 void testApp::keyReleased(int key){
-    
-    currentKey = -1;
-    
-    if (uiRangeSliderTimeline->getState()) {
+    if (!lockedDueToInteraction && !lockedDueToPrinting) {
         
-        if (key == OF_KEY_RIGHT || key == OF_KEY_LEFT || key == OF_KEY_UP || key == OF_KEY_DOWN) {
-            uiSliderValueLow = uiRangeSliderTimeline->getScaledValueLow();
-            uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
-            updateAllStills();
-    ofLog(OF_LOG_VERBOSE, "asdfadfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfaf" );
-
+        currentKey = -1;
+        
+        if (uiRangeSliderTimeline->getState()) {
+            
+            if (key == OF_KEY_RIGHT || key == OF_KEY_LEFT || key == OF_KEY_UP || key == OF_KEY_DOWN) {
+                uiSliderValueLow = uiRangeSliderTimeline->getScaledValueLow();
+                uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
+                updateAllStills();
+                ofLog(OF_LOG_VERBOSE, "asdfadfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfaf" );
+                
+            }
         }
+        
+        manipulateSlider = FALSE;
+        loadedMovie.gmScrubMovie = FALSE;
+        
+        superKeyPressed = FALSE;
+        shiftKeyPressed = FALSE;
+    } else {
+        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
     }
-    
-    manipulateSlider = FALSE;
-    loadedMovie.gmScrubMovie = FALSE;
-    
-    superKeyPressed = FALSE;
-    shiftKeyPressed = FALSE;
-
 }
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
-    if (y > ofGetHeight() - footerHeight/1.2) {
-        if (!showTimeline) {
-            ofLog(OF_LOG_VERBOSE, "Show Timeline------------------------------------------------");
-            finishedTimeline = FALSE;
-            showTimeline = TRUE;
-            moveInOutTimeline();
+    if (!lockedDueToInteraction && !lockedDueToPrinting) {
+        
+        if (y > ofGetHeight() - footerHeight/1.2) {
+            if (!showTimeline) {
+                ofLog(OF_LOG_VERBOSE, "Show Timeline------------------------------------------------");
+                finishedTimeline = FALSE;
+                showTimeline = TRUE;
+                moveInOutTimeline();
+            }
+        } else {
+            if (!ofGetMousePressed()) {
+                timer.setStartTime();
+                finishedTimeline = TRUE;
+            }
         }
-
-//        keyPressed(116);
-//        timer.setStartTime();
     } else {
-        if (!ofGetMousePressed()) {
-            timer.setStartTime();
-            finishedTimeline = TRUE;
-//            ofLog(OF_LOG_VERBOSE, "Finished Showing Timeline--------------------------------------------");
-        }
+        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
     }
 }
 
@@ -1196,88 +1145,95 @@ void testApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
-    ofLog(OF_LOG_VERBOSE, "which button is clicked:" + ofToString(button));
-
-    if (loadedMovie.isMovieLoaded && loadedMovie.gmMovieScrub.isLoaded()) {
-        if(button == 0){
-            if (y > ofGetHeight() - footerHeight/1.2) {
+    if (!lockedDueToInteraction && !lockedDueToPrinting) {
+        ofLog(OF_LOG_VERBOSE, "which button is clicked:" + ofToString(button));
+        
+        if (loadedMovie.isMovieLoaded && loadedMovie.gmMovieScrub.isLoaded()) {
+            if(button == 0){
+                if (y > ofGetHeight() - footerHeight/1.2) {
+                    if (showTimeline) {
+                        ofLog(OF_LOG_VERBOSE, "Show Timeline------------------------------------------------");
+                        finishedTimeline = FALSE;
+                        showTimeline = TRUE;
+                        //                    moveInOutTimeline();
+                    }
+                }
+                
                 if (showTimeline) {
-                    ofLog(OF_LOG_VERBOSE, "Show Timeline------------------------------------------------");
-                    finishedTimeline = FALSE;
-                    showTimeline = TRUE;
-//                    moveInOutTimeline();
-                }
-            }
-            
-            if (showTimeline) {
-                if (finishedTimeline) {
-                    if (timer.getElapsedSeconds() > 0.5) {
-                        showTimeline = FALSE;
-                        moveInOutTimeline();
+                    if (finishedTimeline) {
+                        if (timer.getElapsedSeconds() > 0.5) {
+                            showTimeline = FALSE;
+                            moveInOutTimeline();
+                        }
                     }
                 }
-            }
-
-            
-            if (!showDroppedList) {
-                if (!(menuMovieInfo.getMenuActivated() || menuSettings.getMenuActivated() || menuMoviePrintPreview.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated())) {
-                    if (loadedMovie.grabbedStill[loadedMovie.gmRollOverMovieID].gsRollOver){
-                        
-                        rollOverMovieID = loadedMovie.gmRollOverMovieID;
-                        rollOverMovieButtonID = loadedMovie.gmRollOverMovieButtonID;
-                        rollOverClicked = TRUE;
-                        ofLog(OF_LOG_VERBOSE, "clicked in rolloverstate ID =" + ofToString(loadedMovie.gmRollOverMovieID));
+                
+                
+                if (!showListView) {
+                    if (!(menuMovieInfo.getMenuActivated() || menuSettings.getMenuActivated() || menuMoviePrintPreview.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated())) {
+                        if (loadedMovie.grabbedStill[loadedMovie.gmRollOverMovieID].gsRollOver){
+                            
+                            rollOverMovieID = loadedMovie.gmRollOverMovieID;
+                            rollOverMovieButtonID = loadedMovie.gmRollOverMovieButtonID;
+                            rollOverClicked = TRUE;
+                            ofLog(OF_LOG_VERBOSE, "clicked in rolloverstate ID =" + ofToString(loadedMovie.gmRollOverMovieID));
+                            
+                        }
+                        updateInOut = FALSE;
+                        ofLog(OF_LOG_VERBOSE, "the mouse was clicked" );
+                        Tweener.removeTween(scrubFade);
+                        scrubFade = 255;
                         
                     }
-                    updateInOut = FALSE;
-                    ofLog(OF_LOG_VERBOSE, "the mouse was clicked" );
-                    Tweener.removeTween(scrubFade);
-                    scrubFade = 255;
-                    
                 }
             }
         }
+        
+        ofLog(OF_LOG_VERBOSE, "mousePressed - Button:" + ofToString(button) );
+    } else {
+        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
     }
-    
-    ofLog(OF_LOG_VERBOSE, "mousePressed - Button:" + ofToString(button) );
-
 }
 
 //--------------------------------------------------------------
 void testApp::mouseReleased(int x, int y, int button){
-    if (loadedMovie.isMovieLoaded) {
-        ofLog(OF_LOG_VERBOSE, "mouseReleased" );
-        
-        if (!showDroppedList) {
-            if (loadedMovie.isThreadRunning()) {
-                loadedMovie.stop(false);
-            }
-            if (updateInOut) {
-                ofLog(OF_LOG_VERBOSE, "mouseReleased - updateInOut True" );
-                Tweener.addTween(scrubFade, 0, 1);
-                updateAllStills();
-            }
-            if (updateScrub) {
-                Tweener.addTween(scrubFade, 0, 1);
-                
-                int i = loadedMovie.gmScrubID;
-                loadedMovie.grabbedStill[i].gsManipulated = TRUE;
-                loadedMovie.grabbedStill[i].gsToBeGrabbed = TRUE;
-                loadedMovie.grabbedStill[i].gsToBeUpdated = TRUE;
-                if (!loadedMovie.isThreadRunning()) {
-                    loadedMovie.start();
+    if (!lockedDueToInteraction && !lockedDueToPrinting) {
+        if (loadedMovie.isMovieLoaded) {
+            ofLog(OF_LOG_VERBOSE, "mouseReleased" );
+            
+            if (!showListView) {
+                if (loadedMovie.isThreadRunning()) {
+                    loadedMovie.stop(false);
+                }
+                if (updateInOut) {
+                    ofLog(OF_LOG_VERBOSE, "mouseReleased - updateInOut True" );
+                    Tweener.addTween(scrubFade, 0, 1);
+                    updateAllStills();
+                }
+                if (updateScrub) {
+                    Tweener.addTween(scrubFade, 0, 1);
+                    
+                    int i = loadedMovie.gmScrubID;
+                    loadedMovie.grabbedStill[i].gsManipulated = TRUE;
+                    loadedMovie.grabbedStill[i].gsToBeGrabbed = TRUE;
+                    loadedMovie.grabbedStill[i].gsToBeUpdated = TRUE;
+                    if (!loadedMovie.isThreadRunning()) {
+                        loadedMovie.start();
+                    }
+                }
+                if (rollOverClicked) {
+                    rollOverButtonsClicked(rollOverMovieID, rollOverMovieButtonID);
                 }
             }
-            if (rollOverClicked) {
-                rollOverButtonsClicked(rollOverMovieID, rollOverMovieButtonID);
-            }
         }
+        manipulateSlider = FALSE;
+        loadedMovie.gmScrubMovie = FALSE;
+        loadedMovie.gmRollOver = FALSE;
+        scrollGrid = FALSE;
+        scrollList = FALSE;
+    } else {
+        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
     }
-    manipulateSlider = FALSE;
-    loadedMovie.gmScrubMovie = FALSE;
-    loadedMovie.gmRollOver = FALSE;
-    scrollGrid = FALSE;
-    scrollList = FALSE;
 }
 
 //--------------------------------------------------------------
@@ -1339,36 +1295,40 @@ void testApp::gotMessage(ofMessage msg){
 
 //--------------------------------------------------------------
 void testApp::dragEvent(ofDragInfo dragInfo){
-    
-    if (setupFinished) {
+    if (!lockedDueToInteraction && !lockedDueToPrinting) {
         
-        if( dragInfo.files.size() > 0 ){
+        if (setupFinished) {
             
-            loadNewMovie("", FALSE, TRUE, FALSE);
-
-            droppedList.disableMouseEvents(droppedFiles.size());
-            droppedFiles.clear();
-            for (int i=0; i<dragInfo.files.size(); i++) {
-                ofFile testFile(dragInfo.files[i]);
-                if (!testFile.isDirectory()) {
-                    if (checkExtension(ofToString(testFile.getExtension()))){
-                        droppedFiles.push_back(dragInfo.files[i]);
+            if( dragInfo.files.size() > 0 ){
+                
+                loadNewMovie("", FALSE, TRUE, FALSE);
+                
+                droppedList.disableMouseEvents(droppedFiles.size());
+                droppedFiles.clear();
+                for (int i=0; i<dragInfo.files.size(); i++) {
+                    ofFile testFile(dragInfo.files[i]);
+                    if (!testFile.isDirectory()) {
+                        if (checkExtension(ofToString(testFile.getExtension()))){
+                            droppedFiles.push_back(dragInfo.files[i]);
+                        }
                     }
                 }
-            }
-            
-            droppedList.setup(droppedFiles);
-            updateTheListScrollBar();
-
-            if(droppedFiles.size() > 1){
-                moveToList();
-            } else if(droppedFiles.size() > 0){
-                ofLog(OF_LOG_VERBOSE, "Start LoadingMovie------------------------------------------------");
-                updateMovieFromDrop = TRUE;
+                
+                droppedList.setup(droppedFiles);
+                updateTheListScrollBar();
+                
+                if(droppedFiles.size() > 1){
+                    moveToList();
+                } else if(droppedFiles.size() > 0){
+                    ofLog(OF_LOG_VERBOSE, "Start LoadingMovie------------------------------------------------");
+                    updateMovieFromDrop = TRUE;
+                    
+                }
                 
             }
-
         }
+    } else {
+        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
     }
 }
 
@@ -1389,303 +1349,253 @@ void testApp::exit(){
 
 //--------------------------------------------------------------
 void testApp::guiEvent(ofxUIEventArgs &e){
-    string name = e.widget->getName();
-	ofLog(OF_LOG_VERBOSE, "got event from: " + name );
-
-	if(name == "LOADER")
-    {
-        ofxUISlider *slider = (ofxUISlider *) e.widget;
-        slider->update();
-    }
-    else if(name == "FULLSCREEN")
-    {
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        ofSetFullscreen(toggle->getValue());
-    }
-    else if(name == "RSLIDER")
-    {
-        if (uiRangeSliderTimeline->hitLow) {
-            if ((uiRangeSliderTimeline->getScaledValueHigh()-uiRangeSliderTimeline->getScaledValueLow() < numberOfStills)) {
-                uiRangeSliderTimeline->setValueLow(uiRangeSliderTimeline->getScaledValueHigh()-(numberOfStills-1));
-            }
-        }
-        if (uiRangeSliderTimeline->hitHigh) {
-            if ((uiRangeSliderTimeline->getScaledValueHigh()-uiRangeSliderTimeline->getScaledValueLow() < numberOfStills)) {
-                uiRangeSliderTimeline->setValueHigh(uiRangeSliderTimeline->getScaledValueLow()+(numberOfStills-1));
-            }
-        }
-        if (uiRangeSliderTimeline->hitCenter) {
-            if (uiRangeSliderTimeline->getScaledValueHigh() >= totalFrames-1) {
+    if (!lockedDueToInteraction && !lockedDueToPrinting) {
+        
+        string name = e.widget->getName();
+        ofLog(OF_LOG_VERBOSE, "got event from: " + name );
+        
+        if(name == "RSLIDER")
+        {
+            if (uiRangeSliderTimeline->hitLow) {
                 if ((uiRangeSliderTimeline->getScaledValueHigh()-uiRangeSliderTimeline->getScaledValueLow() < numberOfStills)) {
                     uiRangeSliderTimeline->setValueLow(uiRangeSliderTimeline->getScaledValueHigh()-(numberOfStills-1));
                 }
             }
-            if (uiRangeSliderTimeline->getScaledValueLow() == 0) {
+            if (uiRangeSliderTimeline->hitHigh) {
                 if ((uiRangeSliderTimeline->getScaledValueHigh()-uiRangeSliderTimeline->getScaledValueLow() < numberOfStills)) {
                     uiRangeSliderTimeline->setValueHigh(uiRangeSliderTimeline->getScaledValueLow()+(numberOfStills-1));
                 }
             }
-        }
-        uiSliderValueLow = uiRangeSliderTimeline->getScaledValueLow();
-        uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
-        manipulateSlider = TRUE;
-    }
-	else if(name == "Columns")
-	{
-		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-		ofLog(OF_LOG_VERBOSE, "Columns " + ofToString(slider->getScaledValue()));
-		gridColumns = (int)slider->getScaledValue();
-        updateDisplayGrid();
-	}
-
-	else if(name == "ThumbWidth")
-	{
-		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-		ofLog(OF_LOG_VERBOSE, "ThumbWidth " + ofToString(slider->getScaledValue()));
-		thumbWidth = possStillResWidth169[(int)slider->getScaledValue()];
-        calculateNewPrintGrid();
-	}
-	else if(name == "Select Output Folder")
-	{
-        ofxUIButton *button = (ofxUIButton *) e.widget;
-        if (button->getValue()) {
-            
-            string movieFileName = loadedMovie.gmMovie.getMoviePath();
-            movieFileName = loadedFilePath.getFileName(movieFileName, TRUE) + "_MoviePrint";
-
-            string formatExtension;
-            if (printFormat == OF_IMAGE_FORMAT_JPEG) {
-                formatExtension = "jpg";
-            } else {
-                formatExtension = "png";
+            if (uiRangeSliderTimeline->hitCenter) {
+                if (uiRangeSliderTimeline->getScaledValueHigh() >= totalFrames-1) {
+                    if ((uiRangeSliderTimeline->getScaledValueHigh()-uiRangeSliderTimeline->getScaledValueLow() < numberOfStills)) {
+                        uiRangeSliderTimeline->setValueLow(uiRangeSliderTimeline->getScaledValueHigh()-(numberOfStills-1));
+                    }
+                }
+                if (uiRangeSliderTimeline->getScaledValueLow() == 0) {
+                    if ((uiRangeSliderTimeline->getScaledValueHigh()-uiRangeSliderTimeline->getScaledValueLow() < numberOfStills)) {
+                        uiRangeSliderTimeline->setValueHigh(uiRangeSliderTimeline->getScaledValueLow()+(numberOfStills-1));
+                    }
+                }
             }
-            
-            ofFileDialogResult saveFileResult = ofSystemSaveDialog(movieFileName + "." + formatExtension, "Select a Folder");
-            if (saveFileResult.bSuccess){
-                vector<string> tempVectorString = ofSplitString(saveFileResult.getPath(), "/");
-                tempVectorString.pop_back();
-                saveMoviePrintPath = ofJoinString(tempVectorString, "/") + "/";
-                ofLogVerbose("User selected saveMoviePrintPath: "  + ofToString(saveMoviePrintPath));
-            } else {
-                ofLogVerbose("User hit cancel");
-            }
+            uiSliderValueLow = uiRangeSliderTimeline->getScaledValueLow();
+            uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
+            manipulateSlider = TRUE;
         }
-        uiLabelOutputFolder->setLabel(cropFrontOfString(saveMoviePrintPath, 40, "..."));
-	}
-	else if(name == "PrintScale")
-	{
-		ofxUISlider *slider = (ofxUISlider *) e.widget;
-		printScale = slider->getScaledValue();
-        ofLog(OF_LOG_VERBOSE, "PrintScale: " + ofToString(printScale));
-        if (isnan(printScale) || printScale > 20.0 || printScale < 1.0) {
-            printScale = 1.0;
+        else if(name == "Columns")
+        {
+            ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
+            ofLog(OF_LOG_VERBOSE, "Columns " + ofToString(slider->getScaledValue()));
+            gridColumns = (int)slider->getScaledValue();
+            updateDisplayGrid();
         }
-	}
-    else if(name == "PrintColumns")
-	{
-		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-		ofLog(OF_LOG_VERBOSE, "PrintColumns " + ofToString(slider->getScaledValue()));
-		printGridColumns = (int)slider->getScaledValue();
-        if (printGridSetWithColumnsAndRows) {
-            printNumberOfThumbs = printGridColumns * printGridRows;
+        
+        else if(name == "ThumbWidth")
+        {
+            ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
+            ofLog(OF_LOG_VERBOSE, "ThumbWidth " + ofToString(slider->getScaledValue()));
+            thumbWidth = possStillResWidth169[(int)slider->getScaledValue()];
             calculateNewPrintGrid();
-        } else {
-            printGridRows = ceil(numberOfStills/(float)printGridColumns);
-            calculateNewPrintSize();
         }
-	}
-	else if(name == "PrintRows")
-	{
-		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-		ofLog(OF_LOG_VERBOSE, "PrintRows " + ofToString(slider->getScaledValue()));
-		printGridRows = (int)slider->getScaledValue();
-		printNumberOfThumbs = printGridColumns * printGridRows;
-        calculateNewPrintGrid();
-	}
-	else if(name == "PrintNumber")
-	{
-		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-		ofLog(OF_LOG_VERBOSE, "PrintNumber " + ofToString(slider->getScaledValue()));
-		printNumberOfThumbs = (int)slider->getScaledValue();
-        calculateNewPrintGrid();
-	}
-    else if(name == "DisplayVideoAudioInfo")
-	{
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        bool val = toggle->getValue();
-        if (val) {
-            printDisplayVideoAudioInfo = true;
-        } else {
-            printDisplayVideoAudioInfo = false;
-        }
-        calculateNewPrintSize();
-	}
-    else if(name == "Save Individual Frames")
-	{
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        bool val = toggle->getValue();
-        if (val) {
-            printSingleFrames = true;
-        } else {
-            printSingleFrames = false;
-        }
-	}
-    else if(name == "TEXT INPUT")
-    {
-        ofxUITextInput *textinput = (ofxUITextInput *) e.widget;
-        if(textinput->getTriggerType() == OFX_UI_TEXTINPUT_ON_ENTER)
+        else if(name == "Select Output Folder")
         {
-            ofLog(OF_LOG_VERBOSE, "ON ENTER: ");
-            //            ofUnregisterKeyEvents((testApp*)this);
+            ofxUIButton *button = (ofxUIButton *) e.widget;
+            if (button->getValue()) {
+                
+                string movieFileName = loadedMovie.gmMovie.getMoviePath();
+                movieFileName = loadedFilePath.getFileName(movieFileName, TRUE) + "_MoviePrint";
+                
+                string formatExtension;
+                if (printFormat == OF_IMAGE_FORMAT_JPEG) {
+                    formatExtension = "jpg";
+                } else {
+                    formatExtension = "png";
+                }
+                
+                ofFileDialogResult saveFileResult = ofSystemSaveDialog(movieFileName + "." + formatExtension, "Select a Folder");
+                if (saveFileResult.bSuccess){
+                    vector<string> tempVectorString = ofSplitString(saveFileResult.getPath(), "/");
+                    tempVectorString.pop_back();
+                    saveMoviePrintPath = ofJoinString(tempVectorString, "/") + "/";
+                    ofLogVerbose("User selected saveMoviePrintPath: "  + ofToString(saveMoviePrintPath));
+                } else {
+                    ofLogVerbose("User hit cancel");
+                }
+            }
+            uiLabelOutputFolder->setLabel(cropFrontOfString(saveMoviePrintPath, 40, "..."));
         }
-        else if(textinput->getTriggerType() == OFX_UI_TEXTINPUT_ON_FOCUS)
+        else if(name == "PrintColumns")
         {
-            ofLog(OF_LOG_VERBOSE, "ON FOCUS: ");
-        }
-        else if(textinput->getTriggerType() == OFX_UI_TEXTINPUT_ON_UNFOCUS)
-        {
-            ofLog(OF_LOG_VERBOSE, "ON BLUR: ");
-            //            ofRegisterKeyEvents(this);
-        }
-        string output = textinput->getTextString();
-        ofLog(OF_LOG_VERBOSE, output );
-    }
-    else if(name == "Set Columns and Rows")
-	{
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        bool val = toggle->getValue();
-        if (val) {
-            if (!(printNumberOfThumbs == (printGridColumns * printGridRows))){
+            ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
+            ofLog(OF_LOG_VERBOSE, "PrintColumns " + ofToString(slider->getScaledValue()));
+            printGridColumns = (int)slider->getScaledValue();
+            if (printGridSetWithColumnsAndRows) {
                 printNumberOfThumbs = printGridColumns * printGridRows;
                 calculateNewPrintGrid();
+            } else {
+                printGridRows = ceil(numberOfStills/(float)printGridColumns);
+                calculateNewPrintSize();
             }
-            printGridSetWithColumnsAndRows = TRUE;
-            uiSliderPrintColumns->setVisible(TRUE);
-            uiSliderPrintRows->setVisible(TRUE);
-            uiSliderNumberOfThumbs->setVisible(FALSE);
         }
+        else if(name == "PrintRows")
+        {
+            ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
+            ofLog(OF_LOG_VERBOSE, "PrintRows " + ofToString(slider->getScaledValue()));
+            printGridRows = (int)slider->getScaledValue();
+            printNumberOfThumbs = printGridColumns * printGridRows;
+            calculateNewPrintGrid();
+        }
+        else if(name == "PrintNumber")
+        {
+            ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
+            ofLog(OF_LOG_VERBOSE, "PrintNumber " + ofToString(slider->getScaledValue()));
+            printNumberOfThumbs = (int)slider->getScaledValue();
+            calculateNewPrintGrid();
+        }
+        else if(name == "DisplayVideoAudioInfo")
+        {
+            ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+            bool val = toggle->getValue();
+            if (val) {
+                printDisplayVideoAudioInfo = true;
+            } else {
+                printDisplayVideoAudioInfo = false;
+            }
+            calculateNewPrintSize();
+        }
+        else if(name == "Save Individual Frames")
+        {
+            ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+            bool val = toggle->getValue();
+            if (val) {
+                printSingleFrames = true;
+            } else {
+                printSingleFrames = false;
+            }
+        }
+        else if(name == "Set Columns and Rows")
+        {
+            ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+            bool val = toggle->getValue();
+            if (val) {
+                if (!(printNumberOfThumbs == (printGridColumns * printGridRows))){
+                    printNumberOfThumbs = printGridColumns * printGridRows;
+                    calculateNewPrintGrid();
+                }
+                printGridSetWithColumnsAndRows = TRUE;
+                uiSliderPrintColumns->setVisible(TRUE);
+                uiSliderPrintRows->setVisible(TRUE);
+                uiSliderNumberOfThumbs->setVisible(FALSE);
+            }
+        }
+        else if(name == "Set Number of Frames")
+        {
+            ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+            bool val = toggle->getValue();
+            if (val) {
+                //            calculateNewPrintGrid(); // not necessary as the number is the same
+                printGridSetWithColumnsAndRows = FALSE;
+                uiSliderPrintRows->setVisible(FALSE);
+                uiSliderPrintColumns->setVisible(true);
+                uiSliderNumberOfThumbs->setVisible(true);
+            }
+        }
+        else if(name == "PrintMargin")
+        {
+            ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
+            ofLog(OF_LOG_VERBOSE, "PrintMargin " + ofToString(slider->getScaledValue()));
+            printGridMargin = (int)slider->getScaledValue();
+            calculateNewPrintSize();
+        }
+        else if(name == "TimeCode")
+        {
+            ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+            bool val = toggle->getValue();
+            if (val) {
+                loadedMovie.gmShowFramesUI = TRUE;
+                loadedMovie.vfFramesToTimeSwitch = TRUE;
+            }
+            
+        }
+        else if(name == "Frames")
+        {
+            ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+            bool val = toggle->getValue();
+            if (val) {
+                loadedMovie.gmShowFramesUI = TRUE;
+                loadedMovie.vfFramesToTimeSwitch = FALSE;
+            }
+        }
+        else if(name == "off")
+        {
+            ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+            bool val = toggle->getValue();
+            if (val) {
+                loadedMovie.gmShowFramesUI = FALSE;
+            }
+        }
+        else if(name == "jpg")
+        {
+            ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+            bool val = toggle->getValue();
+            if (val) {
+                printFormat = OF_IMAGE_FORMAT_JPEG;
+            }
+        }
+        else if(name == "png with alpha")
+        {
+            ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+            bool val = toggle->getValue();
+            if (val) {
+                printFormat = OF_IMAGE_FORMAT_PNG;
+            }
+        }
+        else if(name == "1024px wide")
+        {
+            ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+            bool val = toggle->getValue();
+            if (val) {
+                printSizeWidth = 1024;
+            }
+        }
+        else if(name == "2048px wide")
+        {
+            ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+            bool val = toggle->getValue();
+            if (val) {
+                printSizeWidth = 2048;
+            }
+        }
+        else if(name == "3072px wide")
+        {
+            ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+            bool val = toggle->getValue();
+            if (val) {
+                printSizeWidth = 3072;
+            }
+        }
+        else if(name == "4096px wide")
+        {
+            ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+            bool val = toggle->getValue();
+            if (val) {
+                printSizeWidth = 4096;
+            }
+        }
+    } else {
+        ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
     }
-    else if(name == "Set Number of Frames")
-	{
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        bool val = toggle->getValue();
-        if (val) {
-//            calculateNewPrintGrid(); // not necessary as the number is the same
-            printGridSetWithColumnsAndRows = FALSE;
-            uiSliderPrintRows->setVisible(FALSE);
-            uiSliderPrintColumns->setVisible(true);
-            uiSliderNumberOfThumbs->setVisible(true);
-        }
-	}
-    else if(name == "PrintMargin")
-	{
-		ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-		ofLog(OF_LOG_VERBOSE, "PrintMargin " + ofToString(slider->getScaledValue()));
-		printGridMargin = (int)slider->getScaledValue();
-        calculateNewPrintSize();
-	}
-    else if(name == "TimeCode")
-	{
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        bool val = toggle->getValue();
-        if (val) {
-            loadedMovie.gmShowFramesUI = TRUE;
-            loadedMovie.vfFramesToTimeSwitch = TRUE;
-        }
-
-	}
-    else if(name == "Frames")
-	{
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        bool val = toggle->getValue();
-        if (val) {
-            loadedMovie.gmShowFramesUI = TRUE;
-            loadedMovie.vfFramesToTimeSwitch = FALSE;
-        }
-	}
-    else if(name == "off")
-	{
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        bool val = toggle->getValue();
-        if (val) {
-            loadedMovie.gmShowFramesUI = FALSE;
-        }
-	}
-    else if(name == "jpg")
-	{
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        bool val = toggle->getValue();
-        if (val) {
-            printFormat = OF_IMAGE_FORMAT_JPEG;
-        }
-	}
-    else if(name == "png with alpha")
-	{
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        bool val = toggle->getValue();
-        if (val) {
-            printFormat = OF_IMAGE_FORMAT_PNG;
-        }
-	}
-    else if(name == "1024px wide")
-	{
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        bool val = toggle->getValue();
-        if (val) {
-            printSizeWidth = 1024;
-        }
-	}
-    else if(name == "2048px wide")
-	{
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        bool val = toggle->getValue();
-        if (val) {
-            printSizeWidth = 2048;
-        }
-	}
-    else if(name == "3072px wide")
-	{
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        bool val = toggle->getValue();
-        if (val) {
-            printSizeWidth = 3072;
-        }
-	}
-    else if(name == "4096px wide")
-	{
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        bool val = toggle->getValue();
-        if (val) {
-            printSizeWidth = 4096;
-        }
-	}
 
 }
 
 //--------------------------------------------------------------
 void testApp::scrollEvent(ofVec2f &e){
     if (!updateScrub) {
-        if (showDroppedList) {
+        if (showListView) {
             scrollList = TRUE;
         } else {
             scrollGrid = TRUE;
         }
-    }
-}
-
-//--------------------------------------------------------------
-void testApp::menuIsOpened(int &e){
-    ofLog(OF_LOG_VERBOSE, "menuIsOpened:" + ofToString(e));
-    if (e == 5) {
-        setVisibilityMoviePrintPreview(true);
-    }
-}
-
-//--------------------------------------------------------------
-void testApp::menuIsClosed(int &e){
-    ofLog(OF_LOG_VERBOSE, "menuIsClosed:" + ofToString(e));
-    if (e == 5) {
-        setVisibilityMoviePrintPreview(false);
     }
 }
 
@@ -1788,7 +1698,7 @@ void testApp::setVisibilityMoviePrintPreview(bool _visibility){
 
 //--------------------------------------------------------------
 void testApp::drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeingPrinted, float _scrollAmountRel, bool _showPlaceHolder){
-    
+    ofPushMatrix();
     ofPushStyle();
     float _scrollAmount = 0;
     if (scrollBar.sbActive) {
@@ -1802,11 +1712,12 @@ void testApp::drawDisplayGrid(float _scaleFactor, bool _hideInPNG, bool _isBeing
 //    ofLog(OF_LOG_VERBOSE, "_scrollAmount:"+ ofToString(_scrollAmount) +  " tempY:"+ ofToString(tempY) +  "_scrollAmount:"+ ofToString(_scrollAmount));
     loadedMovie.drawGridOfStills(tempX, tempY, gridColumns, displayGridMargin, _scrollAmount, _scaleFactor, 1, _isBeingPrinted, TRUE, superKeyPressed, shiftKeyPressed, _showPlaceHolder);
     ofPopStyle();
+    ofPopMatrix();
 }
 
 //--------------------------------------------------------------
 void testApp::drawList(float _scrollAmountRel){
-    
+    if (droppedFiles.size() > 1){
     float _scrollAmount = 0;
     if (scrollBarList.sbActive) {
 //        _scrollAmount = ((droppedList.getListHeight()-scrollBarList.sbAreaHeight)+(bottomMargin+topMargin)*2)*(1-_scrollAmountRel)+(ofGetHeight()/2 - droppedList.getListHeight()/2)-(bottomMargin+topMargin);
@@ -1815,19 +1726,15 @@ void testApp::drawList(float _scrollAmountRel){
     if (isnan(_scrollAmount)) {
         _scrollAmount = 0;
     }
-//    ofLog(OF_LOG_VERBOSE, "droppedList.getListHeight(): " + ofToString(droppedList.getListHeight()));
-//    ofLog(OF_LOG_VERBOSE, "scrollBarList.sbAreaHeight: " + ofToString(scrollBarList.sbAreaHeight));
-//    ofLog(OF_LOG_VERBOSE, "_scrollAmountRel: " + ofToString(_scrollAmountRel));
-//    ofLog(OF_LOG_VERBOSE, "_scrollAmount: " + ofToString(_scrollAmount));
 
-    ofPushStyle();
+        ofPushStyle();
     ofSetColor(255, 255, 255, 255);
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
     ofPopStyle();
     
     droppedList.draw(leftMargin - listWidth + listWidth * tweenListInOut.update(), topMargin + headerHeight, ofGetWidth() - scrollBarWidth - rightMargin - leftMargin, _scrollAmount);
 
-    
+    }
 }
 
 //--------------------------------------------------------------
@@ -1852,8 +1759,11 @@ void testApp::drawMovieInfo(float _x, float _y, float _fade){
 
 //--------------------------------------------------------------
 void testApp::drawPrintScreen(){
-    
+    ofPushMatrix();
     ofPushStyle();
+    if (showListView) {
+        ofTranslate(-ofGetWindowWidth(), 0);
+    }
     ofEnableAlphaBlending();
     ofSetColor(255, 255, 255, 127);
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
@@ -1865,36 +1775,18 @@ void testApp::drawPrintScreen(){
 
     }
     ofPopStyle();
-    
+    ofPopMatrix();
 }
 
 //--------------------------------------------------------------
 void testApp::drawStartScreen(){
-
+    ofPushMatrix();
     ofPushStyle();
     ofSetColor(255, 255, 255, 255);
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
     startImage.draw(ofGetWidth()/2-startImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-startImage.getHeight()/2);
     ofPopStyle();
-    
-}
-
-//--------------------------------------------------------------
-void testApp::drawResizeScreen(){
-    
-    
-    ofPushStyle();
-    ofSetColor(255, 255, 255, 255);
-    backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
-    
-    for(int i=0; i<(numberOfStills+gridColumns); i++)
-    {
-        ofSetColor(30,(int)scrubFade);
-        ofRectRounded(((thumbWidth+displayGridMargin)*(i%gridColumns))+(ofGetWidth()/2 - displayGridWidth/2), ((thumbHeight+displayGridMargin)*(i/gridColumns))+(ofGetHeight()/2 - displayGridHeight/2), thumbWidth, thumbHeight, thumbWidth/64);
-    }
-
-    ofPopStyle();
-
+    ofPopMatrix();
 }
 
 //--------------------------------------------------------------
@@ -2121,11 +2013,10 @@ void testApp::printImageToFile(int _printSizeWidth){
     }
     
     if (!currPrintingList) {
-        timer.setStartTime();
-        finishedPrinting = TRUE;
+        stopPrinting();
+    } else {
+        ofLog(OF_LOG_VERBOSE, "Finished Printing file in list------------------------------- currPrintingList" + ofToString(currPrintingList));
     }
-    activateAllMenus();
-    ofLog(OF_LOG_VERBOSE, "Finished Printing-------------------------------------------- currPrintingList" + ofToString(currPrintingList));
     
 }
 
@@ -2165,10 +2056,7 @@ void testApp::printListToFile(){
         }
     }
     if (tempIterator >= droppedList.glDroppedItem.size()) {
-        currPrintingList = FALSE;
-        moveToList();
-        activateAllMenus();
-        ofLog(OF_LOG_VERBOSE, "Finished Printing List-------------------------------------------");
+        stopListPrinting();
     }
 
     timer.setStartTime();
@@ -2345,52 +2233,159 @@ void testApp::updateAllStills(){
         ofxNotify() << "Thread is started - " + ofToString(numberOfStills) + " Stills are being updated";
 }
 
+//--------------------------------------------------------------
+void testApp::menuIsOpened(int &e){
+    ofLog(OF_LOG_VERBOSE, "menuIsOpened:" + ofToString(e));
+    if (e == 5) {
+        setVisibilityMoviePrintPreview(true);
+    }
+    allMenusAreClosed = false;
+    allMenusAreClosedOnce = 1;
+}
 
+//--------------------------------------------------------------
+void testApp::menuIsClosed(int &e){
+    ofLog(OF_LOG_VERBOSE, "menuIsClosed:" + ofToString(e));
+    if (e == 5) {
+        setVisibilityMoviePrintPreview(false);
+    }
+    if (!menuMovieInfo.getMenuActivated() && !menuMoviePrintSettings.getMenuActivated() && !menuHelp.getMenuActivated()) {
+        allMenusAreClosed = true;
+        allMenusAreClosedOnce = 0;
+        ofLog(OF_LOG_VERBOSE, "allMenusAreClosed:" + ofToString(allMenusAreClosedOnce));
+    }
+}
+
+//--------------------------------------------------------------
+void testApp::startPrinting(){
+    lockedDueToPrinting = true;
+    inactivateAllMenus();
+    ofLog(OF_LOG_VERBOSE, "Start Printing------------------------------------------------");
+    printImageToFile(printSizeWidth);
+}
+
+//--------------------------------------------------------------
+void testApp::stopPrinting(){
+    timer.setStartTime();
+    finishedPrinting = TRUE;
+    activateAllMenus();
+    droppedList.enableMouseEvents();
+    lockedDueToPrinting = false;
+    ofLog(OF_LOG_VERBOSE, "Finished Printing-------------------------------------------- ");
+}
+
+//--------------------------------------------------------------
+void testApp::startListPrinting(){
+    lockedDueToPrinting = true;
+    inactivateAllMenus();
+    ofLog(OF_LOG_VERBOSE, "Start Printing List-------------------------------------------");
+    itemToPrint = 0;
+    droppedList.disableMouseEvents(droppedFiles.size());
+    resetItemsToPrint();
+    printListToFile();
+}
+
+//--------------------------------------------------------------
+void testApp::stopListPrinting(){
+    currPrintingList = FALSE;
+    moveToList();
+    activateAllMenus();
+    droppedList.enableMouseEvents();
+    lockedDueToPrinting = false;
+    ofLog(OF_LOG_VERBOSE, "Finished Printing List-------------------------------------------");
+}
 
 //--------------------------------------------------------------
 void testApp::moveToMovie(){
+    lockedDueToInteraction = true;
+    closeAllMenus();
     
-    showDroppedList = FALSE;
+    showListView = FALSE;
     
     droppedList.disableMouseEvents(droppedFiles.size());
     loadedMovie.enableMouseEvents();
+    
     scrollBarList.unregisterMouseEvents();
     scrollBarList.unregisterTouchEvents();
     scrollBar.registerMouseEvents();
     scrollBar.registerTouchEvents();
-    guiTimeline->setVisible(TRUE);
-    printListNotImage = FALSE;
     
+    guiTimeline->setVisible(TRUE);
+    
+    printListNotImage = FALSE;
     updateInOut = FALSE;
     manipulateSlider = FALSE;
-    tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),0);
+    
+    if (tweenListInOut.update() != 0.0) {
+        tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),0);
+    }
 
 }
 
 //--------------------------------------------------------------
 void testApp::moveToList(){
+    lockedDueToInteraction = true;
+    closeAllMenus();
     
-    showDroppedList = TRUE;
+    showListView = TRUE;
+    
     scrollBar.unregisterMouseEvents();
     scrollBar.unregisterTouchEvents();
+    
     scrollBarList.registerMouseEvents();
     scrollBarList.registerTouchEvents();
+    
     loadedMovie.stop(TRUE);
     loadedMovie.disableMouseEvents();
+    
     guiTimeline->setVisible(FALSE);
+    
     droppedList.enableMouseEvents();
     printListNotImage = TRUE;
     
-    tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,ofRandom(600, 1000),0);
-
+    if (tweenListInOut.update() != 1.0) {
+        tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,ofRandom(600, 1000),0);
+    }
+}
+//--------------------------------------------------------------
+void testApp::handlingEventOverlays(){
+    // check if one of the topMenus is active and in this case turn of the mouseEvents for the thumbs
+    if (menuMovieInfo.getMenuActivated() || menuSettings.getMenuActivated() || menuMoviePrintPreview.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated()) {
+        if (loadedMovie.getMouseEventsEnabled()) {
+            loadedMovie.disableMouseEvents();
+        }
+        if (showListView) {
+            droppedList.disableMouseEvents(droppedFiles.size());
+        }
+    } else {
+        if (allMenusAreClosedOnce == 0) {
+            if (!lockedDueToInteraction && !lockedDueToPrinting) {
+                allMenusAreClosedOnce++;
+                if (!loadedMovie.getMouseEventsEnabled() && !showListView) {
+                    loadedMovie.enableMouseEvents();
+                }
+                if (showListView) {
+                    droppedList.enableMouseEvents();
+                }
+            }
+        }
+    }
 }
 
+//--------------------------------------------------------------
+void testApp::closeAllMenus(){
+    menuMoviePrintSettings.closeMenuManually();
+    menuMovieInfo.closeMenuManually();
+    menuHelp.closeMenuManually();
+    ofLog(OF_LOG_VERBOSE, "closeMenuManually-------------------------------------------");
+}
 
 //--------------------------------------------------------------
 void testApp::inactivateAllMenus(){
     menuMoviePrintSettings.setMenuInactive();
     menuMovieInfo.setMenuInactive();
     menuHelp.setMenuInactive();
+    ofLog(OF_LOG_VERBOSE, "inactivateAllMenus-------------------------------------------");
 }
 
 //--------------------------------------------------------------
@@ -2398,6 +2393,7 @@ void testApp::activateAllMenus(){
     menuMoviePrintSettings.setMenuActive();
     menuMovieInfo.setMenuActive();
     menuHelp.setMenuActive();
+    ofLog(OF_LOG_VERBOSE, "activateAllMenus-------------------------------------------");
 }
 
 //--------------------------------------------------------------

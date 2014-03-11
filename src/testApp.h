@@ -79,6 +79,12 @@ public:
     void menuIsClosed(int &e);
     void inactivateAllMenus();
     void activateAllMenus();
+    void closeAllMenus();
+    void startPrinting();
+    void stopPrinting();
+    void startListPrinting();
+    void stopListPrinting();
+    void handlingEventOverlays();
 
     void updateTimeSlider(bool _wholeRange);
     void drawPrintScreen();
@@ -140,7 +146,10 @@ public:
     bool updateInOut; // manipulated slider plus fading
     bool updateScrub; // scrubbing plus fading
     bool updateDropped;
-    bool showDroppedList;
+    bool showListView;
+    bool showMovieView;
+    bool lockedDueToInteraction;
+    bool lockedDueToPrinting;
     bool updateNewPrintGrid;
     bool updateMovieFromList;
     
@@ -153,7 +162,8 @@ public:
     
     bool updateMovieFromDrop;
     bool currPrintingList;
-
+    bool allMenusAreClosed;
+    int allMenusAreClosedOnce;
     
     int currentKey = -1;
     
