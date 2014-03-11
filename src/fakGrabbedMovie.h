@@ -814,7 +814,7 @@ public:
         {
             float tempX = (_x + _gridMargin + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor;
             float tempY = (_y + _gridMargin + (gmThumbHeight+_gridMargin)*(i/_gridColumns)) * _scaleFactor;
-            if ((_gridColumns * _gridRows) > gmNumberOfStills) {
+            if (((_gridColumns * _gridRows) > gmNumberOfStills) || !isMovieLoaded) {
                 printStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, true);
             } else {
                 printStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, _drawPlaceHolder);

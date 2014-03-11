@@ -891,89 +891,87 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
     
-    if(showLoadMovieScreen){
-        
-        drawLoadMovieScreen();
     
-    } else {
-
-        if (!(tweenListInOut.update() == 0.0)) { // stop drawing when position is at showMovieView
-            
-            drawList(scrollListAmountRel);
-            scrollBarList.draw();
-            
-        }
+    if (!(tweenListInOut.update() == 0.0)) { // stop drawing when position is at showMovieView
         
-        if (!(tweenListInOut.update() == 1.0)) { // stop drawing when position is at showListView
-            
-            if (!loadedMovie.isMovieLoaded) { // if no movie is loaded
-                if (!showListView) {
-                    guiTimeline->setVisible(FALSE);
-                    drawStartScreen();
-                }
-                
-            } else {
-                
-                // draw all frames
-                drawDisplayGrid(1, FALSE, FALSE, scrollAmountRel, showPlaceHolder);
-                
-                // draw the In and Out Point Manipulations
-                if (updateInOut) {
-
-                    ofPushStyle();
-                    
-                    ofEnableAlphaBlending();
-                    ofSetColor(0,(int)(scrubFade/255)*155);
-                    ofRect(0, 0, ofGetWidth(), ofGetHeight());
-                    ofSetColor(255,255,255,(int)scrubFade);
-
-                    loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
-                    loadedMovie.drawStillUI(scrubWindowGridNumber, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (scrubFade/255));
-                    
-                    ofSetColor(255, 255, 255, (int)(scrubFade/255)*255);
-                    
-                    if (uiRangeSliderTimeline->hitLow) {
-                        inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-inPointImage.getHeight()/2);
-                    }
-                    if (uiRangeSliderTimeline->hitHigh) {
-                        outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-outPointImage.getHeight()/2);
-                    }
-                    if (uiRangeSliderTimeline->hitCenter) {
-                        inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-inPointImage.getHeight()/2);
-                        outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-outPointImage.getHeight()/2);
-                    }
-                    
-                    if(scrubFade < 5){
-                        updateInOut = FALSE;
-                        manipulateSlider = FALSE;
-                    }
-
-                    ofSetColor(255);
-
-                    ofPopStyle();
-
-                }
-                
-                // draw the scrubbed video
-                if (updateScrub) {
-                    drawScrubScreen(1.0);
-                }
-                
-                scrollBar.draw();
-                
-            }
-            
-        }
+        drawList(scrollListAmountRel);
+        scrollBarList.draw();
         
-        if (showPrintScreen) {
-            drawPrintScreen();
-        } else {
-            if(showUpdateScreen){
-                drawUpdateScreen();
-            }
-        }
-        drawUI(1, FALSE);
     }
+    
+    if (!(tweenListInOut.update() == 1.0)) { // stop drawing when position is at showListView
+        
+        if (!loadedMovie.isMovieLoaded) { // if no movie is loaded
+            if (!showListView) { // if no List View
+                guiTimeline->setVisible(FALSE);
+                drawStartScreen();
+            }
+            
+        } else {
+            
+            // draw all frames
+            drawDisplayGrid(1, FALSE, FALSE, scrollAmountRel, showPlaceHolder);
+            
+            // draw the In and Out Point Manipulations
+            if (updateInOut) {
+                
+                ofPushStyle();
+                
+                ofEnableAlphaBlending();
+                ofSetColor(0,(int)(scrubFade/255)*155);
+                ofRect(0, 0, ofGetWidth(), ofGetHeight());
+                ofSetColor(255,255,255,(int)scrubFade);
+                
+                loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
+                loadedMovie.drawStillUI(scrubWindowGridNumber, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (scrubFade/255));
+                
+                ofSetColor(255, 255, 255, (int)(scrubFade/255)*255);
+                
+                if (uiRangeSliderTimeline->hitLow) {
+                    inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-inPointImage.getHeight()/2);
+                }
+                if (uiRangeSliderTimeline->hitHigh) {
+                    outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-outPointImage.getHeight()/2);
+                }
+                if (uiRangeSliderTimeline->hitCenter) {
+                    inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-inPointImage.getHeight()/2);
+                    outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-outPointImage.getHeight()/2);
+                }
+                
+                if(scrubFade < 5){
+                    updateInOut = FALSE;
+                    manipulateSlider = FALSE;
+                }
+                
+                ofSetColor(255);
+                
+                ofPopStyle();
+                
+            }
+            
+            // draw the scrubbed video
+            if (updateScrub) {
+                drawScrubScreen(1.0);
+            }
+            
+            scrollBar.draw();
+            
+        }
+        
+    }
+    
+    if(showLoadMovieScreen){
+        drawLoadMovieScreen();
+    } else if (showPrintScreen) {
+        drawPrintScreen();
+    } else {
+        if(showUpdateScreen){
+            drawUpdateScreen();
+    }
+        
+    }
+    drawUI(1, FALSE);
+    
     
     ofxNotify::draw(drawNotify);
 }
@@ -1601,7 +1599,7 @@ void testApp::scrollEvent(ofVec2f &e){
 
 //--------------------------------------------------------------
 void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
-    
+    ofPushMatrix();
     ofPushStyle();
     ofSetColor(255);
 
@@ -1646,37 +1644,45 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     float tempY = 0;
     int tempXPos = 0;
     int menuHeightInRows = 4;
+    int originalThumbHeight = 144;
     
-    tempXPos = 0;
-    menuMovieInfo.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
-    menuMovieInfo.drawMenu();
-    drawMovieInfo((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuMovieInfo.getRelSizeH());
-    fontStashHelveticaMedium.draw(loadedMovie.gmMIFileName, 10, (int)(leftMargin + 33 * _scaleFactor), (int)((0 + headerHeight*0.6) * _scaleFactor));
+    if (loadedMovie.isMovieLoaded) {
+        tempXPos = 0;
+        menuMovieInfo.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+        menuMovieInfo.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
+        menuMovieInfo.drawMenu();
+        drawMovieInfo((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*3, menuMovieInfo.getRelSizeH());
+        fontStashHelveticaMedium.draw(loadedMovie.gmMIFileName, 10, (int)(leftMargin + 33 * _scaleFactor), (int)((0 + headerHeight*0.6) * _scaleFactor));
+    }
     
     tempXPos = gridColumns-1;
     menuMoviePrintSettings.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
+    menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMoviePrintSettings.drawMenu();
     
     tempXPos = gridColumns-2;
     menuHelp.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuHelp.setSize(thumbWidth, headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
+    menuHelp.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuHelp.drawMenu();
     ofSetColor(255, 255, 255, menuHelp.getRelSizeH() * 255);
     helpMenuImage.draw((leftMargin + displayGridMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, headerHeight + displayGridMargin*1, helpMenuImage.getWidth(), helpMenuImage.getHeight() * menuHelp.getRelSizeH());
     ofSetColor(255, 255, 255, 255);
     
-    menuTimeline.setPosition(0, ofGetWindowHeight());
-    menuTimeline.setSize(ofGetWindowWidth(), footerHeight/2);
-    menuTimeline.drawMenu();
+    if (!showListView) {
+        if (loadedMovie.isMovieLoaded) {
+            menuTimeline.setPosition(0, ofGetWindowHeight());
+            menuTimeline.setSize(ofGetWindowWidth(), footerHeight/2);
+            menuTimeline.drawMenu();
+        }
+    }
     
     ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
-    fboToPreview.draw((leftMargin + (thumbWidth + displayGridMargin)*(gridColumns/2) + thumbWidth/2), headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin, tweenMoviePrintPreview.update() * fboToPreviewWidth, tweenMoviePrintPreview.update() * fboToPreviewHeight);
-//    fboToPreview.draw((leftMargin + listWidth * tweenListInOut.update() + (thumbWidth + displayGridMargin)*(gridColumns/2) + thumbWidth/2), headerHeight + topMargin + (thumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin, tweenMoviePrintPreview.update() * fboToPreviewWidth, tweenMoviePrintPreview.update() * fboToPreviewHeight);
+    fboToPreview.draw((leftMargin + (thumbWidth + displayGridMargin)*(gridColumns/2) + thumbWidth/2), headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin, tweenMoviePrintPreview.update() * fboToPreviewWidth, tweenMoviePrintPreview.update() * fboToPreviewHeight);
     ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
     
+    
     ofPopStyle;
+    ofPopMatrix();
 }
 
 //--------------------------------------------------------------
@@ -1759,8 +1765,8 @@ void testApp::drawMovieInfo(float _x, float _y, float _fade){
 
 //--------------------------------------------------------------
 void testApp::drawPrintScreen(){
-    ofPushMatrix();
     ofPushStyle();
+    ofPushMatrix();
     if (showListView) {
         ofTranslate(-ofGetWindowWidth(), 0);
     }
@@ -1774,8 +1780,8 @@ void testApp::drawPrintScreen(){
         printImage.draw(ofGetWidth()/2-printImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-printImage.getHeight()/2);
 
     }
-    ofPopStyle();
     ofPopMatrix();
+    ofPopStyle();
 }
 
 //--------------------------------------------------------------
@@ -1819,7 +1825,7 @@ void testApp::drawUpdateScreen(){
 void testApp::drawLoadMovieScreen(){
 
     ofPushStyle();
-    ofSetColor(255, 255, 255, 255);
+    ofSetColor(255, 255, 255, 100);
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
     loadMovieImage.draw(ofGetWidth()/2-loadMovieImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-loadMovieImage.getHeight()/2);
     ofPopStyle();
@@ -2311,6 +2317,8 @@ void testApp::moveToMovie(){
     scrollBar.registerTouchEvents();
     
     guiTimeline->setVisible(TRUE);
+    menuTimeline.registerMouseEvents();
+    menuTimeline.setMenuActive();
     
     printListNotImage = FALSE;
     updateInOut = FALSE;
@@ -2339,6 +2347,8 @@ void testApp::moveToList(){
     loadedMovie.disableMouseEvents();
     
     guiTimeline->setVisible(FALSE);
+    menuTimeline.unRegisterMouseEvents();
+    menuTimeline.setMenuInactive();
     
     droppedList.enableMouseEvents();
     printListNotImage = TRUE;
