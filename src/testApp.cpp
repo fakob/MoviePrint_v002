@@ -118,7 +118,7 @@ void testApp::setup(){
     fboToPreviewWidth = 1320 - leftMargin - rightMargin - thumbWidth*2 - displayGridMargin*2;
     fboToPreviewHeight = 660 - headerHeight - footerHeight;
     
-    fboToPreview.allocate(fboToPreviewWidth, fboToPreviewHeight, GL_RGBA );
+    fboToPreview.allocate(fboToPreviewWidth, fboToPreviewHeight, GL_RGBA);
     
     counterToUpdate = 0;
     counterToLoad = 0;
@@ -1883,11 +1883,21 @@ void testApp::printImageToFile(int _printSizeWidth){
         float _newScaleFactor = (float)_printSizeWidth / (float)(printGridWidth);
         int outputWidth = printGridWidth * _newScaleFactor;
         int outputHeight = printGridHeight * _newScaleFactor;
-//        if (outputWidth > 9999.0) {
-//            _scaleFactor = 9950.0 / (gridAreaWidth + gridMargin * 2);
-//            outputWidth = (gridAreaWidth + gridMargin * 2) * _scaleFactor;
-//            outputHeight = (gridAreaHeight + gridMargin * 2) * _scaleFactor;
-//        }
+        ofLog(OF_LOG_VERBOSE, "outputSize before: " + ofToString(outputWidth) + "x" + ofToString(outputHeight));
+        int tempMaxDimension = 16000;
+        if (outputWidth > outputHeight) {
+            if (outputWidth > tempMaxDimension) {
+                _newScaleFactor = tempMaxDimension / printGridWidth;
+                outputWidth = tempMaxDimension;
+                outputHeight = printGridHeight * _newScaleFactor;
+            }
+        } else {
+            if (outputHeight > tempMaxDimension) {
+                _newScaleFactor = tempMaxDimension / printGridHeight;
+                outputHeight = tempMaxDimension;
+                outputWidth = printGridWidth * _newScaleFactor;
+            }
+        }
         
         if (printFormat == OF_IMAGE_FORMAT_JPEG) {
             // make sure that the jpg size can be divided by 4
@@ -1903,12 +1913,12 @@ void testApp::printImageToFile(int _printSizeWidth){
             if ((outputHeight%4) == 2) {
                 outputHeight = outputHeight + 2;
             }
-            ofLog(OF_LOG_VERBOSE, "outputSize " + ofToString(outputWidth) + "x" + ofToString(outputHeight));
-
+            ofLog(OF_LOG_VERBOSE, "outputSize: " + ofToString(outputWidth) + "x" + ofToString(outputHeight));
             fboToSave.allocate(outputWidth, outputHeight, GL_RGB);
             gmPixToSave.allocate(outputWidth, outputHeight, OF_PIXELS_RGB);
         }
         else {
+            ofLog(OF_LOG_VERBOSE, "outputSize: " + ofToString(outputWidth) + "x" + ofToString(outputHeight));
             fboToSave.allocate(outputWidth, outputHeight, GL_RGBA);
             gmPixToSave.allocate(outputWidth, outputHeight, OF_PIXELS_RGB);
         }
