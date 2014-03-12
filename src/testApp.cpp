@@ -20,7 +20,7 @@
 
 #define FAK_WHITE ofColor(255, 255, 255, 255)
 #define FAK_BLACK ofColor(0, 0, 0, 255)
-#define FAK_SHADOW ofColor(0, 0, 0, 32)
+#define FAK_SHADOW ofColor(0, 0, 0, 130)
 #define FAK_GRAY ofColor(59, 59, 59, 255)
 
 //--------------------------------------------------------------
@@ -184,23 +184,27 @@ void testApp::setup(){
     guiSettingsMoviePrint->loadSettings("guiMoviePrintSettings.xml");
 
 
-    menuMovieInfo.setupMenu(1,0,0,0,0,headerHeight, true, true, false);
+    menuMovieInfo.setupMenu(1,0,0,0,0,headerHeight, true, 'T', false);
     menuMovieInfo.registerMouseEvents();
     ofAddListener(menuMovieInfo.mMenuIsBeingOpened, this, &testApp::menuIsOpened);
     ofAddListener(menuMovieInfo.mMenuIsBeingClosed, this, &testApp::menuIsClosed);
     
-    menuMoviePrintSettings.setupMenu(5,0,0,0,0,headerHeight, true, true, false);
+    menuMoviePrintSettings.setupMenu(5,0,0,0,0,headerHeight, true, 'T', false);
     menuMoviePrintSettings.registerMouseEvents();
     ofAddListener(menuMoviePrintSettings.mMenuIsBeingOpened, this, &testApp::menuIsOpened);
     ofAddListener(menuMoviePrintSettings.mMenuIsBeingClosed, this, &testApp::menuIsClosed);
     
-    menuHelp.setupMenu(2,0,0,0,0,headerHeight, true, true, false);
+    menuHelp.setupMenu(2,0,0,0,0,headerHeight, true, 'T', false);
     menuHelp.registerMouseEvents();
     ofAddListener(menuHelp.mMenuIsBeingOpened, this, &testApp::menuIsOpened);
     ofAddListener(menuHelp.mMenuIsBeingClosed, this, &testApp::menuIsClosed);
     
-    menuTimeline.setupMenu(0,0,0,0,0,footerHeight/2, true, false, false);
+    menuTimeline.setupMenu(0,0,0,0,0,footerHeight/2, true, 'B', false);
     menuTimeline.registerMouseEvents();
+    
+    menuMoveToList.setupMenu(6,0,0,0,0,leftMargin*2, true, 'L', false);
+    menuMoveToList.registerMouseEvents();
+    ofAddListener(menuMoveToList.mMenuIsBeingClicked, this, &testApp::menuIsClicked);
     
     moveInOutTimeline();
     
@@ -1094,7 +1098,7 @@ void testApp::mousePressed(int x, int y, int button){
                 
                 
                 if (!showListView) {
-                    if (!(menuMovieInfo.getMenuActivated() || menuSettings.getMenuActivated() || menuMoviePrintPreview.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated())) {
+                    if (!(menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated())) {
                         if (loadedMovie.grabbedStill[loadedMovie.gmRollOverMovieID].gsRollOver){
                             
                             rollOverMovieID = loadedMovie.gmRollOverMovieID;
@@ -1179,7 +1183,12 @@ void testApp::windowResized(int w, int h){
 void testApp::updateAllLimits(){
     loadedMovie.setAllLimitsUpper(headerHeight);
     droppedList.setAllLimitsUpper(headerHeight);
-    loadedMovie.setAllLimitsLeft(leftMargin);
+    if (droppedFiles.size() > 1) { // Limit for menuMoveToList
+        ofLog(OF_LOG_VERBOSE, "setLeftLimits for menuMoveToList" + ofToString(leftMargin*4));
+        loadedMovie.setAllLimitsLeft(leftMargin*4);
+    } else {
+        loadedMovie.setAllLimitsLeft(leftMargin);
+    }
     droppedList.setAllLimitsLeft(leftMargin);
     loadedMovie.setAllLimitsLower(ofGetHeight());
     droppedList.setAllLimitsLower(ofGetHeight());
@@ -1546,6 +1555,16 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
     ofPopStyle();
     
+    if (droppedFiles.size() > 1) { // draw
+        if (loadedMovie.isMovieLoaded) {
+            if (showListView == FALSE) {
+                menuMoveToList.setPosition(0, 0);
+                menuMoveToList.setSize(leftMargin*2, ofGetWindowHeight());
+                menuMoveToList.drawMenu();
+            }
+        }
+    }
+    
     layoutHeaderImage.draw(0, 0, ofGetWindowWidth() * _scaleFactor, layoutHeaderImage.getHeight() * _scaleFactor);
     
     ofPushStyle();
@@ -1556,16 +1575,16 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
                 ofSetColor(FAK_ORANGE1);
                 break;
             case 1:
-                ofSetColor(FAK_ORANGE5);
+                ofSetColor(FAK_ORANGE2);
                 break;
             case 2:
                 ofSetColor(FAK_ORANGE3);
                 break;
             case 3:
-                ofSetColor(FAK_ORANGE2);
+                ofSetColor(FAK_ORANGE4);
                 break;
             case 4:
-                ofSetColor(FAK_ORANGE4);
+                ofSetColor(FAK_ORANGE5);
                 break;
             default:
                 ofSetColor(255, 255, 255, 255);
@@ -1701,6 +1720,7 @@ void testApp::drawMovieInfo(float _x, float _y, float _fade){
 
     
 }
+
 
 //--------------------------------------------------------------
 void testApp::drawPrintScreen(){
@@ -2212,6 +2232,21 @@ void testApp::menuIsClosed(int &e){
 }
 
 //--------------------------------------------------------------
+void testApp::menuIsClicked(int &e){
+    ofLog(OF_LOG_VERBOSE, "menuIsClicked:" + ofToString(e));
+    if (e == 6) {
+        if (droppedFiles.size() > 1) {
+            if (loadedMovie.isMovieLoaded) {
+                showListView = !showListView;
+                if (showListView == TRUE) {
+                    moveToList();
+                }
+            }
+        }
+    }
+}
+
+//--------------------------------------------------------------
 void testApp::startPrinting(){
     lockedDueToPrinting = true;
     inactivateAllMenus();
@@ -2309,7 +2344,7 @@ void testApp::moveToList(){
 //--------------------------------------------------------------
 void testApp::handlingEventOverlays(){
     // check if one of the topMenus is active and in this case turn of the mouseEvents for the thumbs
-    if (menuMovieInfo.getMenuActivated() || menuSettings.getMenuActivated() || menuMoviePrintPreview.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated()) {
+    if (menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated()) {
         if (loadedMovie.getMouseEventsEnabled()) {
             loadedMovie.disableMouseEvents();
         }

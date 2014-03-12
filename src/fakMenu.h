@@ -27,7 +27,7 @@
 
 #define FAK_WHITE ofColor(255, 255, 255, 255)
 #define FAK_BLACK ofColor(0, 0, 0, 255)
-#define FAK_SHADOW ofColor(0, 0, 0, 32)
+#define FAK_SHADOW ofColor(0, 0, 0, 130)
 #define FAK_GRAY ofColor(59, 59, 59, 255)
 
 
@@ -45,12 +45,12 @@ public:
     
     // functions
     
-    void setupMenu(int _ID, float _mMenuX, float _mMenuY, float _mMenuWidth, float _mMenuHeight, float _mMenuRollOverHeight, bool _mButtonActive, bool _mTopMenu, bool _mNoBackground){
+    void setupMenu(int _ID, float _mMenuX, float _mMenuY, float _mMenuWidth, float _mMenuHeight, float _mMenuRollOverDimension, bool _mButtonActive, char _mLocationOfMenu, bool _mNoBackground){
         mMenuX = _mMenuX;
         mMenuY = _mMenuY;
         mMenuWidth = _mMenuWidth;
         mMenuHeight = _mMenuHeight;
-        mMenuRollOverHeight = _mMenuRollOverHeight;
+        mMenuRollOverDimension = _mMenuRollOverDimension;
         tweenMenuInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),ofRandom(0, 300));
         tweenMenuInOut2.setParameters(1,easingelastic,ofxTween::easeOut,1.0,0.0,ofRandom(600, 1000),ofRandom(0, 300));
         mMenuOffsetX = 2;
@@ -59,7 +59,7 @@ public:
         mMenuStripeHeight = 8;
         mInsideMenuHead = FALSE;
         mMenuActive = _mButtonActive;
-        mTopMenu = _mTopMenu;
+        mLocationOfMenu = _mLocationOfMenu;
         mNoBackground = _mNoBackground;
         mIsOpenManually = false;
         mMenuID = _ID;
@@ -71,7 +71,7 @@ public:
                 break;
             case 4:
                 mMenuImage.loadImage("MoviePrint_Layout_Menu2_v001_00001.png");
-                mBackgroundColor = FAK_ORANGE5;
+                mBackgroundColor = FAK_ORANGE4;
                 break;
             case 3:
                 mMenuImage.loadImage("MoviePrint_Layout_Menu3_v001_00001.png");
@@ -83,7 +83,11 @@ public:
                 break;
             case 5:
                 mMenuImage.loadImage("MoviePrint_Layout_Menu5_v001_00001.png");
-                mBackgroundColor = FAK_ORANGE4;
+                mBackgroundColor = FAK_ORANGE5;
+                break;
+            case 6:
+                mMenuImage.loadImage("MoviePrint_Layout_Menu6_v001_00001.png");
+                mBackgroundColor = FAK_ORANGE3;
                 break;
             default:
                 mBackgroundColor = FAK_GRAY;
@@ -108,12 +112,17 @@ public:
         float minX = mMenuX;
         float maxX = mMenuX + mMenuWidth;
         float minY, maxY;
-        if (mTopMenu) {
+        if (mLocationOfMenu == 'T') {
             minY = mMenuY;
-            maxY = mMenuY + mMenuRollOverHeight;
-        } else {
-            minY = mMenuY - mMenuRollOverHeight;
+            maxY = mMenuY + mMenuRollOverDimension;
+        } else if (mLocationOfMenu == 'B') {
+            minY = mMenuY - mMenuRollOverDimension;
             maxY = mMenuY;
+        } else if (mLocationOfMenu == 'L') {
+            minX = mMenuX;
+            maxX = mMenuX + mMenuRollOverDimension;
+            minY = mMenuY;
+            maxY = mMenuY + mMenuHeight;
         }
         return _x >= minX && _x < maxX && _y >= minY && _y < maxY;
     }
@@ -122,12 +131,17 @@ public:
         float minX = mMenuX;
         float maxX = mMenuX + mMenuWidth;
         float minY, maxY;
-        if (mTopMenu) {
+        if (mLocationOfMenu == 'T') {
             minY = mMenuY;
             maxY = mMenuY + mMenuHeight;
-        } else {
-            minY = mMenuY - mMenuHeight - mMenuRollOverHeight;
+        } else if (mLocationOfMenu == 'B') {
+            minY = mMenuY - mMenuHeight - mMenuRollOverDimension;
             maxY = mMenuY;
+        } else if (mLocationOfMenu == 'L') {
+            minX = mMenuX;
+            maxX = mMenuX + mMenuRollOverDimension + mMenuWidth;
+            minY = mMenuY;
+            maxY = mMenuY + mMenuHeight;
         }
         return _x >= minX && _x < maxX && _y >= minY && _y < maxY;
     }
@@ -169,6 +183,9 @@ public:
     }
     
     void mousePressed(ofMouseEventArgs & args){
+        if (mInsideMenuHead) {
+            ofNotifyEvent(mMenuIsBeingClicked, mMenuID, this);
+        }
     }
     
     void mouseScrolled(ofMouseEventArgs & args){
@@ -205,7 +222,7 @@ public:
     }
     
 	float getSizeH(){
-        return mMenuRollOverHeight + (mMenuHeight - mMenuRollOverHeight) * tweenMenuInOut.update();
+        return mMenuRollOverDimension + (mMenuHeight - mMenuRollOverDimension) * tweenMenuInOut.update();
     }
     
 	float getRelSizeH(){
@@ -239,26 +256,39 @@ public:
     }
     
     void drawMenu(){
+        ofPushMatrix();
         ofPushStyle();
-        if (mTopMenu) {
+        if (mLocationOfMenu == 'T') {
             ofEnableAlphaBlending();
             ofSetColor(FAK_WHITE);
             mMenuImage.draw(mMenuX - mMenuOffsetX, mMenuY, mMenuImage.getWidth(), mMenuImage.getHeight());
 //            ofSetColor(FAK_SHADOW);
 //            ofRectRounded(mMenuX - mShadowMargin*0.3 + mMenuOffsetX, mMenuY + mMenuOffsetY, mMenuWidth - mMenuOffsetX + mShadowMargin*2, mMenuStripeHeight + mMenuHeight * tweenMenuInOut.update(),4.0 * tweenMenuInOut.update());
             if (!mNoBackground) {
-                ofSetColor(mBackgroundColor);
+                ofColor tempColor = mBackgroundColor;
+                ofSetColor(tempColor.lerp(FAK_ORANGE1, tweenMenuInOut.update()));
                 ofRectRounded(mMenuX, mMenuY + mMenuOffsetY, mMenuWidth, mMenuStripeHeight + (mMenuHeight - mMenuOffsetY - mMenuStripeHeight) * tweenMenuInOut.update(), 4.0 * tweenMenuInOut.update());
             } else {
                 ofSetColor(mBackgroundColor);
                 ofRect(mMenuX, mMenuY + mMenuOffsetY, mMenuWidth, mMenuStripeHeight);
             }
-        } else {
+        } else if (mLocationOfMenu == 'B') {
             ofEnableAlphaBlending();
+            ofSetColor(FAK_SHADOW);
+            ofRect(mMenuX, mMenuY - (mMenuRollOverDimension + 3.4 + mMenuHeight * tweenMenuInOut.update()), mMenuWidth, mMenuRollOverDimension + mMenuHeight * tweenMenuInOut.update());
             ofSetColor(mBackgroundColor);
-            ofRect(mMenuX, mMenuY - (mMenuRollOverHeight + mMenuHeight * tweenMenuInOut.update()), mMenuWidth, mMenuRollOverHeight + mMenuHeight * tweenMenuInOut.update());
+            ofRect(mMenuX, mMenuY - (mMenuRollOverDimension + mMenuHeight * tweenMenuInOut.update()), mMenuWidth, mMenuRollOverDimension + mMenuHeight * tweenMenuInOut.update());
+        } else if (mLocationOfMenu == 'L') {
+            ofEnableAlphaBlending();
+            ofColor tempColor = mBackgroundColor;
+//            tempColor.set(tempColor.r, tempColor.g, tempColor.b, ((sin(ofGetElapsedTimef()*3)+1.0)/2.0)*200+30); //pulsating
+            ofSetColor(tempColor.lerp(FAK_ORANGE3, tweenMenuInOut.update()));
+            ofRect(mMenuX, mMenuY, mMenuRollOverDimension + mMenuWidth * tweenMenuInOut.update(), mMenuHeight);
+            ofSetColor(255, 255, 255);
+            mMenuImage.draw(mMenuX - mMenuRollOverDimension/2.0 + mMenuWidth * tweenMenuInOut.update()/2.0, mMenuY);
         }
         ofPopStyle();
+        ofPopMatrix();
     }
     
 
@@ -267,11 +297,12 @@ public:
     
     ofEvent<int> mMenuIsBeingOpened;
     ofEvent<int> mMenuIsBeingClosed;
+    ofEvent<int> mMenuIsBeingClicked;
 
     int mMenuID;
     bool mInsideMenuHead;
     bool mMenuActive;
-    bool mTopMenu;
+    char mLocationOfMenu; // 'T' for Top, 'B' for Bottom, 'L' for Left, 'R' for Right
     bool mIsOpenManually;
     bool mNoBackground;
     
@@ -279,7 +310,7 @@ public:
     float mMenuY;
     float mMenuWidth;
     float mMenuHeight;
-    float mMenuRollOverHeight;
+    float mMenuRollOverDimension;
     int mMenuOffsetX;
     int mMenuOffsetY;
     int mMenuStripeHeight; //stripe of menu which is already visible

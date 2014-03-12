@@ -77,6 +77,7 @@ public:
     void setVisibilityMoviePrintPreview(bool _visibility);
     void menuIsOpened(int &e);
     void menuIsClosed(int &e);
+    void menuIsClicked(int &e);
     void inactivateAllMenus();
     void activateAllMenus();
     void closeAllMenus();
@@ -276,11 +277,10 @@ public:
     
     // Menu
     fakMenu menuMovieInfo;
-    fakMenu menuSettings;
-    fakMenu menuMoviePrintPreview;
     fakMenu menuMoviePrintSettings;
     fakMenu menuHelp;
     fakMenu menuTimeline;
+    fakMenu menuMoveToList;
     
     ofxFontStash fontStashHelveticaLight;
     ofxFontStash fontStashHelveticaMedium;

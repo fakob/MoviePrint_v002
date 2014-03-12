@@ -30,7 +30,7 @@
 
 #define FAK_WHITE ofColor(255, 255, 255, 255)
 #define FAK_BLACK ofColor(0, 0, 0, 255)
-#define FAK_SHADOW ofColor(0, 0, 0, 32)
+#define FAK_SHADOW ofColor(0, 0, 0, 130)
 #define FAK_GRAY ofColor(59, 59, 59, 255)
 
 struct fakItemProperties{
@@ -163,7 +163,7 @@ public:
         if (gliActive) {
             ofSetColor(FAK_ORANGE1);
         } else if(itemProperties.ipPrinted){
-            ofSetColor(FAK_ORANGE2);
+            ofSetColor(FAK_ORANGE3);
         } else if(itemProperties.ipTriedToPrint && !itemProperties.ipPrinted){
             ofSetColor(0,0,255,255);
         } else {

@@ -33,7 +33,7 @@
 
 #define FAK_WHITE ofColor(255, 255, 255, 255)
 #define FAK_BLACK ofColor(0, 0, 0, 255)
-#define FAK_SHADOW ofColor(0, 0, 0, 32)
+#define FAK_SHADOW ofColor(0, 0, 0, 130)
 #define FAK_GRAY ofColor(59, 59, 59, 255)
 
 class fakGrabbedList {
