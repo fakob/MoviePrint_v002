@@ -101,6 +101,7 @@ public:
         frameBackward2Image.loadImage("MoviePrint_FrameBackward_v001_00001.png");
         frameBackward3Image.loadImage("MoviePrint_FrameBackward_v001_00002.png");
         corruptImage.loadImage("MoviePrint_Corrupt_v001_00000.jpg");
+        emptyImage.loadImage("MoviePrint_Corrupt_00000.jpg");
         updatingStill.loadImage("MoviePrint_StillUpdating_v001_00000.png");
         headerImage.loadImage("MoviePrint_Layout_Header_v001_00000.png");
         
@@ -575,7 +576,10 @@ public:
             
             shader.begin(); // draw still with rounded corners
             shader.setUniformTexture("maskTex", maskFbo.getTextureReference(), 1 );
+            
+            ofSetColor(255, 255, 255, 255);
             grabbedStill[i].gsTexture.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
+            
             shader.end();
 
             // draw selection
@@ -591,6 +595,8 @@ public:
             if (grabbedStill[i].gsToBeGrabbed) {
                 ofPushMatrix();
                 ofPushStyle();
+                ofSetColor(0, 0, 0, 130);
+                ofRect(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
                 ofSetColor(255, 255, 255, 200);
                 updatingStill.drawSubsection(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight,updatingStill.width/2 - grabbedStill[i].gsDrawWidth/2, updatingStill.height/2 - grabbedStill[i].gsDrawHeight/2);
 //                }
@@ -952,6 +958,7 @@ public:
     ofImage corruptImage;
     ofImage updatingStill;
     ofImage headerImage;
+    ofImage emptyImage;
     
     ofxFontStash gmFontStashHelveticaLight;
     ofxFontStash gmFontStashHelveticaMedium;

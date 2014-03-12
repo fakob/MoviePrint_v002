@@ -60,6 +60,7 @@ void testApp::setup(){
     windowWasResized = false;
     allMenusAreClosed = true;
     allMenusAreClosedOnce = 0;
+    switchFromLogoToDropZone = false;
     
     // UI Values
     leftMargin = 5;
@@ -128,16 +129,18 @@ void testApp::setup(){
     showTopMenu = false;
     tweenTimelineInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),ofRandom(0, 300));
     tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,1.0,0.0,ofRandom(600, 1000),ofRandom(0, 300));
+    tweenBlendStartDropImageCounter.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,100,0);
 
 
-    startImage.loadImage("MoviePrint_StartBildschirm_v001_00000.png");
-    backgroundImage.loadImage("MoviePrint_Background_v001_00000.jpg");
-    printImage.loadImage("MoviePrint_Print_v001_00000.png");
-    loadMovieImage.loadImage("MoviePrint_Loading_v001_00000.png");
-    updatingImage.loadImage("MoviePrint_Updating_v001_00000.png");
+    startImage.loadImage("MoviePrint_StartBildschirm_v002_00000.png");
+    dropZoneImage.loadImage("MoviePrint_DropZone_v002_00000.png");
+    backgroundImage.loadImage("MoviePrint_Background_v002_00000.jpg");
+    printImage.loadImage("MoviePrint_Print_v002_00000.png");
+    printListImage.loadImage("MoviePrint_PrintList_v002_00000.png");
+    loadMovieImage.loadImage("MoviePrint_Loading_v002_00000.png");
+    updatingImage.loadImage("MoviePrint_Updating_v002_00000.png");
     inPointImage.loadImage("MoviePrint_InPoint_v001_00000.png");
     outPointImage.loadImage("MoviePrint_OutPoint_v001_00000.png");
-    printListImage.loadImage("MoviePrint_PrintList_v001_00000.png");
     layoutHeaderImage.loadImage("MoviePrint_Layout_Header_v001_00000.png");
     helpMenuImage.loadImage("HelpMenu_v001.png");
     backgroundImagePreview.loadImage("MoviePrint_PreviewBackground_v001_00000.png");
@@ -1747,9 +1750,24 @@ void testApp::drawPrintScreen(){
 void testApp::drawStartScreen(){
     ofPushMatrix();
     ofPushStyle();
+    if (tweenBlendStartDropImageCounter.update() > 0.99) {
+        if (switchFromLogoToDropZone) {
+            tweenBlendStartDropImage.setParameters(1,easingsine,ofxTween::easeInOut,1.0,0.0,1000,0);
+            tweenBlendStartDropImageCounter.setParameters(1,easinglinear,ofxTween::easeInOut,0.0,1.0,3000,0);
+        } else {
+            tweenBlendStartDropImage.setParameters(1,easingsine,ofxTween::easeInOut,0.0,1.0,1000,0);
+            tweenBlendStartDropImageCounter.setParameters(1,easinglinear,ofxTween::easeInOut,0.0,1.0,6000,0);
+        }
+        switchFromLogoToDropZone = !switchFromLogoToDropZone;
+    }
+
     ofSetColor(255, 255, 255, 255);
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
+    ofSetColor(255, 255, 255, 255 * tweenBlendStartDropImage.update());
     startImage.draw(ofGetWidth()/2-startImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-startImage.getHeight()/2);
+    ofSetColor(255, 255, 255, 255 * (1-tweenBlendStartDropImage.update()));
+    dropZoneImage.draw(ofGetWidth()/2-startImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-startImage.getHeight()/2);
+
     ofPopStyle();
     ofPopMatrix();
 }

@@ -113,6 +113,7 @@ public:
 
     // Images
     ofImage startImage;
+    ofImage dropZoneImage;
     ofImage backgroundImage;
     ofImage printImage;
     ofImage printListImage;
@@ -137,6 +138,7 @@ public:
     bool finishedUpdating;
     bool showTimeline;
     bool finishedTimeline;
+    bool switchFromLogoToDropZone;
     
     bool drawNotify;
     
@@ -230,6 +232,8 @@ public:
     ofxTween tweenTimelineInOut;
     ofxTween tweenListInOut;
     ofxTween tweenMoviePrintPreview;
+    ofxTween tweenBlendStartDropImage;
+    ofxTween tweenBlendStartDropImageCounter;
     
     ofxEasingBack 	easingback;
     ofxEasingBounce 	easingbounce;
