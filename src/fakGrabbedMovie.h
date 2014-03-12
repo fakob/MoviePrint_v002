@@ -117,14 +117,14 @@ public:
 
         gmSetTitleInfo = TRUE; //create new title size und umbruch
         
-        loadNewMovieToBeGrabbed(vfMovieName, gmNumberOfStills, _showPlaceHolder);
+        loadNewMovieToBeGrabbed(vfMovieName, gmNumberOfStills, _showPlaceHolder, false);
         
         gmSetupFinished = TRUE;
         gmShowFramesUI = TRUE;
         
     }
     
-    bool loadNewMovieToBeGrabbed(string vfMovieName, int _numberOfStills, bool _showPlaceHolder){
+    bool loadNewMovieToBeGrabbed(string vfMovieName, int _numberOfStills, bool _showPlaceHolder, bool _addListener){
         
         setNumberOfStills(_numberOfStills);
         stop(FALSE);
@@ -158,7 +158,7 @@ public:
             }
             
         }
-        allocateNewNumberOfStills(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder);
+        allocateNewNumberOfStills(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder, _addListener);
         
         updatingStill.resize(gmThumbWidth, gmThumbHeight);
         
@@ -245,7 +245,7 @@ public:
 
     }
     
-    void allocateNewNumberOfStills(int _numberOfStills, int _gmThumbWidth, int _gmThumbHeight, bool _drawPlaceHolder){
+    void allocateNewNumberOfStills(int _numberOfStills, int _gmThumbWidth, int _gmThumbHeight, bool _drawPlaceHolder, bool _addListener){
         if (isMovieLoaded) {
             
             gmThumbWidth = _gmThumbWidth;
@@ -262,12 +262,16 @@ public:
             setNumberOfStills(_numberOfStills);
             grabbedStill.clear();
             grabbedStill.resize(_numberOfStills);
-            
-            enableMouseEvents();
+
+            if (_addListener) {
+                enableMouseEvents();
+            }
             for(int i=0; i<gmNumberOfStills; i++)
             {
-                ofAddListener(grabbedStill[i].gsClickedInside, this, &fakGrabbedMovie::scrubMovie);
-                ofAddListener(grabbedStill[i].gsMovedInside, this, &fakGrabbedMovie::rollOverMovie);
+                if (_addListener) {
+                    ofAddListener(grabbedStill[i].gsClickedInside, this, &fakGrabbedMovie::scrubMovie);
+                    ofAddListener(grabbedStill[i].gsMovedInside, this, &fakGrabbedMovie::rollOverMovie);
+                }
                 grabbedStill[i].gsID = i;
                 grabbedStill[i].gsX = 0;
                 grabbedStill[i].gsY = 0;

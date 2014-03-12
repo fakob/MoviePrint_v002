@@ -157,7 +157,7 @@ void testApp::setup(){
     calculateNewPrintGrid();
     loadedMovie.setup(loadedFile, numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
     totalFrames = 100;
-    loadedMovie.allocateNewNumberOfStills(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
+    loadedMovie.allocateNewNumberOfStills(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder, false);
 
     updateInOut = FALSE;
     manipulateSlider = FALSE;
@@ -255,7 +255,7 @@ void testApp::setGUITimeline(){
 void testApp::setGUISettingsMoviePrint(){
 	
 	float dim = 16;
-	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING*3;
+	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING*2;
     float length = menuWidth-xInit;
     
     guiSettingsMoviePrint = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
@@ -268,32 +268,33 @@ void testApp::setGUISettingsMoviePrint(){
     uiLabelOutputFolder->setLabel(cropFrontOfString(saveMoviePrintPath, 40, "..."));
 
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
-    guiSettingsMoviePrint->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
+//    guiSettingsMoviePrint->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
 	guiSettingsMoviePrint->addIntSlider("PrintColumns", 1, 10, &printGridColumns, length-xInit,dim);
 	guiSettingsMoviePrint->addIntSlider("PrintRows", 1, 20, &printGridRows, length-xInit,dim);
     uiSliderPrintColumns = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintColumns");
     uiSliderPrintRows = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintRows");
-    
-    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
-    guiSettingsMoviePrint->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
+    guiSettingsMoviePrint->addSpacer(length-xInit, 0);
    	guiSettingsMoviePrint->addIntSlider("PrintMargin", 0, 30, &printGridMargin, length-xInit,dim);
     uiSliderPrintMargin = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintMargin");
+    
+    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
+//    guiSettingsMoviePrint->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
 
-    guiSettingsMoviePrint->addToggle("DisplayVideoAudioInfo", &printDisplayVideoAudioInfo, dim*1.5, dim);
+    guiSettingsMoviePrint->addToggle("Display Header", &printDisplayVideoAudioInfo, dim*1.5, dim);
     vector<string> names;
-	names.push_back("Frames");
-	names.push_back("TimeCode");
+	names.push_back("Display Frames");
+	names.push_back("Display TimeCode");
 	names.push_back("off");
     ofxUIRadio *uiRadioSetFrameDisplay = guiSettingsMoviePrint->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
     uiRadioSetFrameDisplay->activateToggle("TimeCode");
 
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
 
-    guiSettingsMoviePrint->addToggle("Save Individual Frames", &printSingleFrames, dim*1.5, dim);
+    guiSettingsMoviePrint->addToggle("Save also individual frames", &printSingleFrames, dim*1.5, dim);
 
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
 
-    guiSettingsMoviePrint->addLabel("Choose Output Format", OFX_UI_FONT_MEDIUM);
+//    guiSettingsMoviePrint->addLabel("Choose Output Format", OFX_UI_FONT_MEDIUM);
     vector<string> names3;
     names3.push_back("png with alpha");
     names3.push_back("jpg");
@@ -307,6 +308,10 @@ void testApp::setGUISettingsMoviePrint(){
     names4.push_back("4096px width");
     guiSettingsMoviePrint->addRadio("MoviePrint Width", names4, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
     uiRadioPrintOutputFormat =(ofxUIRadio *) guiSettingsMoviePrint->getWidget("MoviePrint Width");
+    
+    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
+    guiSettingsMoviePrint->addLabelButton("Save MoviePrint", false,length-xInit,dim);
+
     
     guiSettingsMoviePrint->setColorBack(FAK_TRANSPARENT);
 	ofAddListener(guiSettingsMoviePrint->newGUIEvent,this,&testApp::guiEvent);
@@ -413,7 +418,7 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
     loadedMovie.stop(TRUE);
 
     ofxNotify() << "Movie has started to load";
-    loadedMovie.loadNewMovieToBeGrabbed(_newMoviePath, numberOfStills, showPlaceHolder);
+    loadedMovie.loadNewMovieToBeGrabbed(_newMoviePath, numberOfStills, showPlaceHolder, !_loadInBackground);
     calculateNewPrintGrid();
     if (loadedMovie.gmTotalFrames <=1) {
         movieProperlyLoaded = FALSE;
@@ -452,7 +457,8 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
     
     timer.setStartTime();
     finishedLoadingMovie = TRUE;
-    
+
+    ofLog(OF_LOG_VERBOSE, "_loadInBackground: " + ofToString(_loadInBackground));
     ofLog(OF_LOG_VERBOSE, "Finished Loading Movie--------------------------------------------");
     
     if (!loadedMovie.isMovieLoaded) {
@@ -716,7 +722,7 @@ void testApp::update(){
         if(scrubFade < 5){
             updateNewPrintGrid = FALSE;
             if (!showListView) {
-                loadedMovie.allocateNewNumberOfStills(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder);
+                loadedMovie.allocateNewNumberOfStills(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder, true);
                 updateAllStills();
             }
         }
@@ -886,6 +892,8 @@ void testApp::draw(){
         
     }
     
+    drawUI(1, FALSE);
+
     if(showLoadMovieScreen){
         drawLoadMovieScreen();
     } else if (showPrintScreen) {
@@ -893,11 +901,8 @@ void testApp::draw(){
     } else {
         if(showUpdateScreen){
             drawUpdateScreen();
+        }
     }
-        
-    }
-    drawUI(1, FALSE);
-    
     
     ofxNotify::draw(drawNotify);
 }
@@ -1368,7 +1373,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             printNumberOfThumbs = (int)slider->getScaledValue();
             calculateNewPrintGrid();
         }
-        else if(name == "DisplayVideoAudioInfo")
+        else if(name == "Display Header")
         {
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
@@ -1379,7 +1384,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             }
             calculateNewPrintSize();
         }
-        else if(name == "Save Individual Frames")
+        else if(name == "Save also individual frames")
         {
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
@@ -1423,7 +1428,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             printGridMargin = (int)slider->getScaledValue();
             calculateNewPrintSize();
         }
-        else if(name == "TimeCode")
+        else if(name == "Display TimeCode")
         {
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
@@ -1433,7 +1438,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             }
             
         }
-        else if(name == "Frames")
+        else if(name == "Display Frames")
         {
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
@@ -1498,6 +1503,18 @@ void testApp::guiEvent(ofxUIEventArgs &e){
                 printSizeWidth = 4096;
             }
         }
+        else if(name == "Save MoviePrint")
+        {
+            ofxUILabelButton *button = (ofxUILabelButton *) e.widget;
+            if (button->getValue()) {
+                if (loadedMovie.isMovieLoaded || showListView) {
+                    closeAllMenus();
+                    finishedPrinting = FALSE;
+                    showPrintScreen = TRUE;
+                }
+            }
+        }
+        
     } else {
         ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
     }
