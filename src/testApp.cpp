@@ -26,7 +26,7 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 
-    ofSetLogLevel(OF_LOG_VERBOSE);
+//    ofSetLogLevel(OF_LOG_VERBOSE);
     drawNotify = false; // ofxNotify
     showPlaceHolder = false; // added for developing
     
@@ -88,6 +88,7 @@ void testApp::setup(){
     printFormat = OF_IMAGE_FORMAT_PNG;
     printSingleFrames = false;
     writeMoviePrint = false;
+    printGridMargin = 5;
     
     showLoadMovieScreen = FALSE;
     finishedLoadingMovie = TRUE;
@@ -1624,8 +1625,8 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
 
     ofSetColor(255, 255, 255, 255);
     ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
-    float tempYPos = ofLerp(ofGetWindowWidth()/2.0, ((leftMargin + (thumbWidth + displayGridMargin)*tempXPos)/2.0) * _scaleFactor, menuMoviePrintSettings.getRelSizeH());
-        fboToPreview.draw(tempYPos, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin, tweenMoviePrintPreview.update() * fboToPreviewWidth, tweenMoviePrintPreview.update() * fboToPreviewHeight);
+    float tempXPosLerp = ofLerp((ofGetWindowWidth()-scrollBarWidth)/2.0, ((leftMargin + (thumbWidth + displayGridMargin)*tempXPos)/2.0) * _scaleFactor, menuMoviePrintSettings.getRelSizeH());
+        fboToPreview.draw(tempXPosLerp, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows/2.0 - displayGridMargin, tweenMoviePrintPreview.update() * fboToPreviewWidth, tweenMoviePrintPreview.update() * fboToPreviewHeight);
     ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
     
     menuMoviePrintSettings.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);

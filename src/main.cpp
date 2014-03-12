@@ -11,7 +11,7 @@ int main( ){
 
     window.setWindowTitle("MoviePrint");
 //    window.hideCursor();
-    window.setWindowPosition(1200, 300);
+//    window.setWindowPosition(1200, 300);
     
 	// this kicks off the running of my app
 	// can be OF_WINDOW or OF_FULLSCREEN
