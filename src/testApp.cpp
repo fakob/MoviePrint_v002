@@ -220,42 +220,24 @@ void testApp::setGUITimeline(){
     
     // setup gui
     guiTimeline = new ofxUICanvas(ofGetWidth()/2-displayGridWidth/2-OFX_UI_GLOBAL_WIDGET_SPACING, ofGetHeight()-(footerHeight/2) - timeSliderHeight/2, ofGetWidth(),footerHeight); //ofxUICanvas(float x, float y, float width, float height)
-    guiTimeline->setFont("HelveticaNeueLTCom-LtCn.ttf");
     drawPadding = FALSE;
     guiTimeline->setDrawBack(FALSE);
-//    ofColor paddingColor = ofColor(FAK_ORANGE3);
-//    ofColor backgroundColor = ofColor(FAK_ORANGE3);
-//    guiTimeline->setColorBack(FAK_GRAY);
-    
+
 	guiTimeline->addWidgetDown(new ofxUIRangeSlider("RSLIDER", 0.0, (float)totalFrames, 0.0, 100.0, displayGridWidth, timeSliderHeight));
     uiRangeSliderTimeline = (ofxUIRangeSlider *) guiTimeline->getWidget("RSLIDER");
     uiRangeSliderTimeline->setLabelPrecision(0);
     uiRangeSliderTimeline->setLabelVisible(FALSE);
-//    uiRangeSliderTimeline->setDrawPadding(FALSE);
-//    uiRangeSliderTimeline->setDrawPaddingOutline(FALSE);
-//    uiRangeSliderTimeline->setDrawOutlineHighLight(FALSE);
-//    uiRangeSliderTimeline->setDrawOutline(FALSE);
-//    guiTimeline->setDrawPadding(FALSE);
-//    guiTimeline->setDrawPaddingOutline(FALSE);
-//    guiTimeline->setDrawOutlineHighLight(FALSE);
-//    guiTimeline->setDrawOutline(FALSE);
-    
-//    guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_BACK, ofColor(0,25));
+
     guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_OUTLINE, ofColor(0,0,0,0));
     guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_OUTLINE_HIGHLIGHT, ofColor(0,0,0,0));
     guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_FILL, FAK_ORANGE1);
     guiTimeline->setWidgetColor(OFX_UI_WIDGET_COLOR_FILL_HIGHLIGHT, FAK_ORANGE1);
     
+    uiRangeSliderTimeline->setColorBack(FAK_ORANGE5);
 
-
-//    ofColor tempColor (30, 30, 30, 255);
-    uiRangeSliderTimeline->setColorBack(FAK_ORANGE3);
-
-    uiRangeSliderTimeline->setColorPadded(FAK_ORANGE3);
+    uiRangeSliderTimeline->setColorPadded(FAK_ORANGE5);
 
     ofAddListener(guiTimeline->newGUIEvent, this, &testApp::guiEvent);
-    //    guiTimeline->loadSettings("GUI/guiSettings.xml");
-//    guiTimeline->disable();
 
 }
 
