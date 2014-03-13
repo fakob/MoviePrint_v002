@@ -26,7 +26,7 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 
-//    ofSetLogLevel(OF_LOG_VERBOSE);
+    ofSetLogLevel(OF_LOG_VERBOSE);
     drawNotify = false; // ofxNotify
     showPlaceHolder = false; // added for developing
     
@@ -50,7 +50,6 @@ void testApp::setup(){
     ofBackground(30, 30, 30);
     ofSetFrameRate(60);
     loadValue = 0;
-    scrubFade = 255.0;
     scrubWindowW = 640;
     scrubWindowGridNumber = 0;
     scrubDelta = 0;
@@ -366,6 +365,7 @@ void testApp::calculateNewPrintGrid(){
     calculateNewPrintSize();
     
     updateNewPrintGrid = true;
+    tweenTimeDelay.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
     
     updateDisplayGrid();
     
@@ -581,11 +581,6 @@ void testApp::update(){
     // update Loader
     loadValue = ofMap(loadedMovie.percLoaded(), 0, 1.0, 0.0, 1.0, true);
     
-    // update Tweener
-    if (!updateInOut || !updateScrub || !updateNewPrintGrid) {
-        Tweener.update();
-    }
-    
     // update Movie for Scrubbing or InOut manipulations
     if (loadedMovie.gmScrubMovie || updateInOut) {
         loadedMovie.gmMovieScrub.update();
@@ -708,8 +703,8 @@ void testApp::update(){
     if (updateNewPrintGrid == TRUE && !currPrintingList && !ofGetMousePressed()) {
         updateInOut = FALSE;
         updateScrub = FALSE;
-        Tweener.addTween(scrubFade, 0, 0.5);
-        if(scrubFade < 5){
+
+        if(tweenTimeDelay.update() < 5){
             updateNewPrintGrid = FALSE;
             if (!showListView) {
                 loadedMovie.allocateNewNumberOfStills(numberOfStills, thumbWidth, thumbHeight, showPlaceHolder, true);
@@ -840,14 +835,14 @@ void testApp::draw(){
                 ofPushStyle();
                 
                 ofEnableAlphaBlending();
-                ofSetColor(0,(int)(scrubFade/255)*155);
+                ofSetColor(0,(int)(tweenFading.update()/255)*155);
                 ofRect(0, 0, ofGetWidth(), ofGetHeight());
-                ofSetColor(255,255,255,(int)scrubFade);
+                ofSetColor(255,255,255,(int)tweenFading.update());
                 
                 loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
-                loadedMovie.drawStillUI(scrubWindowGridNumber, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (scrubFade/255));
+                loadedMovie.drawStillUI(scrubWindowGridNumber, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (tweenFading.update()/255));
                 
-                ofSetColor(255, 255, 255, (int)(scrubFade/255)*255);
+                ofSetColor(255, 255, 255, (int)(tweenFading.update()/255)*255);
                 
                 if (uiRangeSliderTimeline->hitLow) {
                     inPointImage.draw(ofGetWidth()/2-inPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-inPointImage.getHeight()/2);
@@ -860,7 +855,7 @@ void testApp::draw(){
                     outPointImage.draw(ofGetWidth()/2-outPointImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-outPointImage.getHeight()/2);
                 }
                 
-                if(scrubFade < 5){
+                if(tweenFading.update() < 5){
                     updateInOut = FALSE;
                     manipulateSlider = FALSE;
                 }
@@ -1095,8 +1090,7 @@ void testApp::mousePressed(int x, int y, int button){
                         }
                         updateInOut = FALSE;
                         ofLog(OF_LOG_VERBOSE, "the mouse was clicked" );
-                        Tweener.removeTween(scrubFade);
-                        scrubFade = 255;
+                        tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,0.0,255.0,200,0);
                         
                     }
                 }
@@ -1121,11 +1115,11 @@ void testApp::mouseReleased(int x, int y, int button){
                 }
                 if (updateInOut) {
                     ofLog(OF_LOG_VERBOSE, "mouseReleased - updateInOut True" );
-                    Tweener.addTween(scrubFade, 0, 1);
+                    tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
                     updateAllStills();
                 }
                 if (updateScrub) {
-                    Tweener.addTween(scrubFade, 0, 1);
+                    tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
                     
                     int i = loadedMovie.gmScrubID;
                     loadedMovie.grabbedStill[i].gsManipulated = TRUE;
@@ -1787,6 +1781,7 @@ void testApp::drawLoadMovieScreen(){
     ofPushStyle();
     ofSetColor(255, 255, 255, 200);
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
+    ofSetColor(255, 255, 255, 255);
     loadMovieImage.draw(ofGetWidth()/2-loadMovieImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-loadMovieImage.getHeight()/2);
     ofPopStyle();
     
@@ -1823,37 +1818,37 @@ void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
 void testApp::drawScrubScreen(float _scaleFactor){
     ofPushStyle();
     ofEnableAlphaBlending();
-    ofSetColor(0,(scrubFade/255)*100);
+    ofSetColor(0,(tweenFading.update()/255)*100);
     ofRect(0, 0, ofGetWidth(), ofGetHeight()-footerHeight/2);
 
     // draw the scrubMovie
-    ofSetColor(255,(int)scrubFade);
+    ofSetColor(255,(int)tweenFading.update());
     int j = loadedMovie.gmScrubID;
     loadedMovie.gmMovieScrub.draw(ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH);
-    loadedMovie.drawStillUI(j, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (float)(scrubFade/255));
+    loadedMovie.drawStillUI(j, ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-scrubWindowH/2, scrubWindowW, scrubWindowH, (float)(tweenFading.update()/255));
     
     // drawing frame
     float tempX = ofGetWidth()/2-scrubWindowW/2 + listWidth * tweenListInOut.update();
     float tempY = ofGetHeight()/2-scrubWindowH/2;
     float tempFrameWidth = 3;
-    ofSetColor(220,(int)scrubFade);
+    ofSetColor(220,(int)tweenFading.update());
     ofRect(tempX, tempY - tempFrameWidth, _scaleFactor * scrubWindowW + tempFrameWidth, tempFrameWidth);
     ofRect(tempX - tempFrameWidth, tempY - tempFrameWidth, tempFrameWidth, _scaleFactor * scrubWindowH + tempFrameWidth);
     ofRect(tempX + _scaleFactor * scrubWindowW, tempY, tempFrameWidth, _scaleFactor * scrubWindowH + tempFrameWidth);
     ofRect(tempX - tempFrameWidth, tempY + _scaleFactor * scrubWindowH, _scaleFactor * scrubWindowW + tempFrameWidth, tempFrameWidth);
     // drawing shadow
-    ofSetColor(0,200*(scrubFade/255.0));
+    ofSetColor(0,200*(tweenFading.update()/255.0));
     ofRect(tempX + _scaleFactor * scrubWindowW + tempFrameWidth, tempY, tempFrameWidth, _scaleFactor * scrubWindowH + tempFrameWidth*2);
     ofRect(tempX, tempY + _scaleFactor * scrubWindowH + tempFrameWidth, _scaleFactor * scrubWindowW + tempFrameWidth, tempFrameWidth);
 
     // draw the scrubSpeed
-    ofSetColor(FAK_ORANGECOLOR,(int)scrubFade);
+    ofSetColor(FAK_ORANGECOLOR,(int)tweenFading.update());
     ofRect(ofGetWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2+scrubWindowH/2+tempFrameWidth*3, scrubDelta*30.0, loaderBarHeight/2);
-    ofSetColor(255,255,255,(int)scrubFade);
+    ofSetColor(255,255,255,(int)tweenFading.update());
     
     ofDisableAlphaBlending();
     ofSetColor(255);
-    if(scrubFade < 5){
+    if(tweenFading.update() < 5){
         updateScrub = FALSE;
         loadedMovie.gmScrubMovie = FALSE;
     }

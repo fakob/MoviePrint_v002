@@ -65,6 +65,7 @@ public:
         gmRollOver = FALSE;
         gmNumberOfStills = 1;
         gmHasNoFrames = FALSE;
+        gmCurrAllocating = false;
     }
     
     // functions
@@ -248,7 +249,7 @@ public:
     
     void allocateNewNumberOfStills(int _numberOfStills, int _gmThumbWidth, int _gmThumbHeight, bool _drawPlaceHolder, bool _addListener){
         if (isMovieLoaded) {
-            
+            gmCurrAllocating = true;
             gmThumbWidth = _gmThumbWidth;
             gmThumbHeight = _gmThumbHeight;
             
@@ -315,6 +316,7 @@ public:
             grabbedStill.clear();
             grabbedStill.resize(_numberOfStills);
         }
+        gmCurrAllocating = false;
     }
     
     string StringToUpper(string strToConvert){
@@ -541,7 +543,7 @@ public:
             }
             ofLog(OF_LOG_VERBOSE, "gsImage Size: " + ofToString(grabbedStill[i].gsImage.width)+ " x " + ofToString(grabbedStill[i].gsImage.height));
             ofLog(OF_LOG_VERBOSE, "gmMovie Size: " + ofToString(gmMovie.getWidth())+ " x " + ofToString(gmMovie.getHeight()));
-            if (grabbedStill[i].gsImage.isAllocated()) {
+            if (grabbedStill[i].gsImage.isAllocated() && !gmCurrAllocating) {
                 grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixelsRef());
                 grabbedStill[i].gsToBeGrabbed = FALSE;
             } else {
@@ -946,6 +948,7 @@ public:
     int gmThumbHeight;
     bool gmShowFramesUI;
     bool gmMouseEventsEnabled;
+    bool gmCurrAllocating;
     
     ofImage setInPointImage;
     ofImage setOutPointImage;

@@ -101,8 +101,6 @@
 		3AAF41B117623B5600F94546 /* tinyxmlerror.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF419E17623B5600F94546 /* tinyxmlerror.cpp */; };
 		3AAF41B217623B5600F94546 /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF419F17623B5600F94546 /* tinyxmlparser.cpp */; };
 		3AAF41B317623B5600F94546 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF41A117623B5600F94546 /* ofxXmlSettings.cpp */; };
-		3AAF41BA17623C0900F94546 /* ofxTransitions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF41B617623C0900F94546 /* ofxTransitions.cpp */; };
-		3AAF41BB17623C0900F94546 /* ofxTweener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AAF41B817623C0900F94546 /* ofxTweener.cpp */; };
 		3AAF41C117623DA500F94546 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		3AAF41C317623DC500F94546 /* Franchise-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3AAF41BC17623CDA00F94546 /* Franchise-Bold.ttf */; };
 		3AAF41C417623DC500F94546 /* Ubuntu-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3AAF41BD17623CDA00F94546 /* Ubuntu-Light.ttf */; };
@@ -383,10 +381,6 @@
 		3AAF419F17623B5600F94546 /* tinyxmlparser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxmlparser.cpp; sourceTree = "<group>"; };
 		3AAF41A117623B5600F94546 /* ofxXmlSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxXmlSettings.cpp; sourceTree = "<group>"; };
 		3AAF41A217623B5600F94546 /* ofxXmlSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxXmlSettings.h; sourceTree = "<group>"; };
-		3AAF41B617623C0900F94546 /* ofxTransitions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxTransitions.cpp; sourceTree = "<group>"; };
-		3AAF41B717623C0900F94546 /* ofxTransitions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTransitions.h; sourceTree = "<group>"; };
-		3AAF41B817623C0900F94546 /* ofxTweener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxTweener.cpp; sourceTree = "<group>"; };
-		3AAF41B917623C0900F94546 /* ofxTweener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTweener.h; sourceTree = "<group>"; };
 		3AAF41BC17623CDA00F94546 /* Franchise-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Franchise-Bold.ttf"; path = "bin/data/Franchise-Bold.ttf"; sourceTree = "<group>"; };
 		3AAF41BD17623CDA00F94546 /* Ubuntu-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Ubuntu-Light.ttf"; path = "bin/data/Ubuntu-Light.ttf"; sourceTree = "<group>"; };
 		3AAF41BE17623CDA00F94546 /* verdana.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = verdana.ttf; path = bin/data/verdana.ttf; sourceTree = "<group>"; };
@@ -917,26 +911,6 @@
 			path = src;
 			sourceTree = "<group>";
 		};
-		3AAF41B417623C0900F94546 /* ofxTweener */ = {
-			isa = PBXGroup;
-			children = (
-				3AAF41B517623C0900F94546 /* src */,
-			);
-			name = ofxTweener;
-			path = ../../../addons/ofxTweener;
-			sourceTree = "<group>";
-		};
-		3AAF41B517623C0900F94546 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				3AAF41B617623C0900F94546 /* ofxTransitions.cpp */,
-				3AAF41B717623C0900F94546 /* ofxTransitions.h */,
-				3AAF41B817623C0900F94546 /* ofxTweener.cpp */,
-				3AAF41B917623C0900F94546 /* ofxTweener.h */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
@@ -944,7 +918,6 @@
 				3A5F1F1318B7BA27008F7486 /* ofxUI */,
 				3A8BA6DC18B77C3900E8C9C8 /* ofxTween */,
 				3A75C0F518B35E6D0013648A /* ofxMultiTouchPad */,
-				3AAF41B417623C0900F94546 /* ofxTweener */,
 				3AAF412317623B5600F94546 /* MediaInfoDLL */,
 				3AAF413717623B5600F94546 /* ofxMSATimer */,
 				3AAF413C17623B5600F94546 /* ofxNotify */,
@@ -1264,9 +1237,7 @@
 				3A5F1F8218B7BA27008F7486 /* ofxUIImageSlider.cpp in Sources */,
 				3A5F1F9418B7BA27008F7486 /* ofxUISpectrum.cpp in Sources */,
 				3A5F1F9018B7BA27008F7486 /* ofxUIScrollableCanvas.cpp in Sources */,
-				3AAF41BA17623C0900F94546 /* ofxTransitions.cpp in Sources */,
 				3A5F1F8A18B7BA27008F7486 /* ofxUIMultiImageToggle.cpp in Sources */,
-				3AAF41BB17623C0900F94546 /* ofxTweener.cpp in Sources */,
 				3A8BA70518B77C3900E8C9C8 /* ofxEasingSine.cpp in Sources */,
 				3A5F1F7D18B7BA27008F7486 /* ofxUIFPS.cpp in Sources */,
 				3A8BA6FF18B77C3900E8C9C8 /* ofxEasingElastic.cpp in Sources */,

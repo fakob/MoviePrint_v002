@@ -4,7 +4,6 @@
 #include "fakGrabbedMovie.h"
 #include "fakGrabbedMovieStill.h"
 #include "ofxUI.h"
-#include "ofxTweener.h"
 #include "fakMemory.h"
 #include "fakGrabbedListItem.h"
 #include "fakGrabbedList.h"
@@ -234,6 +233,8 @@ public:
     ofxTween tweenMoviePrintPreview;
     ofxTween tweenBlendStartDropImage;
     ofxTween tweenBlendStartDropImageCounter;
+    ofxTween tweenFading;
+    ofxTween tweenTimeDelay;
     
     ofxEasingBack 	easingback;
     ofxEasingBounce 	easingbounce;
@@ -334,8 +335,6 @@ public:
     int counterToLoad;
     int counterToPrint;
 
-    float scrubFade;
-    
     // scrubbing
     int scrubWindowGridNumber;
     float scrubDelta;
