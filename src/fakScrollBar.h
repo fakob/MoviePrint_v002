@@ -38,7 +38,7 @@ public:
         sbDecelarationConstant = _sbLoose;
         setToTop();
         sbScrollBarDrag = false;
-        sbOvershootHeight = 200;
+        sbOvershootHeight = 40;
         sbMouseIsScrolling = false;
         sbCalculateScrollInertia = false;
         scrollMultiplier = _scrollMultiplier;
@@ -227,6 +227,12 @@ public:
                     if ( sbMouseScrollVelocity.y <= 0 ) { // Return to bottom position
                         sbMouseScrollVelocity.y = sbReturnToBaseConstant * abs(sbScrollBarY - sbScrollBarYMax) *-1;
 //                        ofLog(OF_LOG_VERBOSE, "Return " + ofToString(sbScrollBarY,2));
+                    } else if (sbNumberOfTouches > 0){ // if still holding then do nothing
+                        sbMouseScrollVelocity.y = sbMouseScrollVelocity.y * ((sbOvershootHeight - abs(sbScrollBarY - sbScrollBarYMax))/(float)sbOvershootHeight);
+                        sbMouseScrollVelocity.y = fmin(sbMouseScrollVelocity.y, sbMaxVelocity);
+                        sbScrollBarY = fmin(sbScrollBarY,sbScrollBarYMax+sbOvershootHeight);
+                        ofLog(OF_LOG_VERBOSE, "sbMouseScrollVelocity " + ofToString(sbMouseScrollVelocity.y,2));
+                        ofLog(OF_LOG_VERBOSE, "Holding " + ofToString(sbScrollBarY,2));
                     } else { // Slow down
                         float change = sbBounceDecelerationConstant * getTimeRampDown();
                         sbMouseScrollVelocity.y -= change;
@@ -245,6 +251,12 @@ public:
                     
                     if ( sbMouseScrollVelocity.y > 0 ) { // Return to bottom position
                         sbMouseScrollVelocity.y = sbReturnToBaseConstant * abs(sbScrollBarY - sbScrollBarYMin);
+                    } else if (sbNumberOfTouches > 0){ // if still holding then do nothing
+                        sbMouseScrollVelocity.y = sbMouseScrollVelocity.y * ((sbOvershootHeight - abs(sbScrollBarY - sbScrollBarYMin))/(float)sbOvershootHeight);
+                        sbMouseScrollVelocity.y = fmin(sbMouseScrollVelocity.y, sbMaxVelocity);
+                        sbScrollBarY = fmax(sbScrollBarY,sbScrollBarYMin-sbOvershootHeight);
+                        ofLog(OF_LOG_VERBOSE, "sbMouseScrollVelocity " + ofToString(sbMouseScrollVelocity.y,2));
+                        ofLog(OF_LOG_VERBOSE, "Holding " + ofToString(sbScrollBarY,2));
                     } else { // Slow down
                         float change = sbBounceDecelerationConstant * getTimeRampDown();
                         sbMouseScrollVelocity.y += change;

@@ -1785,7 +1785,7 @@ void testApp::drawUpdateScreen(){
 void testApp::drawLoadMovieScreen(){
 
     ofPushStyle();
-    ofSetColor(255, 255, 255, 100);
+    ofSetColor(255, 255, 255, 200);
     backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
     loadMovieImage.draw(ofGetWidth()/2-loadMovieImage.getWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2-loadMovieImage.getHeight()/2);
     ofPopStyle();
