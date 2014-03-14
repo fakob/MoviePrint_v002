@@ -799,7 +799,7 @@ public:
                 float tempFontScale = _scaleFactor;
 
                 // get Width of Type
-                float tempWidthOfName = gmFontStashFranchise.getBBox("name", tempFontHeightBig * _scaleFactor, 0, 0).getWidth();
+                float tempWidthOfName = gmFontStashFranchise.getBBox("movieprint", tempFontHeightBig * _scaleFactor, 0, 0).getWidth();
                 float tempWidthOfPathName = gmFontStashHelveticaMedium.getBBox(ofToString(gmMovie.getMoviePath()), tempFontHeightSmall * _scaleFactor, 0, 0).getWidth();
                 
                 // when PathName width bigger then display width then downscale the PathName
@@ -809,7 +809,7 @@ public:
                 float tempWidthOfPath = gmFontStashHelveticaLight.getBBox(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, 0, 0).getWidth();
 
                 ofSetColor(255, 255, 255, 255);
-                gmFontStashFranchise.draw("name",20 * _scaleFactor, (int)((_x + _gridMargin) * _scaleFactor), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+                gmFontStashFranchise.draw("movieprint",20 * _scaleFactor, (int)((_x + _gridMargin) * _scaleFactor), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
                 gmFontStashHelveticaLight.draw(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
                 gmFontStashHelveticaMedium.draw(ofToString(gmMIFileNameClean), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1 + tempWidthOfPath), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
             }
