@@ -1010,7 +1010,7 @@ void testApp::keyReleased(int key){
                 uiSliderValueLow = uiRangeSliderTimeline->getScaledValueLow();
                 uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
                 updateAllStills();
-                ofLog(OF_LOG_VERBOSE, "asdfadfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfaf" );
+                ofLog(OF_LOG_VERBOSE, "ArrowKey Manipulation of Timeline Slider" );
                 
             }
         }

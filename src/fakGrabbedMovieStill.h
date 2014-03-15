@@ -50,7 +50,7 @@ public:
                 ofVec2f transferID = ofVec2f(gsID, 4);
                 ofNotifyEvent(gsMovedInside, transferID, this);
             } else {
-                gsRollOver0 = FALSE;
+                gsRollOver0 = TRUE;
                 ofVec2f transferID = ofVec2f(gsID, 0);
                 ofNotifyEvent(gsMovedInside, transferID, this);
             }

@@ -101,6 +101,7 @@ public:
         frameBackwardImage.loadImage("MoviePrint_FrameBackward_v001_00000.png");
         frameBackward2Image.loadImage("MoviePrint_FrameBackward_v001_00001.png");
         frameBackward3Image.loadImage("MoviePrint_FrameBackward_v001_00002.png");
+        scrubImage.loadImage("MoviePrint_Scrubb_v001_00000.png");
         corruptImage.loadImage("MoviePrint_Corrupt_v001_00000.jpg");
         emptyImage.loadImage("MoviePrint_Corrupt_00000.jpg");
         updatingStill.loadImage("MoviePrint_StillUpdating_v001_00000.png");
@@ -622,7 +623,21 @@ public:
                         ofSetColor(255);
                     }
                     setOutPointImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
+
+                    ofSetColor(255, 5);
+                    if (grabbedStill[i].gsRollOver0) {
+                        ofSetColor(255, 20);
+                    }
+                    ofRectRounded(grabbedStill[i].gsX + grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight, grabbedStill[i].gsDrawHeight, grabbedStill[0].gsDrawWidth/64);
+                    ofSetColor(255, 50);
+                    if (grabbedStill[i].gsRollOver0) {
+                        ofSetColor(255);
+                    }
+                    ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
+                    scrubImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight/2, scrubImage.getWidth()/2, scrubImage.getHeight()/2);
+                    ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
                     
+
                     ofSetColor(255, 50);
                     if (grabbedStill[i].gsRollOver1) {
                         ofSetColor(255);
@@ -962,6 +977,7 @@ public:
     ofImage updatingStill;
     ofImage headerImage;
     ofImage emptyImage;
+    ofImage scrubImage;
     
     ofxFontStash gmFontStashHelveticaLight;
     ofxFontStash gmFontStashHelveticaMedium;
