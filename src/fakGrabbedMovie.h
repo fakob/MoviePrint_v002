@@ -10,7 +10,7 @@
 #define __fakBreakupVideo__fakGrabbedMovie__
 
 #include "ofMain.h"
-#include "fakGrabbedStill.h"
+#include "fakGrabbedMovieStill.h"
 #include "ofxFontStash.h"
 #include "boost/algorithm/string/split.hpp"
 #include "boost/algorithm/string/classification.hpp"
@@ -36,6 +36,21 @@ using namespace boost;
 #define FAK_MIDDLEDARKORANGECOLOR ofColor(170, 50, 0, 255)
 #define FAK_LIGHTERMIDDLEDARKORANGECOLOR ofColor(185, 55, 0, 255)
 
+#define FAK_GREENCOLOR ofColor(117, 130, 16, 255)
+#define FAK_LIGHTGRAY ofColor(205, 205, 205, 255)
+#define FAK_MIDDLEGRAY ofColor(195, 195, 195, 255)
+#define FAK_TRANSPARENT ofColor(0,0,0,0)
+
+#define FAK_ORANGE1 ofColor(255, 80, 6, 255)
+#define FAK_ORANGE2 ofColor(255, 183, 153, 255)
+#define FAK_ORANGE3 ofColor(255, 147, 101, 255)
+#define FAK_ORANGE4 ofColor(255, 168, 131, 255)
+#define FAK_ORANGE5 ofColor(255, 211, 193, 255)
+
+#define FAK_WHITE ofColor(255, 255, 255, 255)
+#define FAK_BLACK ofColor(0, 0, 0, 255)
+#define FAK_SHADOW ofColor(0, 0, 0, 130)
+#define FAK_GRAY ofColor(59, 59, 59, 255)
 
 class fakGrabbedMovie : public ofThread {
     
@@ -50,15 +65,16 @@ public:
         gmRollOver = FALSE;
         gmNumberOfStills = 1;
         gmHasNoFrames = FALSE;
+        gmCurrAllocating = false;
     }
     
     // functions
     
-    void setup(string vfMovieName, int _numberOfStills, int _gmGridWidth, int _gmGridHeight){
+    void setup(string vfMovieName, int _numberOfStills, int _gmThumbWidth, int _gmThumbHeight, bool _showPlaceHolder){
         
-        gmGridWidth = _gmGridWidth;
-        gmGridHeight = _gmGridHeight;
-
+        gmThumbWidth = _gmThumbWidth;
+        gmThumbHeight = _gmThumbHeight;
+        gmMouseEventsEnabled = false;
         
         string shaderProgram = "#version 120\n \
         #extension GL_ARB_texture_rectangle : enable\n \
@@ -85,64 +101,72 @@ public:
         frameBackwardImage.loadImage("MoviePrint_FrameBackward_v001_00000.png");
         frameBackward2Image.loadImage("MoviePrint_FrameBackward_v001_00001.png");
         frameBackward3Image.loadImage("MoviePrint_FrameBackward_v001_00002.png");
+        scrubImage.loadImage("MoviePrint_Scrubb_v001_00000.png");
         corruptImage.loadImage("MoviePrint_Corrupt_v001_00000.jpg");
+        emptyImage.loadImage("MoviePrint_Corrupt_00000.jpg");
         updatingStill.loadImage("MoviePrint_StillUpdating_v001_00000.png");
-
+        headerImage.loadImage("MoviePrint_Layout_Header_v001_00000.png");
         
         setNumberOfStills(_numberOfStills);
         
-        gmFontStash.setup("Ubuntu-Light.ttf", 1.03);
+        gmFontStashUbuntu.setup("Ubuntu-Light.ttf", 1.03);
         gmFontStashFranchise.setup("Franchise-Bold.ttf", 0.9);
+        gmFontStashHelveticaLight.setup("HelveticaNeueLTCom-Lt.ttf");
+        gmFontStashHelveticaMedium.setup("HelveticaNeueLTCom-Md.ttf");
         
+      
         franchiseFontRightSize = 0;
         stringMargin = 2;
 
         gmSetTitleInfo = TRUE; //create new title size und umbruch
         
-        loadNewMovieToBeGrabbed(vfMovieName, gmNumberOfStills);
+        loadNewMovieToBeGrabbed(vfMovieName, gmNumberOfStills, _showPlaceHolder, false);
         
         gmSetupFinished = TRUE;
         gmShowFramesUI = TRUE;
         
     }
     
-    bool loadNewMovieToBeGrabbed(string vfMovieName, int _numberOfStills){
+    bool loadNewMovieToBeGrabbed(string vfMovieName, int _numberOfStills, bool _showPlaceHolder, bool _addListener){
         
         setNumberOfStills(_numberOfStills);
         stop(FALSE);
         
         isMovieLoaded = FALSE;
         
-        ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function");
-        gmMovie.loadMovie(vfMovieName);
-        ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function");
-        
-        if (gmMovie.isLoaded()) {
-            isMovieLoaded = TRUE;
-            if (gmMovie.getTotalNumFrames() < 2) { //check if movie has only one frame, if so than calculate totalframes and later use setPosition instead of setFrame
-                gmHasNoFrames = TRUE;
-                gmFrameRate = 25;
-                gmTotalFrames = gmMovie.getDuration() * gmFrameRate;
+        if (!_showPlaceHolder) {
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ start loadMovie function");
+            gmMovie.loadMovie(vfMovieName);
+            ofLog(OF_LOG_VERBOSE, "_____________________________________ end loadMovie function");
+            
+            if (gmMovie.isLoaded()) {
+                isMovieLoaded = TRUE;
+                if (gmMovie.getTotalNumFrames() < 2) { //check if movie has only one frame, if so than calculate totalframes and later use setPosition instead of setFrame
+                    gmHasNoFrames = TRUE;
+                    gmFrameRate = 25;
+                    gmTotalFrames = gmMovie.getDuration() * gmFrameRate;
+                } else {
+                    gmHasNoFrames = FALSE;
+                    gmTotalFrames = gmMovie.getTotalNumFrames();
+                    gmFrameRate = ceil(gmTotalFrames/gmMovie.getDuration());
+                }
+                gmImageRatio = gmMovie.getWidth()/gmMovie.getHeight();
+                gmPixelRatio = gmMovie.getPixelFormat();
+                ofLog(OF_LOG_VERBOSE, "ImageRatio:" + ofToString(gmImageRatio) + " PixelRatio:" + ofToString(gmPixelRatio)  + " Framerate:" + ofToString(gmFrameRate) + " totalFrames:" + ofToString(gmTotalFrames) + " getDuration:" + ofToString(gmMovie.getDuration()));
+                
             } else {
-                gmHasNoFrames = FALSE;
-                gmTotalFrames = gmMovie.getTotalNumFrames();
-                gmFrameRate = ceil(gmTotalFrames/gmMovie.getDuration());
+                gmTotalFrames = gmNumberOfStills;
+                ofLog(OF_LOG_VERBOSE, "gmTotalFrames set manually");
+                
             }
-            gmImageRatio = gmMovie.getWidth()/gmMovie.getHeight();
-            gmPixelRatio = gmMovie.getPixelFormat();
-            ofLog(OF_LOG_VERBOSE, "ImageRatio:" + ofToString(gmImageRatio) + " PixelRatio:" + ofToString(gmPixelRatio)  + " Framerate:" + ofToString(gmFrameRate) + " totalFrames:" + ofToString(gmTotalFrames) + " getDuration:" + ofToString(gmMovie.getDuration()));
-
-        } else {
-            gmTotalFrames = gmNumberOfStills;
-            ofLog(OF_LOG_VERBOSE, "gmTotalFrames set manually");
             
         }
-        createGrid(gmNumberOfStills, gmGridWidth, gmGridHeight);
+        allocateNewNumberOfStills(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder, _addListener);
         
-//        updatingStill.resize(gmGridWidth, gmGridHeight);
+        updatingStill.resize(gmThumbWidth, gmThumbHeight);
         
         getMovieInformation(vfMovieName);
-        
+
         gmSetTitleInfo = TRUE;
         
         return isMovieLoaded;
@@ -166,12 +190,15 @@ public:
     }
     
     void getMovieInformation(string _vfMovieName){
+
+        gmMIFilePathOhne = getMoviePathName();
+        gmMIFilePath = "FilePath: " + gmMIFilePath;
+        
         
         //Information about MediaInfo
         MediaInfo MI;
         MI.Open(__T(_vfMovieName));
         
-//        MI.Option(__T("Inform"), __T("General;General\\r\\n:::CompleteName : %CompleteName%\\r\\n:::FolderName : %FolderName%\\r\\n:::FileName : %FileName%\\r\\n:::FileExtension : %FileExtension%\\r\\n:::Format : %Format%\\r\\n:::Format/Info : %Format/Info%\\r\\n:::FileSize : %FileSize%\\r\\n:::Duration : %Duration%\\r\\n:::Duration/String3 : %Duration/String3%"));
         MI.Option(__T("Inform"), __T("General;Name : %FileName%.%FileExtension%\\r\\n:::Format : %Format%\\r\\n:::Format/String : %Format/String%\\r\\n:::FileSize : %FileSize/String%\\r\\n:::Duration : %Duration/String1%\\r\\n:::\nVideo;FrameCount : %FrameCount%\\r\\n:::Size : %Width%x%Height%\\r\\n:::DisplayAspectRatio : %DisplayAspectRatio/String%\\r\\n:::FrameRate : %FrameRate/String%"));
         
         gmInfCol1 = MI.Inform();
@@ -205,36 +232,13 @@ public:
         gmMIAChannelsString = MI.Get(Stream_Audio, 0, __T("Channel(s)/String"), Info_Text).c_str();
         gmMIASamplingRate = MI.Get(Stream_Audio, 0, __T("SamplingRate/String"), Info_Text).c_str();
 
-        gmMIFileName = "FileName : " + gmMIFileName + "." + gmMIFileExtension;
-        gmMIFormat = "Format : " + gmMIFormat;
-        gmMIFormatString = "Format/String : " + gmMIFormatString;
-        gmMIFileSizeString = "FileSize : " + gmMIFileSizeString;
-        gmMIDurationString1 = "Duration : " + gmMIDurationString1;
-        gmMIFrameCount = "FrameCount : " + gmMIFrameCount;
-        gmMIWidth = "Size : " + gmMIWidth;
-        gmMIDisplayAspectRatioString = "DisplayAspectRatio : " + gmMIDisplayAspectRatioString;
-        gmMIFrameRateString = "FrameRate : " + gmMIFrameRateString;
-        gmMIVFormat = "Codec : " + gmMIVFormat;
-        gmMIFormatInfo = "Codec/Info : " + gmMIFormatInfo;
-        gmMIBitRate = "BitRate : " + gmMIBitRate;
-        gmMIPixelAspectRatio = "PixelAspectRatio : " + gmMIPixelAspectRatio;
-        gmMIDisplayAspectRatio = "DisplayAspectRatio : " + gmMIDisplayAspectRatio;
-        gmMIFrameRate_ModeString = "FrameRate_Mode : " + gmMIFrameRate_ModeString;
-        gmMIColorSpace = "ColorSpace : " + gmMIColorSpace;
-        gmMIChromaSubsampling = "ChromaSubsampling : " + gmMIChromaSubsampling;
-        gmMIBitDepthString = "BitDepth : " + gmMIBitDepthString;
-        gmMIInterlacementString = "Interlacement : " + gmMIInterlacementString;
-        gmMIAFormat = "AudioCodec : " + gmMIAFormat;
-        gmMIAChannelsString = "Channels : " + gmMIAChannelsString;
-        gmMIASamplingRate = "SamplingRate : " + gmMIASamplingRate;
-       
-//        MI.Option(__T("Inform"), __T("Video;Video\\r\\n:::Format : %Format%\\r\\n:::Format/Info : %Format/Info%\\r\\n:::Format/Version : %Format/Version%\\r\\n:::Format/Profile : %Format/Profile%\\r\\n:::Format/Compression : %Format/Compression%\\r\\n:::Format/Settings : %Format/Settings%\\r\\n:::CodecID/Info : %CodecID/Info%\\r\\n:::BitRate : %BitRate%\\r\\n:::BitRate/Mode : %BitRate/Mode%\\r\\n:::Width/String : %Width/String%\\r\\n:::Height/String : %Height/String%\\r\\n:::PixelAspectRatio : %PixelAspectRatio%\\r\\n:::PixelAspectRatio/String : %PixelAspectRatio/String%\\r\\n:::DisplayAspectRatio : %DisplayAspectRatio%\\r\\n:::DisplayAspectRatio/String : %DisplayAspectRatio/String%\\r\\n:::FrameRate_Mode/String : %FrameRate_Mode/String%\\r\\n:::FrameRate/String : %FrameRate/String%\\r\\n:::FrameCount : %FrameCount%\\r\\n:::ColorSpace : %ColorSpace%\\r\\n:::ChromaSubsampling : %ChromaSubsampling%\\r\\n:::BitDepth/String : %BitDepth/String%\\r\\n:::Interlacement : %Interlacement%\\r\\n:::Interlacement/String : %Interlacement/String%\\r\\n:::Channel(s)/String : %Channel(s)/String%\\r\\n:::ChannelPositons : %ChannelPositons%\\r\\n:::SamplingRate/String : %SamplingRate/String%"));
+        gmMIFileNameClean = gmMIFileName + "." + gmMIFileExtension;
+
         MI.Option(__T("Inform"), __T("Video;Video\\r\\n:::Format : %Format%\\r\\n:::Format/Info : %Format/Info%\\r\\n:::BitRate : %BitRate%\\r\\n:::PixelAspectRatio : %PixelAspectRatio%\\r\\n:::DisplayAspectRatio : %DisplayAspectRatio%\\r\\n:::FrameRate_Mode/String : %FrameRate_Mode/String%\\r\\n:::ColorSpace : %ColorSpace%\\r\\n:::ChromaSubsampling : %ChromaSubsampling%\\r\\n:::BitDepth/String : %BitDepth/String%\\r\\n:::Interlacement/String : %Interlacement/String%"));
         
         gmInfCol2 = MI.Inform().c_str();
         gmInfCol2 = ReplaceString(gmInfCol2, ":::", "\n");
         
-//        MI.Option(__T("Inform"), __T("Audio;Audio\\r\\n:::Format : %Format%\\r\\n:::Format/Info : %Format/Info%\\r\\n:::Format/Version : %Format/Version%\\r\\n:::Format/Profile : %Format/Profile%\\r\\n:::Format/Compression : %Format/Compression%\\r\\n:::Format/Settings : %Format/Settings%\\r\\n:::BitRate : %BitRate%\\r\\n:::BitRate/Mode : %BitRate/Mode%\\r\\n:::Channel(s)/String : %Channel(s)/String%\\r\\n:::ChannelPositons : %ChannelPositons%\\r\\n:::SamplingRate/String : %SamplingRate/String%"));
         MI.Option(__T("Inform"), __T("Audio;Audio\\r\\n:::Format : %Format%\\r\\n:::Format/Info : %Format/Info%\\r\\n:::BitRate : %BitRate%\\r\\n:::Channel(s)/String : %Channel(s)/String%\\r\\n:::ChannelPositons : %ChannelPositons%\\r\\n:::SamplingRate/String : %SamplingRate/String%"));
         
         gmInfCol3 = MI.Inform().c_str();
@@ -244,32 +248,33 @@ public:
 
     }
     
-    void createGrid(int _numberOfStills, int _gmGridWidth, int _gmGridHeight){
+    void allocateNewNumberOfStills(int _numberOfStills, int _gmThumbWidth, int _gmThumbHeight, bool _drawPlaceHolder, bool _addListener){
         if (isMovieLoaded) {
-            
-            gmGridWidth = _gmGridWidth;
-            gmGridHeight = _gmGridHeight;
+            gmCurrAllocating = true;
+            gmThumbWidth = _gmThumbWidth;
+            gmThumbHeight = _gmThumbHeight;
             
             stop(TRUE);
             while (isThreadRunning()) {
-                ofLog(OF_LOG_VERBOSE, "createGrid is waiting for thread to stop");
+                ofLog(OF_LOG_VERBOSE, "allocateNewNumberOfStills is waiting for thread to stop");
             }
             
 //          unregister All Mouse Events of the Stills (old gmNumberOfStills)
-            for(int i=0; i<gmNumberOfStills; i++)
-            {
-                grabbedStill[i].unregisterMouseEvents();
-            }
+            disableMouseEvents();
             
             setNumberOfStills(_numberOfStills);
             grabbedStill.clear();
             grabbedStill.resize(_numberOfStills);
-            
+
+            if (_addListener) {
+                enableMouseEvents();
+            }
             for(int i=0; i<gmNumberOfStills; i++)
             {
-                grabbedStill[i].registerMouseEvents();
-                ofAddListener(grabbedStill[i].gsClickedInside, this, &fakGrabbedMovie::scrubMovie);
-                ofAddListener(grabbedStill[i].gsMovedInside, this, &fakGrabbedMovie::rollOverMovie);
+                if (_addListener) {
+                    ofAddListener(grabbedStill[i].gsClickedInside, this, &fakGrabbedMovie::scrubMovie);
+                    ofAddListener(grabbedStill[i].gsMovedInside, this, &fakGrabbedMovie::rollOverMovie);
+                }
                 grabbedStill[i].gsID = i;
                 grabbedStill[i].gsX = 0;
                 grabbedStill[i].gsY = 0;
@@ -307,123 +312,24 @@ public:
             gmSetTitleInfo = TRUE; //create new title size und umbruch
 
             ofLog(OF_LOG_VERBOSE, "Allocations worked");
+        } else if (_drawPlaceHolder){
+            setNumberOfStills(_numberOfStills);
+            grabbedStill.clear();
+            grabbedStill.resize(_numberOfStills);
         }
-    }
-    
-    string wrapStringFontStash(string _text, float _size ,int _width) {
-        
-        _width = stringMargin*2 + _width;
-        string typeWrapped = "";
-        string tempString = "";
-        //        vector <string> words = ofSplitString(_text, " ");
-        vector <string> words;
-        boost::split(words, _text, boost::is_any_of(" \n"));
-        //        ofLog(OF_LOG_VERBOSE, "words: " + ofToString(words));
-        
-        for(int i=0; i<words.size(); i++) {
-            
-            string wrd = words[i];
-            
-            // if we aren't on the first word, add a space
-            if (i > 0) {
-                tempString += " ";
-            }
-            tempString += wrd;
-            
-            float stringwidth = gmFontStash.getWidth(tempString, _size) + _size/3;
-            stringwidth = ceil (stringwidth);
-            //            ofLog(OF_LOG_VERBOSE, "stringwidth:" + ofToString(stringwidth) + " tempString:" + ofToString(tempString));
-            
-            if(stringwidth >= _width) {
-                typeWrapped += "\n";
-                tempString = wrd;       // make sure we're including the extra word on the next line
-            } else if (i > 0) {
-                // if we aren't on the first word, add a space
-                typeWrapped += " ";
-            }
-            
-            typeWrapped += wrd;
-            
-        }
-        
-        //        ofLog(OF_LOG_VERBOSE, "typeWrapped" + ofToString(typeWrapped));
-        
-        return typeWrapped;
-        
-    }
-
-    string wrapStringFontStashFranchise(string _tempString, int _tempWidth, int _tempHeight) {
-        
-        int tempLineHeight = 0;
-        int tempCutPoint = 0;
-        float tempLineHeightFactor = 0.9;
-        franchiseFontRightSize = 0;
-        string tempTempString = _tempString;
-        vector<int> tempTempVecIterator;
-        tempTempVecIterator.clear();
-//        ofLog(OF_LOG_VERBOSE, "_tempString: " + ofToString(_tempString));
-
-        
-        for (int j=0; j<sizeof(tempFontSize); j++) {
-            
-            for (int i=1; i<_tempString.length(); i++) {
-                string tempStringIncrement = _tempString.substr(tempCutPoint,i-tempCutPoint);
-                float tempStringWidth = gmFontStashFranchise.getWidth(tempStringIncrement, tempFontSize[j]);
-//                ofLog(OF_LOG_VERBOSE, "tempFontSize[j]: " + ofToString(tempFontSize[j]));
-//                ofLog(OF_LOG_VERBOSE, "tempStringIncrement: " + ofToString(tempStringIncrement));
-//                ofLog(OF_LOG_VERBOSE, "tempStringWidth: " + ofToString(tempStringWidth));
-
-                if ((int)tempStringWidth > (_tempWidth-(stringMargin+stringMargin+stringMargin))) {
-                    tempCutPoint = i-1;
-                    tempLineHeight = tempLineHeight + tempFontSize[j] * tempLineHeightFactor;
-                }
-//                ofLog(OF_LOG_VERBOSE, "tempLineHeight: " + ofToString(tempLineHeight));
-
-            }
-
-                if (tempLineHeight > (_tempHeight-(tempFontSize[j] * tempLineHeightFactor + stringMargin + stringMargin))) {
-                franchiseFontRightSize = tempFontSize[j-1];
-                break;
-            }
-            if (j == (sizeof(tempFontSize)-1)) {
-                franchiseFontRightSize = tempFontSize[j];
-                break;
-            }
-            tempLineHeight = 0;
-            tempCutPoint = 0;
-        }
-        
-        tempLineHeight = 0;
-        tempCutPoint = 0;
-        
-//        ofLog(OF_LOG_VERBOSE, "franchiseFontRightSize: " + ofToString(franchiseFontRightSize));
-        for (int i=1; i<_tempString.length(); i++) {
-            string tempStringIncrement = _tempString.substr(tempCutPoint,i-tempCutPoint);
-            float tempStringWidth = gmFontStashFranchise.getWidth(tempStringIncrement, franchiseFontRightSize);
-//            ofLog(OF_LOG_VERBOSE, "tempStringIncrement: " + ofToString(tempStringIncrement));
-//            ofLog(OF_LOG_VERBOSE, "tempStringWidth: " + ofToString(tempStringWidth));
-            if ((int)tempStringWidth > (_tempWidth-(stringMargin+stringMargin+stringMargin))) {
-                tempCutPoint = i-1;
-                tempLineHeight = tempLineHeight + franchiseFontRightSize * tempLineHeightFactor;
-                tempTempVecIterator.push_back(tempCutPoint);
-            }
-            if (i == (_tempString.length()-1)) {
-                tempTempVecIterator.push_back(tempCutPoint);
-            }
-        }
-        for (int k = tempTempVecIterator.size()-1; k-- > 0; ) {
-            tempTempString.insert(tempTempVecIterator[k], "\n");
-        }
-        tempTempString = StringToUpper(tempTempString);
-        tempTempString = tempTempString.substr(0,tempTempString.length()-4);
-//        ofLog(OF_LOG_VERBOSE, "tempTempString: " + ofToString(tempTempString));
-        
-        return tempTempString;
+        gmCurrAllocating = false;
     }
     
     string StringToUpper(string strToConvert){
         std::transform(strToConvert.begin(), strToConvert.end(), strToConvert.begin(), ::toupper);
         return strToConvert;
+    }
+
+    string getMoviePathName(){
+        gmMIFilePath = ofToString(gmMovie.getMoviePath());
+        vector<string> tempVectorString = ofSplitString(gmMIFilePath, "/");
+        tempVectorString.pop_back();
+        return ofJoinString(tempVectorString, "/") + "/";
     }
     
     int CountNewlines(string s){
@@ -435,112 +341,8 @@ public:
         }
         return c;
     }
-    
-    void drawTitle(float _x, float _y, float _width, float _height, float _alpha, bool _isBeingPrinted, bool _isActive){
-        float tempStringMargin = franchiseFontRightSize/10;
-        
-        if (gmSetTitleInfo) {
-            string pathName = gmMovie.getMoviePath();
-            pathName = gmLoadedFilePath.getFileName(pathName, TRUE);
-            gmMovieName = wrapStringFontStashFranchise(pathName, _width , _height);
-//            gmSetTitleInfo = FALSE;
-        }
 
-        gmFontStashFranchise.drawMultiLine(gmMovieName, franchiseFontRightSize, _x + tempStringMargin, _y + tempStringMargin + franchiseFontRightSize*0.8);
-    }
-    
-    void drawInfo1(float _x, float _y, float _width, float _height, float _alpha, bool _isBeingPrinted, bool _isActive){
-//        float tempFontSize = 11.0;
-        float tempFontSize = ofMap(_width, 0.0, 1000.0, 0.0, 45.0);
-        float tempStringMargin = tempFontSize/4;
-        int distance = 0;
-        if (gmSetTitleInfo) {
-            gmMIFileName = wrapStringFontStash(gmMIFileName, tempFontSize, (_width+tempStringMargin+tempStringMargin));
-            gmSetTitleInfo = FALSE;
-        }
-        gmFontStash.drawMultiLine(gmMIFileName, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*1);
-        distance = CountNewlines(wrapStringFontStash(gmMIFileName, tempFontSize, (_width+tempStringMargin+tempStringMargin))) + 1;
-        if (tempStringMargin + tempFontSize*1.03*(1+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIFormat, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(1+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(2+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIFormatString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(2+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(3+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIFileSizeString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(3+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(4+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIDurationString1, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(4+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(5+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIFrameCount, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(5+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(6+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIWidth, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(6+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(7+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIDisplayAspectRatioString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(7+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(8+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIFrameRateString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(8+distance));
-        }
-    }
-
-    void drawInfo2(float _x, float _y, float _width, float _height, float _alpha, bool _isBeingPrinted, bool _isActive){
-        
-        float tempFontSize = ofMap(_width, 0.0, 1000.0, 0.0, 45.0);
-        float tempStringMargin = tempFontSize/4;
-        int distance = 1;
-        gmFontStash.drawMultiLine(gmMIVFormat, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*1);
-        if (tempStringMargin + tempFontSize*1.03*(1+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIPixelAspectRatio, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(1+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(2+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIDisplayAspectRatio, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(2+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(3+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIFrameRate_ModeString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(3+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(4+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIColorSpace, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(4+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(5+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIChromaSubsampling, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(5+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(6+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIBitDepthString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(6+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(7+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIInterlacementString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(7+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(8+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIAFormat, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(8+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(9+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIAChannelsString, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(9+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(10+distance) < _height) {
-            gmFontStash.drawMultiLine(gmMIASamplingRate, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(10+distance));
-        }
-    }
-
-    void drawInfo3(float _x, float _y, float _width, float _height, float _alpha, bool _isBeingPrinted, bool _isActive){
-        float tempFontSize = ofMap(_width, 0.0, 1000.0, 0.0, 45.0);
-        float tempStringMargin = tempFontSize/4;
-        int distance = 1;
-        string tempDispFrames = "Displayed Frames : " + ofToString(gmNumberOfStills);
-        string tempInPoint = "InPoint : " + ofToString(grabbedStill[0].gsFrameNumber);
-        string tempOutPoint = "OutPoint : " + ofToString(grabbedStill[gmNumberOfStills-1].gsFrameNumber);
-        gmFontStash.drawMultiLine(tempDispFrames, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*1);
-        if (tempStringMargin + tempFontSize*1.03*(1+distance) < _height) {
-            gmFontStash.drawMultiLine(tempInPoint, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(1+distance));
-        }
-        if (tempStringMargin + tempFontSize*1.03*(2+distance) < _height) {
-            gmFontStash.drawMultiLine(tempOutPoint, tempFontSize, _x + tempStringMargin, _y + tempStringMargin + tempFontSize*1.03*(2+distance));
-        }
-    }
-
-    void scrubMovie(int & i){
+     void scrubMovie(int & i){
         if (isMovieLoaded) {
             gmScrubID = i;
 //            ofLog(OF_LOG_VERBOSE, "rollOverMovieID" + ofToString(gmRollOverMovieID) + "gmRollOverMovieButtonID" + ofToString(gmRollOverMovieButtonID));
@@ -652,14 +454,20 @@ public:
     
     void disableMouseEvents(){
         if (isMovieLoaded) {
+            gmMouseEventsEnabled = false;
             for (int i=0; i<gmNumberOfStills; i++) {
                 grabbedStill[i].unregisterMouseEvents();
             }
         }
     }
     
+    bool getMouseEventsEnabled(){
+        return gmMouseEventsEnabled;
+    }
+    
     void enableMouseEvents(){
         if (isMovieLoaded) {
+            gmMouseEventsEnabled = true;
             for (int i=0; i<gmNumberOfStills; i++) {
                 grabbedStill[i].registerMouseEvents();
             }
@@ -736,7 +544,7 @@ public:
             }
             ofLog(OF_LOG_VERBOSE, "gsImage Size: " + ofToString(grabbedStill[i].gsImage.width)+ " x " + ofToString(grabbedStill[i].gsImage.height));
             ofLog(OF_LOG_VERBOSE, "gmMovie Size: " + ofToString(gmMovie.getWidth())+ " x " + ofToString(gmMovie.getHeight()));
-            if (grabbedStill[i].gsImage.isAllocated()) {
+            if (grabbedStill[i].gsImage.isAllocated() && !gmCurrAllocating) {
                 grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixelsRef());
                 grabbedStill[i].gsToBeGrabbed = FALSE;
             } else {
@@ -745,7 +553,7 @@ public:
         }
     }
     
-    void drawStill(int i, float _x, float _y, float _w, float _h, float _alpha, bool _isBeingPrinted, bool _superKeyPressed, bool _shiftKeyPressed){
+    void drawStill(int i, float _x, float _y, float _w, float _h, float _alpha, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
         
         if (isMovieLoaded) {
             
@@ -768,27 +576,31 @@ public:
                     grabbedStill[i].gsToBeUpdated = FALSE;
                 }
             }
-            if (!_isBeingPrinted) { // draw selection
-                if (grabbedStill[i].gsRollOver) {
-                    int tempSelectionWidth = 2;
-                    ofRect(grabbedStill[i].gsX - tempSelectionWidth/2, grabbedStill[i].gsY - tempSelectionWidth/2, grabbedStill[i].gsDrawWidth + tempSelectionWidth, grabbedStill[i].gsDrawHeight + tempSelectionWidth);
-                }
-            }
             
             shader.begin(); // draw still with rounded corners
             shader.setUniformTexture("maskTex", maskFbo.getTextureReference(), 1 );
+            
+            ofSetColor(255, 255, 255, 255);
             grabbedStill[i].gsTexture.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
+            
             shader.end();
+
+            // draw selection
+            ofPushStyle();
+            ofSetColor(255, 255, 255, 30);
+            if (grabbedStill[i].gsRollOver) {
+                int tempSelectionWidth = 2;
+                ofRect(grabbedStill[i].gsX - tempSelectionWidth/2, grabbedStill[i].gsY - tempSelectionWidth/2, grabbedStill[i].gsDrawWidth + tempSelectionWidth, grabbedStill[i].gsDrawHeight + tempSelectionWidth);
+            }
+            ofPopStyle();
             
             // draw update image
             if (grabbedStill[i].gsToBeGrabbed) {
                 ofPushMatrix();
                 ofPushStyle();
+                ofSetColor(0, 0, 0, 130);
+                ofRect(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
                 ofSetColor(255, 255, 255, 200);
-//                updatingStill.draw(floor(grabbedStill[i].gsX), floor(grabbedStill[i].gsY), grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
-//                if (grabbedStill[i].gsDrawWidth < 160) { // doesnt work right now
-//                    updatingStill.drawSubsection(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, updatingStill.width/2 - grabbedStill[i].gsDrawWidth/4, updatingStill.height/2 - grabbedStill[i].gsDrawHeight/4, updatingStill.width/2, updatingStill.height/2);
-//                } else {
                 updatingStill.drawSubsection(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight,updatingStill.width/2 - grabbedStill[i].gsDrawWidth/2, updatingStill.height/2 - grabbedStill[i].gsDrawHeight/2);
 //                }
                 ofPopStyle();
@@ -799,7 +611,7 @@ public:
                 drawStillUI(i, grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, _alpha);
             }
             
-            if (!_isBeingPrinted) { // drawing overlay graphics
+            // drawing overlay graphics
                 if (grabbedStill[i].gsRollOver) {
                     ofSetColor(255, 50);
                     if (grabbedStill[i].gsRollOver3) {
@@ -811,7 +623,21 @@ public:
                         ofSetColor(255);
                     }
                     setOutPointImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
+
+                    ofSetColor(255, 5);
+                    if (grabbedStill[i].gsRollOver0) {
+                        ofSetColor(255, 20);
+                    }
+                    ofRectRounded(grabbedStill[i].gsX + grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight, grabbedStill[i].gsDrawHeight, grabbedStill[0].gsDrawWidth/64);
+                    ofSetColor(255, 50);
+                    if (grabbedStill[i].gsRollOver0) {
+                        ofSetColor(255);
+                    }
+                    ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
+                    scrubImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight/2, scrubImage.getWidth()/2, scrubImage.getHeight()/2);
+                    ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
                     
+
                     ofSetColor(255, 50);
                     if (grabbedStill[i].gsRollOver1) {
                         ofSetColor(255);
@@ -837,117 +663,198 @@ public:
                     }
 
                 }
+            ofPopStyle();
+            ofSetColor(255);
+        } else if (_drawPlaceHolder){
+            ofPushStyle();
+            ofEnableAlphaBlending();
+            ofSetColor(255);
+            
+//            grabbedStill[i].gsX = _x;
+//            grabbedStill[i].gsY = _y;
+//            grabbedStill[i].gsDrawWidth = _w;
+//            grabbedStill[i].gsDrawHeight = _h;
+//            grabbedStill[i].gsResizeFactor = gmMovie.getWidth()/_w;
+            
+//            shader.begin(); // draw still with rounded corners
+//            shader.setUniformTexture("maskTex", maskFbo.getTextureReference(), 1 );
+//            grabbedStill[i].gsTexture.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
+//            shader.end();
+            
+
+            ofPushMatrix();
+            ofPushStyle();
+            ofSetColor(FAK_MIDDLEGRAY);
+//            updatingStill.drawSubsection(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight,updatingStill.width/2 - grabbedStill[i].gsDrawWidth/2, updatingStill.height/2 - grabbedStill[i].gsDrawHeight/2);
+            
+            ofRect(_x, _y, _w, _h);
+            
+            ofPopStyle();
+            ofPopMatrix();
+
+            ofPopStyle();
+            ofSetColor(255);        }
+    }
+
+    void printStill(int i, float _x, float _y, float _w, float _h, bool _drawPlaceHolder){
+        
+        if (_drawPlaceHolder){
+            
+            ofPushStyle();
+            ofSetColor(FAK_MIDDLEGRAY);
+            
+            ofRect(_x, _y, _w, _h);
+            
+            ofPopStyle();
+            
+        } else if (isMovieLoaded) {
+            
+            ofPushStyle();
+            ofEnableAlphaBlending();
+            ofSetColor(255);
+            
+            grabbedStill[i].gsDrawWidth = _w;
+            grabbedStill[i].gsDrawHeight = _h;
+            grabbedStill[i].gsResizeFactor = gmMovie.getWidth()/_w;
+            
+            if (grabbedStill[i].gsToBeUpdated) { // load textures in proper size
+                if (!grabbedStill[i].gsToBeGrabbed) {
+                    if (gmCalcResizeSwitch) {
+                        grabbedStill[i].gsImage.resize(grabbedStill[i].gsWidth, grabbedStill[i].gsHeight);
+                    }
+                    grabbedStill[i].gsTexture.loadData(grabbedStill[i].gsImage);
+                    grabbedStill[i].gsToBeUpdated = FALSE;
+                }
             }
+            
+            shader.begin(); // draw still with rounded corners
+            shader.setUniformTexture("maskTex", maskFbo.getTextureReference(), 1 );
+            grabbedStill[i].gsTexture.draw(_x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
+            shader.end();
+            
+            if (gmShowFramesUI) { // drawing UI
+                drawStillUI(i, _x, _y, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight, 1.0);
+            }
+            
             ofPopStyle();
             ofSetColor(255);
         }
     }
     
-    void drawGmMoviePrint(float _x, float _y, int _gridColumns, float _gridMargin, float _scrollAmount, float _scaleFactor, float _alpha, bool _isBeingPrinted, bool _isActive, bool _superKeyPressed, bool _shiftKeyPressed){
+    void drawGridOfStills(float _x, float _y, int _gridColumns, float _gridMargin, float _scrollAmount, float _scaleFactor, float _alpha, bool _isBeingPrinted, bool _isActive, bool _superKeyPressed, bool _shiftKeyPressed, bool _drawPlaceHolder){
 
-        if (_isBeingPrinted) {
-            gmSetTitleInfo = TRUE; //create new title size und umbruch
-        }
-        
         // draw all frames
         ofPushStyle();
+        ofPushMatrix();
         ofEnableAlphaBlending();
         ofSetColor(FAK_ORANGECOLOR); // draw title rect
-        ofRectRounded((_x + (gmGridWidth+_gridMargin)*0) * _scaleFactor, _y * _scaleFactor , gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, gmGridWidth * _scaleFactor/64);
-        ofSetColor(30, 30, 30, 255); // draw info rect
-        ofRectRounded((_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor, _y * _scaleFactor, ((gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor, gmGridHeight * _scaleFactor, gmGridWidth * _scaleFactor/64);
-        ofSetColor(255); // draw title and infos
-        drawTitle((_x + (gmGridWidth+_gridMargin)*0) * _scaleFactor, _y * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
-        drawInfo1((_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor, _y * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
-        drawInfo2((_x + (gmGridWidth+_gridMargin)*2) * _scaleFactor, _y * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
-        drawInfo3((_x + (gmGridWidth+_gridMargin)*3) * _scaleFactor, _y * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, TRUE);
-        
-        ofSetColor(FAK_DARKORANGECOLOR); // draw mini timeline 
-        int tempTimelineHeight = 5;
-        ofRect((_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor, (_y + gmGridHeight - tempTimelineHeight) * _scaleFactor, ((gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor, tempTimelineHeight * _scaleFactor);
-        ofSetColor(FAK_ORANGECOLOR); // draw mini timeline range
-        ofRect(
-            ofMap(grabbedStill[0].gsFrameNumber,
-                  0,
-                  gmTotalFrames-1,
-                  (_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor,
-                  ((_x + (gmGridWidth+_gridMargin)*1) + (gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor),
-            (_y + gmGridHeight - tempTimelineHeight) * _scaleFactor,
-            ofMap(grabbedStill[gmNumberOfStills-1].gsFrameNumber - grabbedStill[0].gsFrameNumber,
-                  0,
-                  gmTotalFrames-1,
-                  0,
-                  ((gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor),
-            tempTimelineHeight * _scaleFactor);
-
-        for(int i=0; i<gmNumberOfStills; i++) // draw mini timeline stills positions
-        {
-            if (grabbedStill[i].gsManipulated) {
-                ofSetColor(200, 200, 200, 255);
-            } else {
-                ofSetColor(FAK_MIDDLEDARKORANGECOLOR, 255);
-            }
-            ofRect(
-                   ofMap(grabbedStill[i].gsFrameNumber,
-                         0,
-                         gmTotalFrames-1,
-                         (_x + (gmGridWidth+_gridMargin)*1) * _scaleFactor,
-                         ((_x + (gmGridWidth+_gridMargin)*1) + (gmGridWidth * (_gridColumns-1))+(_gridMargin * (_gridColumns-2))) * _scaleFactor),
-                   (_y + gmGridHeight - tempTimelineHeight) * _scaleFactor,
-                   1 * _scaleFactor,
-                   tempTimelineHeight * _scaleFactor);
-        }
-        
+       
         ofSetColor(255, 255, 255, 255); // draw stills
         for(int i=0; i<gmNumberOfStills; i++)
         {
-            float tempY = ((gmGridHeight+_gridMargin)*((i+_gridColumns)/_gridColumns) + _y );
-            drawStill(i, (_x + (gmGridWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor, tempY * _scaleFactor, gmGridWidth * _scaleFactor, gmGridHeight * _scaleFactor, 1, _isBeingPrinted, _superKeyPressed, _shiftKeyPressed);
-        }
-        
-        
-        // draw the inbetween frames linien
-        if (!_isBeingPrinted) {
-            for(int i=0; i<gmNumberOfStills-1; i++)
-            {
-                if (i%_gridColumns != _gridColumns-1) {
-                    float tempY = ((gmGridHeight+_gridMargin)*((i+_gridColumns)/_gridColumns) + _y );
-                    ofPushStyle();
-                    ofColor tempColor(FAK_DARKORANGECOLOR);
-                    ofSetColor(tempColor);
-                    int tempHeight = (gmGridHeight - gmGridWidth/32) * _scaleFactor;
-                    int deltaFrame = abs(grabbedStill[i+1].gsFrameNumber - grabbedStill[i].gsFrameNumber);
-                    //                int mappedDelta = ofMap(deltaFrame, 0, 20, 0, 3, TRUE);
-                    if (deltaFrame <= 1) {
-                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth) * _scaleFactor, (tempY + gmGridHeight/2) * _scaleFactor - _gridMargin*2, _gridMargin * _scaleFactor, _gridMargin*4);
-                    } else if (deltaFrame > 1 && deltaFrame <= 5){
-                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + _gridMargin/2) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
-                    } else if (deltaFrame > 5 && deltaFrame <= 10){
-                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/3)) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
-                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/3)*2) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
-                    } else if (deltaFrame > 10){
-                        //                    int mappedBrightness = ofMap(deltaFrame, 0, gmTotalFrames, 100, 200);
-                        //                    ofSetColor(mappedBrightness);
-                        //                    tempColor.setBrightness(mappedBrightness);
-                        //                    ofSetColor(tempColor);
-                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/4)) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
-                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/4)*2) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
-                        ofRect((_x + (gmGridWidth+_gridMargin)*(i%_gridColumns) + gmGridWidth + (_gridMargin/4)*3) * _scaleFactor, (tempY + gmGridWidth/64) * _scaleFactor, 1 * _scaleFactor, tempHeight);
-                    }
-                    ofPopStyle();
-                }
-            }
-            
+            float tempX = (_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor;
+            float tempY = (_y + (gmThumbHeight+_gridMargin)*(i/_gridColumns)) * _scaleFactor;
+            drawStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, 1, _superKeyPressed, _shiftKeyPressed, _drawPlaceHolder);
         }
         
         if (_isBeingPrinted) {
             gmSetTitleInfo = TRUE; //create new title size und umbruch
         }
         
+        ofPopMatrix();
         ofPopStyle();
         
     }
     
+    void drawMoviePrint(float _x, float _y, int _gridColumns, int _gridRows, float _gridMargin, float _scaleFactor, float _alpha, bool _drawPlaceHolder, float _printHeaderHeight, bool _printDisplayVideoAudioInfo, bool _drawPreview){
+
+        ofPushStyle();
+        ofPushMatrix();
+
+        if (_printDisplayVideoAudioInfo) { // draw info header
+            ofPushStyle();
+            ofPushMatrix();
+            ofEnableAlphaBlending();
+            ofSetColor(FAK_GRAY);
+            ofRect(_x * _scaleFactor, _y * _scaleFactor, (_gridMargin + (gmThumbWidth+_gridMargin) * _gridColumns) * _scaleFactor, _printHeaderHeight * _scaleFactor);
+            for(int i=0; i<_gridColumns; i++)
+            {
+                switch (i%5) {
+                    case 0:
+                        ofSetColor(FAK_ORANGE1);
+                        break;
+                    case 1:
+                        ofSetColor(FAK_ORANGE2);
+                        break;
+                    case 2:
+                        ofSetColor(FAK_ORANGE3);
+                        break;
+                    case 3:
+                        ofSetColor(FAK_ORANGE4);
+                        break;
+                    case 4:
+                        ofSetColor(FAK_ORANGE5);
+                        break;
+                    default:
+                        ofSetColor(255, 255, 255, 255);
+                        break;
+                }
+                // draw orange stripes
+                ofRect((_x + _gridMargin + (gmThumbWidth+_gridMargin) * i) * _scaleFactor, (_y + _printHeaderHeight*0.7) * _scaleFactor, gmThumbWidth * _scaleFactor, _printHeaderHeight* 0.15 * _scaleFactor);
+            }
+            
+            if (_drawPreview) { // draw Info fake for preview
+                ofSetColor(255, 255, 255, 255);
+                ofRect(((_x + _gridMargin) * _scaleFactor), ((_y +_printHeaderHeight*0.3) * _scaleFactor), (gmThumbWidth/4.0 - gmThumbWidth/40.0) * _scaleFactor, _printHeaderHeight*0.3 * _scaleFactor);
+                ofRect(((_x + _gridMargin + gmThumbWidth/4.0) * _scaleFactor), ((_y + _printHeaderHeight*0.45) * _scaleFactor), ((gmThumbWidth/4)*3) * _scaleFactor, _printHeaderHeight*0.15 * _scaleFactor);
+            } else {
+                // draw Info text
+                float tempFontHeightBig = 20;
+                float tempFontHeightSmall = 10;
+                float tempFontScale = _scaleFactor;
+
+                // get Width of Type
+                float tempWidthOfName = gmFontStashFranchise.getBBox("movieprint", tempFontHeightBig * _scaleFactor, 0, 0).getWidth();
+                float tempWidthOfPathName = gmFontStashHelveticaMedium.getBBox(ofToString(gmMovie.getMoviePath()), tempFontHeightSmall * _scaleFactor, 0, 0).getWidth();
+                
+                // when PathName width bigger then display width then downscale the PathName
+                if ((((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName) <= tempWidthOfPathName) {
+                    tempFontScale = tempFontScale * (((gmThumbWidth+_gridMargin) * _gridColumns - _gridMargin) * _scaleFactor + tempWidthOfName)/tempWidthOfPathName*0.75;
+                }
+                float tempWidthOfPath = gmFontStashHelveticaLight.getBBox(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, 0, 0).getWidth();
+
+                ofSetColor(255, 255, 255, 255);
+                gmFontStashFranchise.draw("movieprint",20 * _scaleFactor, (int)((_x + _gridMargin) * _scaleFactor), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+                gmFontStashHelveticaLight.draw(ofToString(gmMIFilePathOhne), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+                gmFontStashHelveticaMedium.draw(ofToString(gmMIFileNameClean), tempFontHeightSmall * tempFontScale, (int)((_x + _gridMargin) * _scaleFactor + tempWidthOfName + tempWidthOfName*0.1 + tempWidthOfPath), (int)((_y + _printHeaderHeight*0.6) * _scaleFactor));
+            }
+
+            ofPopMatrix();
+            ofPopStyle();
+            
+            ofTranslate(0, (_printHeaderHeight) * _scaleFactor);
+        }
+        
+        // draw all frames
+        ofEnableAlphaBlending();
+        ofSetColor(255, 255, 255, 255);
+        int tempNumberOfThumbsToDisplay;
+        tempNumberOfThumbsToDisplay = _gridColumns * _gridRows;
+
+        for(int i=0; i<tempNumberOfThumbsToDisplay; i++)
+        {
+            float tempX = (_x + _gridMargin + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor;
+            float tempY = (_y + _gridMargin + (gmThumbHeight+_gridMargin)*(i/_gridColumns)) * _scaleFactor;
+            if (((_gridColumns * _gridRows) > gmNumberOfStills) || !isMovieLoaded) {
+                printStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, true);
+            } else {
+                printStill(i, tempX, tempY, gmThumbWidth * _scaleFactor, gmThumbHeight * _scaleFactor, _drawPlaceHolder);
+            }
+        }
+        ofPopMatrix();
+        ofPopStyle();
+    }
+
     void drawStillUI(int i, float x, float y, float w, float h, float _alpha){
         
         if (isMovieLoaded) {
@@ -964,7 +871,7 @@ public:
             ofPushStyle();
             ofEnableAlphaBlending();
             
-            ofRectangle rect = gmFontStash.getBoundingBoxSize(dummyString, tempFontSize, 0, 0);
+            ofRectangle rect = gmFontStashUbuntu.getBBox(dummyString, tempFontSize, 0, 0);
             if (grabbedStill[i].gsManipulated) {
                 ofSetColor(FAK_ORANGECOLOR, 200*_alpha);
             } else {
@@ -976,7 +883,7 @@ public:
             } else {
                 ofSetColor(255, 255 * _alpha);
             }
-            gmFontStash.drawMultiLine(dummyString, tempFontSize, x + rect.width*0.015, y+rect.height + rect.height*0.15);
+            gmFontStashUbuntu.drawMultiLine(dummyString, tempFontSize, x + rect.width*0.015, y+rect.height + rect.height*0.15);
             
             ofPopStyle();
             
@@ -1025,7 +932,7 @@ public:
     ofVideoPlayer gmMovie;
     ofVideoPlayer gmMovieScrub;
     
-    vector<fakGrabbedStill> grabbedStill;
+    vector<fakGrabbedMovieStill> grabbedStill;
     
     bool devTurnOffMovieSwitch = FALSE;
     bool isMovieLoaded = FALSE;
@@ -1052,9 +959,11 @@ public:
     int gmLowerLimitY;
     int gmLeftLimitX;
     int gmRightLimitX;
-    int gmGridWidth;
-    int gmGridHeight;
+    int gmThumbWidth;
+    int gmThumbHeight;
     bool gmShowFramesUI;
+    bool gmMouseEventsEnabled;
+    bool gmCurrAllocating;
     
     ofImage setInPointImage;
     ofImage setOutPointImage;
@@ -1066,8 +975,13 @@ public:
     ofImage frameBackward3Image;
     ofImage corruptImage;
     ofImage updatingStill;
+    ofImage headerImage;
+    ofImage emptyImage;
+    ofImage scrubImage;
     
-    ofxFontStash gmFontStash;
+    ofxFontStash gmFontStashHelveticaLight;
+    ofxFontStash gmFontStashHelveticaMedium;
+    ofxFontStash gmFontStashUbuntu;
     ofxFontStash gmFontStashFranchise;
     int tempFontSize[24] = {6, 10, 14, 18, 22, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 80, 92, 108, 128, 256, 300};
 
@@ -1075,10 +989,13 @@ public:
     int stringMargin;
     ofFilePath gmLoadedFilePath;
     bool gmSetTitleInfo;
+    string gmInfCollected;
     string gmInfCol1, gmInfCol2, gmInfCol3;
     string gmMIFileName, gmMIFileExtension, gmMIFormat, gmMIFormatString, gmMIFileSizeString, gmMIDurationString1, gmMIFrameCount, gmMIWidth, gmMIHeight, gmMIDisplayAspectRatioString, gmMIFrameRateString;
     string gmMIVFormat, gmMIFormatInfo, gmMIBitRate, gmMIPixelAspectRatio, gmMIDisplayAspectRatio, gmMIFrameRate_ModeString, gmMIColorSpace, gmMIChromaSubsampling, gmMIBitDepthString, gmMIInterlacementString;
-    string gmMIAFormat, gmMIAChannelsString, gmMIASamplingRate;
+    string gmMIAFormat, gmMIAChannelsString, gmMIASamplingRate, gmMIFilePath;
+    
+    string gmMIFileNameClean, gmMIFilePathOhne;
 
     // used for rounded corner mask
     ofShader shader;

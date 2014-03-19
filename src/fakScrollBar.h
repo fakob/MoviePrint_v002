@@ -21,29 +21,29 @@ public:
     
     // Functions
     
-    void setup(int _sbID, int _sbScrollAreaX, int _sbScrollAreaY, int _sbScrollAreaWidth, int _sbScrollAreaHeight, float _sbScrollBarX, float _sbScrollBarY, int _sbScrollBarWidth, float _sbLoose, float _scrollMultiplier){
+    void setup(int _sbID, int _windowWidth, int _windowHeight, int _headerHeight, int _footerHeight, int _sbScrollAreaWidth, float _sbLoose, float _scrollMultiplier, int _sbScrollBarMargin){
         sbFirstClick = false;
         sbFirstClickMouseY = 0;
-        sbScrollBarWidth = _sbScrollBarWidth;
-        sbScrollBarHeight = _sbScrollAreaHeight/2;
+        sbScrollAreaX = _windowWidth -  _sbScrollAreaWidth;
+        sbScrollAreaY = _headerHeight;
         sbScrollAreaWidth = _sbScrollAreaWidth;
-        sbScrollAreaHeight = _sbScrollAreaHeight;
-        sbScrollBarX = _sbScrollBarX;
-        sbScrollBarY = _sbScrollBarY;
-        sbScrollAreaX = _sbScrollAreaX;
-        sbScrollAreaY = _sbScrollAreaY;
+        sbScrollAreaHeight = _windowHeight - _headerHeight - _footerHeight;
+        sbScrollBarWidth = _sbScrollAreaWidth - _sbScrollBarMargin*2;
+        sbScrollBarHeight = sbScrollAreaHeight/2;
+        sbScrollBarX = _windowWidth -  _sbScrollAreaWidth + _sbScrollBarMargin;
         sbScrollBarY = sbScrollAreaY + sbScrollAreaHeight/2 - sbScrollBarHeight/2;
         sbScrollBarYNew = sbScrollBarY;
-        sbScrollBarYMin = _sbScrollAreaY;
-        sbScrollBarYMax = _sbScrollAreaY + sbScrollAreaHeight - sbScrollBarHeight;
+        sbScrollBarYMin = sbScrollAreaY;
+        sbScrollBarYMax = sbScrollAreaY + sbScrollAreaHeight - sbScrollBarHeight;
         sbDecelarationConstant = _sbLoose;
         setToTop();
         sbScrollBarDrag = false;
-        sbOvershootHeight = 200;
+        sbOvershootHeight = 40;
         sbMouseIsScrolling = false;
         sbCalculateScrollInertia = false;
         scrollMultiplier = _scrollMultiplier;
         sbFirstNoTouchMouseEvent = true;
+        sbScrollBarMargin = _sbScrollBarMargin;
         
         // should not be lower then 1000ms as the magic mouse sends still after having stopped scrolling
         // as the magic mouse sends shaky values it is difficult to control it
@@ -69,14 +69,15 @@ public:
         sbScrollBarYMax = sbScrollAreaY + sbScrollAreaHeight - sbScrollBarHeight;
     }
     
-    void updateScrollBar(int _newWindowWidth, int _newWindowHeight, int _newScrollHeight, int _headerHeight, int _footerHeight){
+    void updateScrollBar(int _newWindowWidth, int _newWindowHeight, int _headerHeight, int _footerHeight, int _newScrollHeight){
         unregisterMouseEvents();
-        setup(0, _newWindowWidth-sbScrollBarWidth, _headerHeight, sbScrollBarWidth, _newWindowHeight-_headerHeight-_footerHeight, _newWindowWidth-sbScrollBarWidth, _newWindowHeight/2, sbScrollBarWidth, 16, scrollMultiplier);
+//        setup(0, _newWindowWidth-sbScrollBarWidth - sbScrollBarMargin*2, _headerHeight, sbScrollBarWidth, _newWindowHeight-_headerHeight-_footerHeight, _newWindowWidth-sbScrollBarWidth, _newWindowHeight/2, sbScrollBarWidth, sbDecelarationConstant, scrollMultiplier, sbScrollBarMargin);
+        setup(0, _newWindowWidth, _newWindowHeight, _headerHeight, _footerHeight, sbScrollAreaWidth, sbDecelarationConstant, scrollMultiplier, sbScrollBarMargin);
         setScrollHeight((float)_newScrollHeight);
         if (sbActive) {
             registerMouseEvents();
         }
-        ofLog(OF_LOG_VERBOSE, "sbActive:" + ofToString(sbActive) );
+//        ofLog(OF_LOG_VERBOSE, "sbActive:" + ofToString(sbActive) );
     }
     
     void setScrollBarWidth(int _scrollBarWidth){
@@ -201,7 +202,7 @@ public:
             
             
             if (sbScrollBarDrag) {
-                ofLog(OF_LOG_VERBOSE, "_____________barUpdate " + ofToString(sbMousePos.y) );
+//                ofLog(OF_LOG_VERBOSE, "_____________barUpdate " + ofToString(sbMousePos.y) );
                 if (sbRollOverScrollBar) {
                     if (!sbFirstClick) {
                         sbFirstClickMouseY = sbMousePos.y - sbScrollBarY;
@@ -219,18 +220,24 @@ public:
                 }
                 
             } else if (sbCalculateScrollInertia){
-                ofLog(OF_LOG_VERBOSE, "_____________scrollUpdate " + ofToString(sbMouseScrollVelocity.y) );
+//                ofLog(OF_LOG_VERBOSE, "_____________scrollUpdate " + ofToString(sbMouseScrollVelocity.y) );
                 
                 if ((sbScrollBarY > sbScrollBarYMax)) {
                     
                     if ( sbMouseScrollVelocity.y <= 0 ) { // Return to bottom position
                         sbMouseScrollVelocity.y = sbReturnToBaseConstant * abs(sbScrollBarY - sbScrollBarYMax) *-1;
-                        ofLog(OF_LOG_VERBOSE, "Return " + ofToString(sbScrollBarY,2));
+//                        ofLog(OF_LOG_VERBOSE, "Return " + ofToString(sbScrollBarY,2));
+                    } else if (sbNumberOfTouches > 0){ // if still holding then do nothing
+                        sbMouseScrollVelocity.y = sbMouseScrollVelocity.y * ((sbOvershootHeight - abs(sbScrollBarY - sbScrollBarYMax))/(float)sbOvershootHeight);
+                        sbMouseScrollVelocity.y = fmin(sbMouseScrollVelocity.y, sbMaxVelocity);
+                        sbScrollBarY = fmin(sbScrollBarY,sbScrollBarYMax+sbOvershootHeight);
+                        ofLog(OF_LOG_VERBOSE, "sbMouseScrollVelocity " + ofToString(sbMouseScrollVelocity.y,2));
+                        ofLog(OF_LOG_VERBOSE, "Holding " + ofToString(sbScrollBarY,2));
                     } else { // Slow down
                         float change = sbBounceDecelerationConstant * getTimeRampDown();
                         sbMouseScrollVelocity.y -= change;
                         sbMouseScrollVelocity.y = fmin(sbMouseScrollVelocity.y, sbMaxVelocity);
-                        ofLog(OF_LOG_VERBOSE, "Slow down " + ofToString(sbScrollBarY,2));
+//                        ofLog(OF_LOG_VERBOSE, "Slow down " + ofToString(sbScrollBarY,2));
                     }
                     
                     sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y * getTimeRampDown();
@@ -243,7 +250,13 @@ public:
                 } else if ((sbScrollBarY < sbScrollBarYMin)) {
                     
                     if ( sbMouseScrollVelocity.y > 0 ) { // Return to bottom position
-                        sbMouseScrollVelocity.y = sbReturnToBaseConstant * abs(sbScrollBarY);
+                        sbMouseScrollVelocity.y = sbReturnToBaseConstant * abs(sbScrollBarY - sbScrollBarYMin);
+                    } else if (sbNumberOfTouches > 0){ // if still holding then do nothing
+                        sbMouseScrollVelocity.y = sbMouseScrollVelocity.y * ((sbOvershootHeight - abs(sbScrollBarY - sbScrollBarYMin))/(float)sbOvershootHeight);
+                        sbMouseScrollVelocity.y = fmin(sbMouseScrollVelocity.y, sbMaxVelocity);
+                        sbScrollBarY = fmax(sbScrollBarY,sbScrollBarYMin-sbOvershootHeight);
+                        ofLog(OF_LOG_VERBOSE, "sbMouseScrollVelocity " + ofToString(sbMouseScrollVelocity.y,2));
+                        ofLog(OF_LOG_VERBOSE, "Holding " + ofToString(sbScrollBarY,2));
                     } else { // Slow down
                         float change = sbBounceDecelerationConstant * getTimeRampDown();
                         sbMouseScrollVelocity.y += change;
@@ -252,8 +265,8 @@ public:
                     
                     sbScrollBarY = sbScrollBarY + sbMouseScrollVelocity.y * getTimeRampDown();
                     
-                    if (sbScrollBarY > -0.001){ // when close to aim (threshold 0.001), lead to aim manually
-                        sbScrollBarY = 0;
+                    if (sbScrollBarY > (sbScrollBarYMin - 0.001)){ // when close to aim (threshold 0.001), lead to aim manually
+                        sbScrollBarY = sbScrollBarYMin;
                         sbMouseScrollVelocity = ofVec2f(0.0,0.0);
                     }
                     
@@ -280,6 +293,8 @@ public:
         if (sbActive) {
             ofPushStyle();
             ofEnableAlphaBlending();
+            ofSetColor(255, 255, 255, 15);
+            ofRect(sbScrollAreaX, sbScrollAreaY, sbScrollAreaWidth, sbScrollAreaHeight);
             ofSetColor(238, 71, 0, 127);
             ofRectRounded(sbScrollBarX, sbScrollBarY, sbScrollBarWidth, sbScrollBarHeight, sbScrollBarWidth);
             ofPopStyle();
@@ -298,6 +313,7 @@ public:
     int sbScrollBarHeight; //drawn height of ScrollBar
     float sbScrollBarYMin;
     float sbScrollBarYMax;
+    int sbScrollBarMargin;
     bool sbActive;
     
     int sbScrollAreaWidth;
