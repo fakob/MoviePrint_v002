@@ -277,8 +277,7 @@ void testApp::setGUISettingsMoviePrint(){
 	names.push_back("Display Frames");
 	names.push_back("Display TimeCode");
 	names.push_back("off");
-    ofxUIRadio *uiRadioSetFrameDisplay = guiSettingsMoviePrint->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
-    uiRadioSetFrameDisplay->activateToggle("TimeCode");
+    uiRadioSetFrameDisplay = guiSettingsMoviePrint->addRadio("RADIO_HORIZONTAL", names, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
 
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
 
@@ -293,13 +292,14 @@ void testApp::setGUISettingsMoviePrint(){
 //    names3.push_back("gif");
     guiSettingsMoviePrint->addRadio("Choose Output Format", names3, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
     uiRadioPrintOutputFormat =(ofxUIRadio *) guiSettingsMoviePrint->getWidget("Choose Output Format");
+    
     vector<string> names4;
     names4.push_back("1024px width");
     names4.push_back("2048px width");
     names4.push_back("3072px width");
     names4.push_back("4096px width");
     guiSettingsMoviePrint->addRadio("MoviePrint Width", names4, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
-    uiRadioPrintOutputFormat =(ofxUIRadio *) guiSettingsMoviePrint->getWidget("MoviePrint Width");
+    uiRadioPrintOutputWidth =(ofxUIRadio *) guiSettingsMoviePrint->getWidget("MoviePrint Width");
     
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
     guiSettingsMoviePrint->addLabelButton("Save MoviePrint", false,length-xInit,dim);
@@ -954,7 +954,7 @@ void testApp::keyPressed(int key){
                 
             case 'x':
             {
-                showFBO = !showFBO;
+                reloadMoviePrintDataSet();
                 
             }
                 break;
@@ -1514,6 +1514,81 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
     }
 
+}
+
+//--------------------------------------------------------------
+void testApp::reloadMoviePrintDataSet(){
+    string tempName;
+    ofxUIWidget *tempWidget;
+    
+    //    moviePrintDataSet.printGridColumns = 4;
+    //    moviePrintDataSet.printGridRows = 5;
+    moviePrintDataSet.printGridMargin = 5;
+//    guiEvent(ofxUIEventArgs &e);
+    moviePrintDataSet.printDisplayVideoAudioInfo = true;
+    
+    moviePrintDataSet.printDisplayTimecodeFramesOff = 2;
+    switch (moviePrintDataSet.printDisplayTimecodeFramesOff) {
+        case 0:
+            tempName = "off";
+            break;
+        case 1:
+            tempName = "Display Frames";
+            break;
+        case 2:
+            tempName = "Display TimeCode";
+            break;
+        default:
+            tempName = "off";
+            break;
+    }
+    uiRadioSetFrameDisplay->activateToggle(tempName);
+    tempWidget = guiSettingsMoviePrint->getWidget(tempName);
+    guiSettingsMoviePrint->triggerEvent(tempWidget);
+    
+    moviePrintDataSet.printSingleFrames = false;
+    
+    moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_PNG;
+    
+    switch (moviePrintDataSet.printFormat) {
+        case OF_IMAGE_FORMAT_PNG:
+            tempName = "png with alpha";
+            break;
+        case OF_IMAGE_FORMAT_JPEG:
+            tempName = "jpg";
+            break;
+        default:
+            tempName = "png with alpha";
+            break;
+    }
+    uiRadioPrintOutputFormat->activateToggle(tempName);
+    tempWidget = guiSettingsMoviePrint->getWidget(tempName);
+    guiSettingsMoviePrint->triggerEvent(tempWidget);
+
+    
+    moviePrintDataSet.printSizeWidth = 1024;
+    switch (moviePrintDataSet.printSizeWidth) {
+        case 1024:
+            tempName = "1024px width";
+            break;
+        case 2048:
+            tempName = "2048px width";
+            break;
+        case 3072:
+            tempName = "3072px width";
+            break;
+        case 4096:
+            tempName = "4096px width";
+            break;
+        default:
+            tempName = "1024px width";
+            break;
+    }
+    uiRadioPrintOutputWidth->activateToggle(tempName);
+    tempWidget = guiSettingsMoviePrint->getWidget(tempName);
+    guiSettingsMoviePrint->triggerEvent(tempWidget);
+    
+    
 }
 
 //--------------------------------------------------------------

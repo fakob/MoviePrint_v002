@@ -85,6 +85,7 @@ public:
     void startListPrinting();
     void stopListPrinting();
     void handlingEventOverlays();
+    void reloadMoviePrintDataSet();
 
     void updateTimeSlider(bool _wholeRange);
     void drawPrintScreen();
