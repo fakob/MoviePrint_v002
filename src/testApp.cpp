@@ -273,6 +273,8 @@ void testApp::setGUISettingsMoviePrint(){
 //    guiSettingsMoviePrint->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
 
     guiSettingsMoviePrint->addToggle("Display Header", &moviePrintDataSet.printDisplayVideoAudioInfo, dim*1.5, dim);
+    uiToggleHeaderDisplay = (ofxUIToggle *) guiSettingsMoviePrint->getWidget("Display Header");
+    
     vector<string> names;
 	names.push_back("Display Frames");
 	names.push_back("Display TimeCode");
@@ -282,6 +284,7 @@ void testApp::setGUISettingsMoviePrint(){
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
 
     guiSettingsMoviePrint->addToggle("Save also individual frames", &moviePrintDataSet.printSingleFrames, dim*1.5, dim);
+    uiToggleSingleFrames = (ofxUIToggle *) guiSettingsMoviePrint->getWidget("Save also individual frames");
 
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
 
@@ -1520,14 +1523,38 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 void testApp::reloadMoviePrintDataSet(){
     string tempName;
     ofxUIWidget *tempWidget;
-    
-    //    moviePrintDataSet.printGridColumns = 4;
-    //    moviePrintDataSet.printGridRows = 5;
+
+    moviePrintDataSet.printGridColumns = 4;
+    moviePrintDataSet.printGridRows = 5;
     moviePrintDataSet.printGridMargin = 5;
-//    guiEvent(ofxUIEventArgs &e);
     moviePrintDataSet.printDisplayVideoAudioInfo = true;
-    
     moviePrintDataSet.printDisplayTimecodeFramesOff = 2;
+    moviePrintDataSet.printSingleFrames = false;
+    moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_PNG;
+    moviePrintDataSet.printSizeWidth = 1024;
+
+    
+    // printGridColumns
+    uiSliderPrintColumns->setValue(moviePrintDataSet.printGridColumns);
+    tempWidget = guiSettingsMoviePrint->getWidget("PrintColumns");
+    guiSettingsMoviePrint->triggerEvent(tempWidget);
+    
+    // printGridRows
+    uiSliderPrintRows->setValue(moviePrintDataSet.printGridRows);
+    tempWidget = guiSettingsMoviePrint->getWidget("PrintRows");
+    guiSettingsMoviePrint->triggerEvent(tempWidget);
+    
+    // printGridMargin
+    uiSliderPrintMargin->setValue(moviePrintDataSet.printGridMargin);
+    tempWidget = guiSettingsMoviePrint->getWidget("PrintMargin");
+    guiSettingsMoviePrint->triggerEvent(tempWidget);
+    
+    // printDisplayVideoAudioInfo
+    uiToggleHeaderDisplay->setValue(moviePrintDataSet.printDisplayVideoAudioInfo);
+    tempWidget = guiSettingsMoviePrint->getWidget("Display Header");
+    guiSettingsMoviePrint->triggerEvent(tempWidget);
+    
+    // printDisplayTimecodeFramesOff
     switch (moviePrintDataSet.printDisplayTimecodeFramesOff) {
         case 0:
             tempName = "off";
@@ -1546,10 +1573,12 @@ void testApp::reloadMoviePrintDataSet(){
     tempWidget = guiSettingsMoviePrint->getWidget(tempName);
     guiSettingsMoviePrint->triggerEvent(tempWidget);
     
-    moviePrintDataSet.printSingleFrames = false;
+    // printSingleFrames
+    uiToggleSingleFrames->setValue(moviePrintDataSet.printSingleFrames);
+    tempWidget = guiSettingsMoviePrint->getWidget("Save also individual frames");
+    guiSettingsMoviePrint->triggerEvent(tempWidget);
     
-    moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_PNG;
-    
+    // printFormat
     switch (moviePrintDataSet.printFormat) {
         case OF_IMAGE_FORMAT_PNG:
             tempName = "png with alpha";
@@ -1565,8 +1594,7 @@ void testApp::reloadMoviePrintDataSet(){
     tempWidget = guiSettingsMoviePrint->getWidget(tempName);
     guiSettingsMoviePrint->triggerEvent(tempWidget);
 
-    
-    moviePrintDataSet.printSizeWidth = 1024;
+    // printSizeWidth
     switch (moviePrintDataSet.printSizeWidth) {
         case 1024:
             tempName = "1024px width";
@@ -2418,6 +2446,7 @@ void testApp::moveToList(){
         tweenListInOut.setParameters(1,easingexpo,ofxTween::easeInOut,0.0,1.0,ofRandom(600, 1000),0);
     }
 }
+
 //--------------------------------------------------------------
 void testApp::handlingEventOverlays(){
     // check if one of the topMenus is active and in this case turn of the mouseEvents for the thumbs

@@ -229,6 +229,8 @@ public:
     ofxUIIntSlider *uiSliderPrintColumns;
 //    ofxUIIntSlider *uiSliderThumbWidth;
     ofxUIIntSlider *uiSliderPrintMargin;
+    ofxUIToggle *uiToggleHeaderDisplay;
+    ofxUIToggle *uiToggleSingleFrames;
     ofxUIRadio *uiRadioSetFrameDisplay;
     ofxUIRadio *uiRadioSetFitManually;
     ofxUIIntSlider *uiSliderNumberOfThumbs;
