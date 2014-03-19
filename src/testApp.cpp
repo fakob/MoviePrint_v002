@@ -86,6 +86,16 @@ void testApp::setup(){
     moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_PNG;
     moviePrintDataSet.printSizeWidth = 1024;
     
+    previousMoviePrintDataSet.printGridColumns = 3;
+    previousMoviePrintDataSet.printGridRows = 3;
+    previousMoviePrintDataSet.printGridMargin = 3;
+    previousMoviePrintDataSet.printDisplayVideoAudioInfo = false;
+    previousMoviePrintDataSet.printDisplayTimecodeFramesOff = 1;
+    previousMoviePrintDataSet.printSingleFrames = true;
+    previousMoviePrintDataSet.printFormat = OF_IMAGE_FORMAT_JPEG;
+    previousMoviePrintDataSet.printSizeWidth = 2048;
+
+    
     threadIsRunning = FALSE;
     
     showPrintScreen = FALSE;
@@ -957,7 +967,7 @@ void testApp::keyPressed(int key){
                 
             case 'x':
             {
-                reloadMoviePrintDataSet();
+                setMoviePrintDataSet(previousMoviePrintDataSet);
                 
             }
                 break;
@@ -1520,18 +1530,18 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 }
 
 //--------------------------------------------------------------
-void testApp::reloadMoviePrintDataSet(){
+void testApp::setMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
     string tempName;
     ofxUIWidget *tempWidget;
 
-    moviePrintDataSet.printGridColumns = 4;
-    moviePrintDataSet.printGridRows = 5;
-    moviePrintDataSet.printGridMargin = 5;
-    moviePrintDataSet.printDisplayVideoAudioInfo = true;
-    moviePrintDataSet.printDisplayTimecodeFramesOff = 2;
-    moviePrintDataSet.printSingleFrames = false;
-    moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_PNG;
-    moviePrintDataSet.printSizeWidth = 1024;
+    moviePrintDataSet.printGridColumns = _newMoviePrintDataSet.printGridColumns;
+    moviePrintDataSet.printGridRows = _newMoviePrintDataSet.printGridRows;
+    moviePrintDataSet.printGridMargin = _newMoviePrintDataSet.printGridMargin;
+    moviePrintDataSet.printDisplayVideoAudioInfo = _newMoviePrintDataSet.printDisplayVideoAudioInfo;
+    moviePrintDataSet.printDisplayTimecodeFramesOff = _newMoviePrintDataSet.printDisplayTimecodeFramesOff;
+    moviePrintDataSet.printSingleFrames = _newMoviePrintDataSet.printSingleFrames;
+    moviePrintDataSet.printFormat = _newMoviePrintDataSet.printFormat;
+    moviePrintDataSet.printSizeWidth = _newMoviePrintDataSet.printSizeWidth;
 
     
     // printGridColumns
@@ -1560,10 +1570,10 @@ void testApp::reloadMoviePrintDataSet(){
             tempName = "off";
             break;
         case 1:
-            tempName = "Display Frames";
+            tempName = "Display TimeCode";
             break;
         case 2:
-            tempName = "Display TimeCode";
+            tempName = "Display Frames";
             break;
         default:
             tempName = "off";

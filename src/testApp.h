@@ -38,6 +38,22 @@ public:
     void gotMessage(ofMessage msg);
     void guiEvent(ofxUIEventArgs &e);
     
+    //--------------------------------------------------------------
+    struct moviePrintDataStruct {
+        int * gridTimeArray;
+        int printGridColumns;
+        int printGridRows;
+        int printGridMargin;
+        bool printDisplayVideoAudioInfo;
+        int printDisplayTimecodeFramesOff; // 0=off, 1=timecode, 2=frames
+        bool printSingleFrames;
+        ofImageFormat printFormat;
+        int printSizeWidth;
+    };
+    
+    moviePrintDataStruct moviePrintDataSet;
+    moviePrintDataStruct previousMoviePrintDataSet;
+    
     void updateAllStills();
     void calculateNewPrintGrid();
     void calculateNewPrintSize();
@@ -85,7 +101,7 @@ public:
     void startListPrinting();
     void stopListPrinting();
     void handlingEventOverlays();
-    void reloadMoviePrintDataSet();
+    void setMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet);
 
     void updateTimeSlider(bool _wholeRange);
     void drawPrintScreen();
@@ -108,23 +124,7 @@ public:
     fakGrabbedMovie loadedMovie;
     vector<string> stringMovieInfo;
     vector<string> stringMovieData;
-    
 
-    
-    //--------------------------------------------------------------
-    struct moviePrintDataStruct {
-        int * gridTimeArray;
-        int printGridColumns;
-        int printGridRows;
-        int printGridMargin;
-        bool printDisplayVideoAudioInfo;
-        int printDisplayTimecodeFramesOff; // 0=off, 1=frames, 2=timecode
-        bool printSingleFrames;
-        ofImageFormat printFormat;
-        int printSizeWidth;
-    };
-    
-    moviePrintDataStruct moviePrintDataSet;
     
     // Images
     ofImage startImage;
