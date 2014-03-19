@@ -73,21 +73,24 @@ void testApp::setup(){
     timeSliderHeight = 10;
     gridColumns = 5;
     gridRows = 4;
-    printGridColumns = 4;
-    printGridRows = 5;
     printNumberOfThumbs = 20;
     menuWidth = 255;
     listWidth = 1320;
+
+    moviePrintDataSet.printGridColumns = 4;
+    moviePrintDataSet.printGridRows = 5;
+    moviePrintDataSet.printGridMargin = 5;
+    moviePrintDataSet.printDisplayVideoAudioInfo = true;
+    moviePrintDataSet.printDisplayTimecodeFramesOff = 0;
+    moviePrintDataSet.printSingleFrames = false;
+    moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_PNG;
+    moviePrintDataSet.printSizeWidth = 1024;
     
     threadIsRunning = FALSE;
     
-    printSizeWidth = 1024;
     showPrintScreen = FALSE;
     finishedPrinting = TRUE;
-    printFormat = OF_IMAGE_FORMAT_PNG;
-    printSingleFrames = false;
     writeMoviePrint = false;
-    printGridMargin = 5;
     
     showLoadMovieScreen = FALSE;
     finishedLoadingMovie = TRUE;
@@ -258,18 +261,18 @@ void testApp::setGUISettingsMoviePrint(){
 
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
 //    guiSettingsMoviePrint->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
-	guiSettingsMoviePrint->addIntSlider("PrintColumns", 1, 10, &printGridColumns, length-xInit,dim);
-	guiSettingsMoviePrint->addIntSlider("PrintRows", 1, 20, &printGridRows, length-xInit,dim);
+	guiSettingsMoviePrint->addIntSlider("PrintColumns", 1, 10, &moviePrintDataSet.printGridColumns, length-xInit,dim);
+	guiSettingsMoviePrint->addIntSlider("PrintRows", 1, 20, &moviePrintDataSet.printGridRows, length-xInit,dim);
     uiSliderPrintColumns = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintColumns");
     uiSliderPrintRows = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintRows");
     guiSettingsMoviePrint->addSpacer(length-xInit, 0);
-   	guiSettingsMoviePrint->addIntSlider("PrintMargin", 0, 30, &printGridMargin, length-xInit,dim);
+   	guiSettingsMoviePrint->addIntSlider("PrintMargin", 0, 30, &moviePrintDataSet.printGridMargin, length-xInit,dim);
     uiSliderPrintMargin = (ofxUIIntSlider *) guiSettingsMoviePrint->getWidget("PrintMargin");
     
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
 //    guiSettingsMoviePrint->addLabel("SHOW INFO", OFX_UI_FONT_MEDIUM);
 
-    guiSettingsMoviePrint->addToggle("Display Header", &printDisplayVideoAudioInfo, dim*1.5, dim);
+    guiSettingsMoviePrint->addToggle("Display Header", &moviePrintDataSet.printDisplayVideoAudioInfo, dim*1.5, dim);
     vector<string> names;
 	names.push_back("Display Frames");
 	names.push_back("Display TimeCode");
@@ -279,7 +282,7 @@ void testApp::setGUISettingsMoviePrint(){
 
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
 
-    guiSettingsMoviePrint->addToggle("Save also individual frames", &printSingleFrames, dim*1.5, dim);
+    guiSettingsMoviePrint->addToggle("Save also individual frames", &moviePrintDataSet.printSingleFrames, dim*1.5, dim);
 
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
 
@@ -308,11 +311,11 @@ void testApp::setGUISettingsMoviePrint(){
 
 //--------------------------------------------------------------
 void testApp::calculateNewPrintSize(){
-    printGridWidth = (thumbWidth + printGridMargin) * printGridColumns + printGridMargin;
-    if (printDisplayVideoAudioInfo) {
-        printGridHeight = (thumbHeight + printGridMargin) * printGridRows + printGridMargin + printHeaderHeight;
+    printGridWidth = (thumbWidth + moviePrintDataSet.printGridMargin) * moviePrintDataSet.printGridColumns + moviePrintDataSet.printGridMargin;
+    if (moviePrintDataSet.printDisplayVideoAudioInfo) {
+        printGridHeight = (thumbHeight + moviePrintDataSet.printGridMargin) * moviePrintDataSet.printGridRows + moviePrintDataSet.printGridMargin + printHeaderHeight;
     } else {
-        printGridHeight = (thumbHeight + printGridMargin) * printGridRows + printGridMargin;
+        printGridHeight = (thumbHeight + moviePrintDataSet.printGridMargin) * moviePrintDataSet.printGridRows + moviePrintDataSet.printGridMargin;
     }
     ofLog(OF_LOG_VERBOSE, "printGridSize" + ofToString(printGridWidth) + "x" + ofToString(printGridHeight));
 }
@@ -340,22 +343,22 @@ void testApp::calculateNewPrintGrid(){
     
     
     if (displayGridSetWithColumnsAndRows) {
-        numberOfStills = printGridColumns*printGridRows;
+        numberOfStills = moviePrintDataSet.printGridColumns*moviePrintDataSet.printGridRows;
     } else {
         numberOfStills = printNumberOfThumbs;
-        printGridRows = ceil(numberOfStills/(float)printGridColumns);
+        moviePrintDataSet.printGridRows = ceil(numberOfStills/(float)moviePrintDataSet.printGridColumns);
         
     }
 
-    if (!(gridTimeArray == 0)){
-        delete[] gridTimeArray;
+    if (!(moviePrintDataSet.gridTimeArray == 0)){
+        delete[] moviePrintDataSet.gridTimeArray;
     }
-    gridTimeArray = new (nothrow) int[numberOfStills];
-    if (gridTimeArray == 0){
+    moviePrintDataSet.gridTimeArray = new (nothrow) int[numberOfStills];
+    if (moviePrintDataSet.gridTimeArray == 0){
         ofLog(OF_LOG_VERBOSE, "Error: memory could not be allocated" );
     } else {
         for (int i=0; i<numberOfStills; i++) {
-            gridTimeArray[i] = i;
+            moviePrintDataSet.gridTimeArray[i] = i;
         }
     }
     
@@ -1316,7 +1319,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
                 movieFileName = loadedFilePath.getFileName(movieFileName, TRUE) + "_MoviePrint";
                 
                 string formatExtension;
-                if (printFormat == OF_IMAGE_FORMAT_JPEG) {
+                if (moviePrintDataSet.printFormat == OF_IMAGE_FORMAT_JPEG) {
                     formatExtension = "jpg";
                 } else {
                     formatExtension = "png";
@@ -1338,12 +1341,12 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         {
             ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
             ofLog(OF_LOG_VERBOSE, "PrintColumns " + ofToString(slider->getScaledValue()));
-            printGridColumns = (int)slider->getScaledValue();
+            moviePrintDataSet.printGridColumns = (int)slider->getScaledValue();
             if (printGridSetWithColumnsAndRows) {
-                printNumberOfThumbs = printGridColumns * printGridRows;
+                printNumberOfThumbs = moviePrintDataSet.printGridColumns * moviePrintDataSet.printGridRows;
                 calculateNewPrintGrid();
             } else {
-                printGridRows = ceil(numberOfStills/(float)printGridColumns);
+                moviePrintDataSet.printGridRows = ceil(numberOfStills/(float)moviePrintDataSet.printGridColumns);
                 calculateNewPrintSize();
             }
         }
@@ -1351,8 +1354,8 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         {
             ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
             ofLog(OF_LOG_VERBOSE, "PrintRows " + ofToString(slider->getScaledValue()));
-            printGridRows = (int)slider->getScaledValue();
-            printNumberOfThumbs = printGridColumns * printGridRows;
+            moviePrintDataSet.printGridRows = (int)slider->getScaledValue();
+            printNumberOfThumbs = moviePrintDataSet.printGridColumns * moviePrintDataSet.printGridRows;
             calculateNewPrintGrid();
         }
         else if(name == "PrintNumber")
@@ -1367,9 +1370,9 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
             if (val) {
-                printDisplayVideoAudioInfo = true;
+                moviePrintDataSet.printDisplayVideoAudioInfo = true;
             } else {
-                printDisplayVideoAudioInfo = false;
+                moviePrintDataSet.printDisplayVideoAudioInfo = false;
             }
             calculateNewPrintSize();
         }
@@ -1378,9 +1381,9 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
             if (val) {
-                printSingleFrames = true;
+                moviePrintDataSet.printSingleFrames = true;
             } else {
-                printSingleFrames = false;
+                moviePrintDataSet.printSingleFrames = false;
             }
         }
         else if(name == "Set Columns and Rows")
@@ -1388,8 +1391,8 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
             if (val) {
-                if (!(printNumberOfThumbs == (printGridColumns * printGridRows))){
-                    printNumberOfThumbs = printGridColumns * printGridRows;
+                if (!(printNumberOfThumbs == (moviePrintDataSet.printGridColumns * moviePrintDataSet.printGridRows))){
+                    printNumberOfThumbs = moviePrintDataSet.printGridColumns * moviePrintDataSet.printGridRows;
                     calculateNewPrintGrid();
                 }
                 printGridSetWithColumnsAndRows = TRUE;
@@ -1414,7 +1417,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         {
             ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
             ofLog(OF_LOG_VERBOSE, "PrintMargin " + ofToString(slider->getScaledValue()));
-            printGridMargin = (int)slider->getScaledValue();
+            moviePrintDataSet.printGridMargin = (int)slider->getScaledValue();
             calculateNewPrintSize();
         }
         else if(name == "Display TimeCode")
@@ -1422,6 +1425,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
             if (val) {
+                moviePrintDataSet.printDisplayTimecodeFramesOff = 2;
                 loadedMovie.gmShowFramesUI = TRUE;
                 loadedMovie.vfFramesToTimeSwitch = TRUE;
             }
@@ -1432,6 +1436,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
             if (val) {
+                moviePrintDataSet.printDisplayTimecodeFramesOff = 1;
                 loadedMovie.gmShowFramesUI = TRUE;
                 loadedMovie.vfFramesToTimeSwitch = FALSE;
             }
@@ -1441,6 +1446,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
             if (val) {
+                moviePrintDataSet.printDisplayTimecodeFramesOff = 0;
                 loadedMovie.gmShowFramesUI = FALSE;
             }
         }
@@ -1449,7 +1455,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
             if (val) {
-                printFormat = OF_IMAGE_FORMAT_JPEG;
+                moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_JPEG;
             }
         }
         else if(name == "png with alpha")
@@ -1457,7 +1463,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
             if (val) {
-                printFormat = OF_IMAGE_FORMAT_PNG;
+                moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_PNG;
             }
         }
         else if(name == "1024px width")
@@ -1465,7 +1471,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
             if (val) {
-                printSizeWidth = 1024;
+                moviePrintDataSet.printSizeWidth = 1024;
             }
         }
         else if(name == "2048px width")
@@ -1473,7 +1479,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
             if (val) {
-                printSizeWidth = 2048;
+                moviePrintDataSet.printSizeWidth = 2048;
             }
         }
         else if(name == "3072px width")
@@ -1481,7 +1487,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
             if (val) {
-                printSizeWidth = 3072;
+                moviePrintDataSet.printSizeWidth = 3072;
             }
         }
         else if(name == "4096px width")
@@ -1489,7 +1495,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
             if (val) {
-                printSizeWidth = 4096;
+                moviePrintDataSet.printSizeWidth = 4096;
             }
         }
         else if(name == "Save MoviePrint")
@@ -1797,7 +1803,7 @@ void testApp::drawMoviePrintPreview(float _scaleFactor, bool _showPlaceHolder){
     ofTranslate(tempX, tempY);
     ofSetColor(255);
     backgroundImagePreview.draw(0, 0, _scaleFactor * printGridWidth, _scaleFactor * printGridHeight);
-    loadedMovie.drawMoviePrint(0, 0, printGridColumns, printGridRows, printGridMargin, _scaleFactor, 1, _showPlaceHolder, printHeaderHeight, printDisplayVideoAudioInfo, true);
+    loadedMovie.drawMoviePrint(0, 0, moviePrintDataSet.printGridColumns, moviePrintDataSet.printGridRows, moviePrintDataSet.printGridMargin, _scaleFactor, 1, _showPlaceHolder, printHeaderHeight, moviePrintDataSet.printDisplayVideoAudioInfo, true);
     
     // drawing frame
     float tempFrameWidth = 3;
@@ -1915,7 +1921,7 @@ void testApp::printImageToFile(int _printSizeWidth){
             }
         }
         
-        if (printFormat == OF_IMAGE_FORMAT_JPEG) {
+        if (moviePrintDataSet.printFormat == OF_IMAGE_FORMAT_JPEG) {
             // make sure that the jpg size can be divided by 4
             if ((outputWidth%2) == 1) {
                 outputWidth = outputWidth + 1;
@@ -1946,7 +1952,7 @@ void testApp::printImageToFile(int _printSizeWidth){
         ofBackground(0, 0, 0, 0);
         ofSetColor(255, 255, 255, 255);
 
-        loadedMovie.drawMoviePrint(0, 0, printGridColumns, printGridRows, printGridMargin, _newScaleFactor, 1, showPlaceHolder, printHeaderHeight, printDisplayVideoAudioInfo, false);
+        loadedMovie.drawMoviePrint(0, 0, moviePrintDataSet.printGridColumns, moviePrintDataSet.printGridRows, moviePrintDataSet.printGridMargin, _newScaleFactor, 1, showPlaceHolder, printHeaderHeight, moviePrintDataSet.printDisplayVideoAudioInfo, false);
 
         fboToSave.end();
         fboToSave.readToPixels(gmPixToSave);
@@ -1957,7 +1963,7 @@ void testApp::printImageToFile(int _printSizeWidth){
         string pathName = loadedMovie.gmMovie.getMoviePath();
         string fileName = loadedFilePath.getFileName(pathName, TRUE);
         string formatExtension;
-        if (printFormat == OF_IMAGE_FORMAT_JPEG) {
+        if (moviePrintDataSet.printFormat == OF_IMAGE_FORMAT_JPEG) {
             formatExtension = "jpg";
         } else {
             formatExtension = "png";
@@ -1965,7 +1971,7 @@ void testApp::printImageToFile(int _printSizeWidth){
         string imageName = fileName + "_MoviePrint." + formatExtension;
         imageName = saveMoviePrintPath + imageName;
         
-        if (printSingleFrames) {
+        if (moviePrintDataSet.printSingleFrames) {
             string singleImagePath = saveMoviePrintPath+fileName+"/";
             ofDirectory dir2(singleImagePath);
             if(!dir2.exists()){
@@ -2004,7 +2010,7 @@ void testApp::printListToFile(){
         ofLog(OF_LOG_VERBOSE, "printImageToFile: " + ofToString(itemToPrint) );
         if (loadedMovie.isMovieLoaded){
             calculateNewPrintGrid();
-            printImageToFile(printSizeWidth);
+            printImageToFile(moviePrintDataSet.printSizeWidth);
             droppedList.glDroppedItem[itemToPrint].itemProperties.ipPrinted = TRUE;
         }
         droppedList.glDroppedItem[itemToPrint].itemProperties.ipTriedToPrint = TRUE;
@@ -2191,13 +2197,13 @@ void testApp::updateAllStills(){
         
         for (int i=0; i<numberOfStills; i++) {
             if (numberOfStills == 1) {
-                gridTimeArray[i] = ofMap(0.5, 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
+                moviePrintDataSet.gridTimeArray[i] = ofMap(0.5, 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
                 
             } else {
-                gridTimeArray[i] = ofMap(float(i)/(numberOfStills - 1), 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
+                moviePrintDataSet.gridTimeArray[i] = ofMap(float(i)/(numberOfStills - 1), 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
             }
         }
-        loadedMovie.updateAllFrameNumbers(gridTimeArray);
+        loadedMovie.updateAllFrameNumbers(moviePrintDataSet.gridTimeArray);
         movieIsBeingGrabbed = TRUE;
         loadedMovie.start();
         
@@ -2247,7 +2253,7 @@ void testApp::startPrinting(){
     lockedDueToPrinting = true;
     inactivateAllMenus();
     ofLog(OF_LOG_VERBOSE, "Start Printing------------------------------------------------");
-    printImageToFile(printSizeWidth);
+    printImageToFile(moviePrintDataSet.printSizeWidth);
 }
 
 //--------------------------------------------------------------

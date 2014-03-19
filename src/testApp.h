@@ -108,8 +108,23 @@ public:
     vector<string> stringMovieInfo;
     vector<string> stringMovieData;
     
-    int * gridTimeArray;
 
+    
+    //--------------------------------------------------------------
+    struct moviePrintDataStruct {
+        int * gridTimeArray;
+        int printGridColumns;
+        int printGridRows;
+        int printGridMargin;
+        bool printDisplayVideoAudioInfo;
+        int printDisplayTimecodeFramesOff; // 0=off, 1=frames, 2=timecode
+        bool printSingleFrames;
+        ofImageFormat printFormat;
+        int printSizeWidth;
+    };
+    
+    moviePrintDataStruct moviePrintDataSet;
+    
     // Images
     ofImage startImage;
     ofImage dropZoneImage;
@@ -260,7 +275,6 @@ public:
     int headerHeight;
     int footerHeight;
     int displayGridMargin;
-    int printGridMargin;
     int scrollBarWidth;
     int scrollBarMargin;
     int loaderBarHeight;
@@ -293,14 +307,8 @@ public:
     
     // Printing
     float printScale;
-    int printSizeWidth;
-    ofImageFormat printFormat;
     ofFbo fboToPreview;
     bool printHideInPrint;
-    bool printSingleFrames;
-    bool printDisplayVideoAudioInfo;
-    int printGridColumns;
-    int printGridRows;
     int printNumberOfThumbs;
     bool showMoviePrintPreview;
 
