@@ -52,7 +52,10 @@ public:
     };
     
     moviePrintDataStruct moviePrintDataSet;
-    moviePrintDataStruct previousMoviePrintDataSet;
+    deque<moviePrintDataStruct> previousMoviePrintDataSet;
+    int undoPosition;
+    int maxUndoSteps;
+
     
     void updateAllStills();
     void calculateNewPrintGrid();
@@ -101,7 +104,11 @@ public:
     void startListPrinting();
     void stopListPrinting();
     void handlingEventOverlays();
-    void setMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet);
+    
+    void applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet);
+    void addMoviePrintDataSet(int _undoPosition);
+    void undoStep();
+    void redoStep();
 
     void updateTimeSlider(bool _wholeRange);
     void drawPrintScreen();
@@ -144,6 +151,8 @@ public:
     bool shiftKeyPressed = FALSE;
     
     bool threadIsRunning;
+    
+    bool addToUndo;
     
     bool showPrintScreen;
     bool finishedPrinting;

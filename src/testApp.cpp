@@ -86,17 +86,12 @@ void testApp::setup(){
     moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_PNG;
     moviePrintDataSet.printSizeWidth = 1024;
     
-    previousMoviePrintDataSet.printGridColumns = 3;
-    previousMoviePrintDataSet.printGridRows = 3;
-    previousMoviePrintDataSet.printGridMargin = 3;
-    previousMoviePrintDataSet.printDisplayVideoAudioInfo = false;
-    previousMoviePrintDataSet.printDisplayTimecodeFramesOff = 1;
-    previousMoviePrintDataSet.printSingleFrames = true;
-    previousMoviePrintDataSet.printFormat = OF_IMAGE_FORMAT_JPEG;
-    previousMoviePrintDataSet.printSizeWidth = 2048;
-
     
     threadIsRunning = FALSE;
+    
+    addToUndo = false;
+    undoPosition = 0;
+    maxUndoSteps = 10 + 1;
     
     showPrintScreen = FALSE;
     finishedPrinting = TRUE;
@@ -223,8 +218,13 @@ void testApp::setup(){
     ofAddListener(menuMoveToList.mMenuIsBeingClicked, this, &testApp::menuIsClicked);
     
     moveInOutTimeline();
+
     
+    previousMoviePrintDataSet.clear();
+    addMoviePrintDataSet(undoPosition); // add loaded settings as first undo step
+
     setupFinished = TRUE;
+
 }
 
 //--------------------------------------------------------------
@@ -408,8 +408,8 @@ void testApp::updateDisplayGrid(){
     
     ofxNotify() << "updateDisplayGrid - Total Number of Stills: " + ofToString(numberOfStills);
     
-    ofLog(OF_LOG_VERBOSE, "displayGridWidth: " + ofToString(displayGridWidth));
-    ofLog(OF_LOG_VERBOSE, "displayGridHeight: " + ofToString(displayGridHeight));
+//    ofLog(OF_LOG_VERBOSE, "displayGridWidth: " + ofToString(displayGridWidth));
+//    ofLog(OF_LOG_VERBOSE, "displayGridHeight: " + ofToString(displayGridHeight));
     
 }
 
@@ -967,14 +967,13 @@ void testApp::keyPressed(int key){
                 
             case 'x':
             {
-                setMoviePrintDataSet(previousMoviePrintDataSet);
-                
+                redoStep();
             }
                 break;
                 
             case 'z':
             {
-                showPlaceHolder = !showPlaceHolder;
+                undoStep();
             }
                 break;
                 
@@ -1150,6 +1149,9 @@ void testApp::mouseReleased(int x, int y, int button){
                 }
             }
         }
+        if (addToUndo) {
+            addMoviePrintDataSet(undoPosition);
+        }
         manipulateSlider = FALSE;
         loadedMovie.gmScrubMovie = FALSE;
         loadedMovie.gmRollOver = FALSE;
@@ -1307,6 +1309,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             uiSliderValueLow = uiRangeSliderTimeline->getScaledValueLow();
             uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
             manipulateSlider = TRUE;
+            addToUndo = true;
         }
         else if(name == "Columns")
         {
@@ -1362,6 +1365,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
                 moviePrintDataSet.printGridRows = ceil(numberOfStills/(float)moviePrintDataSet.printGridColumns);
                 calculateNewPrintSize();
             }
+            addToUndo = true;
         }
         else if(name == "PrintRows")
         {
@@ -1370,6 +1374,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             moviePrintDataSet.printGridRows = (int)slider->getScaledValue();
             printNumberOfThumbs = moviePrintDataSet.printGridColumns * moviePrintDataSet.printGridRows;
             calculateNewPrintGrid();
+            addToUndo = true;
         }
         else if(name == "PrintNumber")
         {
@@ -1388,6 +1393,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
                 moviePrintDataSet.printDisplayVideoAudioInfo = false;
             }
             calculateNewPrintSize();
+            addToUndo = true;
         }
         else if(name == "Save also individual frames")
         {
@@ -1398,6 +1404,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             } else {
                 moviePrintDataSet.printSingleFrames = false;
             }
+            addToUndo = true;
         }
         else if(name == "Set Columns and Rows")
         {
@@ -1432,6 +1439,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             ofLog(OF_LOG_VERBOSE, "PrintMargin " + ofToString(slider->getScaledValue()));
             moviePrintDataSet.printGridMargin = (int)slider->getScaledValue();
             calculateNewPrintSize();
+            addToUndo = true;
         }
         else if(name == "Display TimeCode")
         {
@@ -1441,8 +1449,8 @@ void testApp::guiEvent(ofxUIEventArgs &e){
                 moviePrintDataSet.printDisplayTimecodeFramesOff = 2;
                 loadedMovie.gmShowFramesUI = TRUE;
                 loadedMovie.vfFramesToTimeSwitch = TRUE;
+                addToUndo = true;
             }
-            
         }
         else if(name == "Display Frames")
         {
@@ -1452,6 +1460,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
                 moviePrintDataSet.printDisplayTimecodeFramesOff = 1;
                 loadedMovie.gmShowFramesUI = TRUE;
                 loadedMovie.vfFramesToTimeSwitch = FALSE;
+                addToUndo = true;
             }
         }
         else if(name == "off")
@@ -1461,6 +1470,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             if (val) {
                 moviePrintDataSet.printDisplayTimecodeFramesOff = 0;
                 loadedMovie.gmShowFramesUI = FALSE;
+                addToUndo = true;
             }
         }
         else if(name == "jpg")
@@ -1469,6 +1479,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             bool val = toggle->getValue();
             if (val) {
                 moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_JPEG;
+                addToUndo = true;
             }
         }
         else if(name == "png with alpha")
@@ -1477,6 +1488,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             bool val = toggle->getValue();
             if (val) {
                 moviePrintDataSet.printFormat = OF_IMAGE_FORMAT_PNG;
+                addToUndo = true;
             }
         }
         else if(name == "1024px width")
@@ -1485,6 +1497,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             bool val = toggle->getValue();
             if (val) {
                 moviePrintDataSet.printSizeWidth = 1024;
+                addToUndo = true;
             }
         }
         else if(name == "2048px width")
@@ -1493,6 +1506,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             bool val = toggle->getValue();
             if (val) {
                 moviePrintDataSet.printSizeWidth = 2048;
+                addToUndo = true;
             }
         }
         else if(name == "3072px width")
@@ -1501,6 +1515,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             bool val = toggle->getValue();
             if (val) {
                 moviePrintDataSet.printSizeWidth = 3072;
+                addToUndo = true;
             }
         }
         else if(name == "4096px width")
@@ -1509,6 +1524,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             bool val = toggle->getValue();
             if (val) {
                 moviePrintDataSet.printSizeWidth = 4096;
+                addToUndo = true;
             }
         }
         else if(name == "Save MoviePrint")
@@ -1530,7 +1546,47 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 }
 
 //--------------------------------------------------------------
-void testApp::setMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
+void testApp::undoStep(){
+    if (undoPosition > 0) {
+        undoPosition = fmin((undoPosition-1), previousMoviePrintDataSet.size() - 1);
+        applyMoviePrintDataSet(previousMoviePrintDataSet[undoPosition]);
+    }
+    ofLog(OF_LOG_VERBOSE, "UNDO undoPosition:" + ofToString(undoPosition));
+}
+
+//--------------------------------------------------------------
+void testApp::redoStep(){
+    if (undoPosition < (previousMoviePrintDataSet.size() - 1)) {
+        undoPosition = fmax(0, (undoPosition+1));
+        applyMoviePrintDataSet(previousMoviePrintDataSet[undoPosition]);
+    }
+    ofLog(OF_LOG_VERBOSE, "REDO undoPosition:" + ofToString(undoPosition));
+}
+
+//--------------------------------------------------------------
+void testApp::addMoviePrintDataSet(int _undoPosition){
+    
+    if (_undoPosition >= (previousMoviePrintDataSet.size()-1)) { // add undo step when undoPosition at end
+        previousMoviePrintDataSet.push_back(moviePrintDataSet);
+        ofLog(OF_LOG_VERBOSE, "ADD AT END undoPosition:" + ofToString(undoPosition));
+        if (previousMoviePrintDataSet.size() > maxUndoSteps) {
+            previousMoviePrintDataSet.pop_front();
+            ofLog(OF_LOG_VERBOSE, "REMOVE FIRST undoPosition:" + ofToString(undoPosition));
+        } else {
+            undoPosition++;
+        }
+    } else { // if undoPosition lower than first delete all later undo Steps and then add new undo step
+        int tempStepsToDelete = (previousMoviePrintDataSet.size() - 1 - _undoPosition);
+        tempStepsToDelete = fmin(tempStepsToDelete, previousMoviePrintDataSet.size() - 1); // make sure not to delete more than whats there
+        previousMoviePrintDataSet.erase(previousMoviePrintDataSet.end() - tempStepsToDelete,previousMoviePrintDataSet.end());
+        previousMoviePrintDataSet.push_back(moviePrintDataSet);
+        undoPosition = previousMoviePrintDataSet.size()-1;
+        ofLog(OF_LOG_VERBOSE, "ADD INBETWEEN undoPosition:" + ofToString(undoPosition));
+    }
+}
+
+//--------------------------------------------------------------
+void testApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
     string tempName;
     ofxUIWidget *tempWidget;
 
