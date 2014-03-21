@@ -120,6 +120,7 @@ public:
     void moveInOutTimeline();
     void setInPoint(int _inPoint);
     void setOutPoint(int _outPoint);
+    void updateOneThumb(int _thumbID, int _newFrameNumber);
     bool checkExtension(string _tempExtension);
     bool writeMoviePrint;
   

@@ -977,6 +977,16 @@ void testApp::keyPressed(int key){
             }
                 break;
                 
+            case 'c':
+            {
+                if (loadedMovie.getAllFrameNumbers(moviePrintDataSet.gridTimeArray, numberOfStills)){
+                    for (int i = 0; i<numberOfStills; i++) {
+                        ofLog(OF_LOG_VERBOSE, "GridTimeArray" +  ofToString(moviePrintDataSet.gridTimeArray[i]));
+                    }
+                }
+            }
+                break;
+                
             case 'w':
             {
                 if (setupFinished) {
@@ -1137,12 +1147,8 @@ void testApp::mouseReleased(int x, int y, int button){
                     tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
                     
                     int i = loadedMovie.gmScrubID;
-                    loadedMovie.grabbedStill[i].gsManipulated = TRUE;
-                    loadedMovie.grabbedStill[i].gsToBeGrabbed = TRUE;
-                    loadedMovie.grabbedStill[i].gsToBeUpdated = TRUE;
-                    if (!loadedMovie.isThreadRunning()) {
-                        loadedMovie.start();
-                    }
+                    updateOneThumb(i, loadedMovie.grabbedStill[i].gsFrameNumber);
+
                 }
                 if (rollOverClicked) {
                     rollOverButtonsClicked(rollOverMovieID, rollOverMovieButtonID);
@@ -1710,7 +1716,21 @@ void testApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet)
     tempWidget = guiSettingsMoviePrint->getWidget(tempName);
     guiSettingsMoviePrint->triggerEvent(tempWidget);
     
-    
+//    if (loadedMovie.getAllFrameNumbers(moviePrintDataSet.gridTimeArray, numberOfStills)){
+//        for (int i = 0; i<numberOfStills; i++) {
+//            if (!(moviePrintDataSet.gridTimeArray == 0)){
+//                delete[] moviePrintDataSet.gridTimeArray;
+//            }
+//            moviePrintDataSet.gridTimeArray = new (nothrow) int[numberOfStills];
+//            if (moviePrintDataSet.gridTimeArray == 0){
+//                ofLog(OF_LOG_VERBOSE, "Error: memory could not be allocated" );
+//            } else {
+//                for (int i=0; i<numberOfStills; i++) {
+//                    moviePrintDataSet.gridTimeArray[i] = i;
+//                }
+//            }
+//        }
+//    }
 }
 
 //--------------------------------------------------------------
@@ -2279,13 +2299,7 @@ void testApp::rollOverButtonsClicked(int _rollOverMovieID, int _rollOverMovieBut
         } else if (_rollOverMovieID == (numberOfStills-1)) {
             setOutPoint(j);
         } else {
-            loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber = j;
-            loadedMovie.grabbedStill[_rollOverMovieID].gsManipulated = TRUE;
-            loadedMovie.grabbedStill[_rollOverMovieID].gsToBeGrabbed = TRUE;
-            loadedMovie.grabbedStill[_rollOverMovieID].gsToBeUpdated = TRUE;
-            if (!loadedMovie.isThreadRunning()) {
-                loadedMovie.start();
-            }
+            updateOneThumb(_rollOverMovieID, j);
         }
     } else if (_rollOverMovieButtonID == 2) {
         ofLog(OF_LOG_VERBOSE, "frame forward" );
@@ -2307,16 +2321,30 @@ void testApp::rollOverButtonsClicked(int _rollOverMovieID, int _rollOverMovieBut
         } else if (_rollOverMovieID == (numberOfStills-1)) {
             setOutPoint(j);
         } else {
-            loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber = j;
-            loadedMovie.grabbedStill[_rollOverMovieID].gsManipulated = TRUE;
-            loadedMovie.grabbedStill[_rollOverMovieID].gsToBeGrabbed = TRUE;
-            loadedMovie.grabbedStill[_rollOverMovieID].gsToBeUpdated = TRUE;
-            if (!loadedMovie.isThreadRunning()) {
-                loadedMovie.start();
-            }
+            updateOneThumb(_rollOverMovieID, j);
         }
     }
     rollOverClicked = FALSE;
+}
+
+//--------------------------------------------------------------
+void testApp::updateOneThumb(int _thumbID, int _newFrameNumber){
+    loadedMovie.grabbedStill[_thumbID].gsFrameNumber = _newFrameNumber;
+    loadedMovie.grabbedStill[_thumbID].gsManipulated = TRUE;
+    loadedMovie.grabbedStill[_thumbID].gsToBeGrabbed = TRUE;
+    loadedMovie.grabbedStill[_thumbID].gsToBeUpdated = TRUE;
+    
+    // get the recent frameNumbers into GridTimeArray
+    if (loadedMovie.getAllFrameNumbers(moviePrintDataSet.gridTimeArray, numberOfStills)){
+        for (int i = 0; i<numberOfStills; i++) {
+            ofLog(OF_LOG_VERBOSE, "Updated: GridTimeArray" +  ofToString(moviePrintDataSet.gridTimeArray[i]));
+        }
+    }
+    
+    if (!loadedMovie.isThreadRunning()) {
+        loadedMovie.start();
+    }
+    ofLog(OF_LOG_VERBOSE, "manipulated one thumb" );
 }
 
 //--------------------------------------------------------------

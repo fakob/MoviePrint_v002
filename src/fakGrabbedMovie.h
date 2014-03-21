@@ -490,6 +490,18 @@ public:
             }
         }
     }
+
+    bool getAllFrameNumbers(int _gridTimeArray[], int _gridTimeArraySize){
+        if(_gridTimeArraySize == gmNumberOfStills){
+            for (int i = 0; i<gmNumberOfStills; i++) {
+                _gridTimeArray[i] = grabbedStill[i].gsFrameNumber;
+            }
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     
     string framesToTime(int _frames){
         
