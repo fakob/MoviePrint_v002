@@ -468,6 +468,7 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
     ofLog(OF_LOG_VERBOSE, "Finished Loading Movie--------------------------------------------");
     
     // reset all undo steps and save initial DataSet
+    previousMoviePrintDataSet.clear();
     addMoviePrintDataSet(0);
     
     if (!loadedMovie.isMovieLoaded) {
@@ -1585,7 +1586,7 @@ void testApp::redoStep(){
 
 //--------------------------------------------------------------
 void testApp::addMoviePrintDataSet(int _undoPosition){
-    ofLog(OF_LOG_VERBOSE, "AaddMoviePrintDataSet:" + ofToString(undoPosition));
+    ofLog(OF_LOG_VERBOSE, "addMoviePrintDataSet:" + ofToString(undoPosition));
     if (previousMoviePrintDataSet.size() == 0) { // save initial settings without increasing undoPosition
         previousMoviePrintDataSet.push_back(moviePrintDataSet);
         ofLog(OF_LOG_VERBOSE, "ADD INIT undoPosition:" + ofToString(undoPosition));
