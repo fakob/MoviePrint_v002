@@ -365,11 +365,11 @@ void testApp::calculateNewPrintGrid(){
         
     }
 
-    if (!(moviePrintDataSet.gridTimeArray == 0)){
-        delete[] moviePrintDataSet.gridTimeArray;
+    if (!(moviePrintDataSet.gridTimeArray.empty())){
+        moviePrintDataSet.gridTimeArray.clear();
     }
-    moviePrintDataSet.gridTimeArray = new (nothrow) int[numberOfStills];
-    if (moviePrintDataSet.gridTimeArray == 0){
+    moviePrintDataSet.gridTimeArray.resize(numberOfStills,0);
+    if (moviePrintDataSet.gridTimeArray.empty()){
         ofLog(OF_LOG_VERBOSE, "Error: memory could not be allocated" );
     } else {
         for (int i=0; i<numberOfStills; i++) {
@@ -988,24 +988,24 @@ void testApp::keyPressed(int key){
             {
                 for (int i=0; i < previousMoviePrintDataSet.size(); i++) {
                     ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet Adress" +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
-                    string tempString = "";
-                    for (int j=0; j < previousMoviePrintDataSet[i].printGridColumns * previousMoviePrintDataSet[i].printGridRows; j++) {
-                        tempString = tempString + ", " + ofToString(previousMoviePrintDataSet[i].gridTimeArray[j]);
-                    }
-                    ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet" +  tempString);
+//                    string tempString = "";
+//                    for (int j=0; j < previousMoviePrintDataSet[i].printGridColumns * previousMoviePrintDataSet[i].printGridRows; j++) {
+//                        tempString = tempString + ", " + ofToString(previousMoviePrintDataSet[i].gridTimeArray[j]);
+//                    }
+//                    ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet" +  tempString);
                 }
             }
                 break;
                 
             case 'c':
             {
-                if (loadedMovie.getAllFrameNumbers(moviePrintDataSet.gridTimeArray, numberOfStills)){
+//                if (loadedMovie.getAllFrameNumbers(moviePrintDataSet.gridTimeArray, numberOfStills)){
                     string tempString = "";
                     for (int j=0; j < numberOfStills; j++) {
                         tempString = tempString + ", " + ofToString(moviePrintDataSet.gridTimeArray[j]);
                     }
                     ofLog(OF_LOG_VERBOSE, "MoviePrintDataSet" +  tempString);
-                }
+//                }
             }
                 break;
                 
@@ -1162,21 +1162,25 @@ void testApp::mouseReleased(int x, int y, int button){
                     ofLog(OF_LOG_VERBOSE, "mouseReleased - updateInOut True" );
                     tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
                     updateAllStills();
+                    addToUndo = true;
                 }
                 if (updateScrub) {
                     tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
                     
                     int i = loadedMovie.gmScrubID;
                     updateOneThumb(i, loadedMovie.grabbedStill[i].gsFrameNumber);
+                    addToUndo = true;
 
                 }
                 if (rollOverClicked) {
                     rollOverButtonsClicked(rollOverMovieID, rollOverMovieButtonID);
+                    addToUndo = true;
                 }
             }
         }
         if (addToUndo) {
             addMoviePrintDataSet(undoPosition);
+            addToUndo = false;
         }
         manipulateSlider = FALSE;
         loadedMovie.gmScrubMovie = FALSE;
@@ -1621,16 +1625,36 @@ void testApp::addMoviePrintDataSet(int _undoPosition){
 }
 
 //--------------------------------------------------------------
+bool testApp::getAllFrameNumbers(){
+//        ofLog(OF_LOG_VERBOSE, "_gridTimeArraySize:" + ofToString(_gridTimeArraySize));
+//        ofLog(OF_LOG_VERBOSE, "gmNumberOfStills:" + ofToString(gmNumberOfStills));
+//        ofLog(OF_LOG_VERBOSE, "grabbedStill.size():" + ofToString(grabbedStill.size()));
+            while (loadedMovie.gmCurrAllocating) {
+                ofLog(OF_LOG_VERBOSE, "waiting for allocating to end:" + ofToString(loadedMovie.gmCurrAllocating));
+            }
+        if(loadedMovie.gmNumberOfStills == loadedMovie.grabbedStill.size()){
+            for (int i = 0; i<loadedMovie.gmNumberOfStills; i++) {
+                moviePrintDataSet.gridTimeArray[i] = loadedMovie.grabbedStill[i].gsFrameNumber;
+            }
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+//--------------------------------------------------------------
 void testApp::addGridTimeArrayToMoviePrintDataSet(){ // adds the GridTimeArray to the last previousMoviePrintDataSet
     ofLog(OF_LOG_VERBOSE, "addGridTimeArrayToMoviePrintDataSet:" + ofToString(undoPosition));
     if (previousMoviePrintDataSet.size() != 0) { // first update the manipulated frames and get the frameNumbers into the gridTimeArray
-        loadedMovie.getAllFrameNumbers(moviePrintDataSet.gridTimeArray, numberOfStills);
+        getAllFrameNumbers();
     }
-    previousMoviePrintDataSet.back().gridTimeArray = new (nothrow) int[numberOfStills];
-    if (previousMoviePrintDataSet.back().gridTimeArray == 0){
+    previousMoviePrintDataSet.back().gridTimeArray.clear();
+    previousMoviePrintDataSet.back().gridTimeArray.resize(numberOfStills,0);
+    if (previousMoviePrintDataSet.back().gridTimeArray.empty()){
         ofLog(OF_LOG_VERBOSE, "Error: memory could not be allocated" );
     } else {
-        if (!(moviePrintDataSet.gridTimeArray == 0)){
+        if (!(moviePrintDataSet.gridTimeArray.empty())){
             for (int i=0; i<numberOfStills; i++) {
                 ofLog(OF_LOG_VERBOSE, "moviePrintDataSet.gridTimeArray[i]:" + ofToString(moviePrintDataSet.gridTimeArray[i]));
                 previousMoviePrintDataSet.back().gridTimeArray[i] = moviePrintDataSet.gridTimeArray[i];
@@ -2395,7 +2419,7 @@ void testApp::updateOneThumb(int _thumbID, int _newFrameNumber){
     loadedMovie.grabbedStill[_thumbID].gsToBeUpdated = TRUE;
     
     // get the recent frameNumbers into GridTimeArray
-    if (loadedMovie.getAllFrameNumbers(moviePrintDataSet.gridTimeArray, numberOfStills)){
+    if (getAllFrameNumbers()){
 //        for (int i = 0; i<numberOfStills; i++) {
 //            ofLog(OF_LOG_VERBOSE, "Updated: GridTimeArray" +  ofToString(moviePrintDataSet.gridTimeArray[i]));
 //        }
@@ -2489,7 +2513,7 @@ void testApp::updateAllStills(){
         }
     }
     
-    loadedMovie.updateAllFrameNumbers(moviePrintDataSet.gridTimeArray);
+    loadedMovie.updateAllFrameNumbers(&moviePrintDataSet.gridTimeArray);
 
     if (updateGridTimeArrayToMoviePrintDataSet) {
         addGridTimeArrayToMoviePrintDataSet();

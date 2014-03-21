@@ -40,7 +40,7 @@ public:
     
     //--------------------------------------------------------------
     struct moviePrintDataStruct {
-        int * gridTimeArray;
+        vector<int> gridTimeArray;
         int printGridColumns;
         int printGridRows;
         int printGridMargin;
@@ -116,7 +116,8 @@ public:
     void addGridTimeArrayToMoviePrintDataSet();
     void undoStep();
     void redoStep();
-
+    bool getAllFrameNumbers();
+    
     void updateTimeSlider(bool _wholeRange);
     void drawPrintScreen();
     void drawLoadMovieScreen();
