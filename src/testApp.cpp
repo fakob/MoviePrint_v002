@@ -1565,24 +1565,52 @@ void testApp::redoStep(){
 
 //--------------------------------------------------------------
 void testApp::addMoviePrintDataSet(int _undoPosition){
-    
-    if (_undoPosition >= (previousMoviePrintDataSet.size()-1)) { // add undo step when undoPosition at end
+    if (previousMoviePrintDataSet.size() == 0) { // save initial settings without increasing undoPosition
         previousMoviePrintDataSet.push_back(moviePrintDataSet);
-        ofLog(OF_LOG_VERBOSE, "ADD AT END undoPosition:" + ofToString(undoPosition));
-        if (previousMoviePrintDataSet.size() > maxUndoSteps) {
-            previousMoviePrintDataSet.pop_front();
-            ofLog(OF_LOG_VERBOSE, "REMOVE FIRST undoPosition:" + ofToString(undoPosition));
-        } else {
-            undoPosition++;
+        ofLog(OF_LOG_VERBOSE, "ADD INIT undoPosition:" + ofToString(undoPosition));
+    } else {
+        if (hasChangedMoviePrintDataSet()) {
+            if (_undoPosition >= (previousMoviePrintDataSet.size()-1)) { // add undo step when undoPosition at end
+                previousMoviePrintDataSet.push_back(moviePrintDataSet);
+                ofLog(OF_LOG_VERBOSE, "ADD AT END undoPosition:" + ofToString(undoPosition));
+                if (previousMoviePrintDataSet.size() > maxUndoSteps) {
+                    previousMoviePrintDataSet.pop_front();
+                    ofLog(OF_LOG_VERBOSE, "REMOVE FIRST undoPosition:" + ofToString(undoPosition));
+                } else {
+                    undoPosition++;
+                }
+            } else { // if undoPosition lower than first delete all later undo Steps and then add new undo step
+                int tempStepsToDelete = (previousMoviePrintDataSet.size() - 1 - _undoPosition);
+                tempStepsToDelete = fmin(tempStepsToDelete, previousMoviePrintDataSet.size() - 1); // make sure not to delete more than whats there
+                previousMoviePrintDataSet.erase(previousMoviePrintDataSet.end() - tempStepsToDelete,previousMoviePrintDataSet.end());
+                previousMoviePrintDataSet.push_back(moviePrintDataSet);
+                undoPosition = previousMoviePrintDataSet.size()-1;
+                ofLog(OF_LOG_VERBOSE, "ADD INBETWEEN undoPosition:" + ofToString(undoPosition));
+            }
         }
-    } else { // if undoPosition lower than first delete all later undo Steps and then add new undo step
-        int tempStepsToDelete = (previousMoviePrintDataSet.size() - 1 - _undoPosition);
-        tempStepsToDelete = fmin(tempStepsToDelete, previousMoviePrintDataSet.size() - 1); // make sure not to delete more than whats there
-        previousMoviePrintDataSet.erase(previousMoviePrintDataSet.end() - tempStepsToDelete,previousMoviePrintDataSet.end());
-        previousMoviePrintDataSet.push_back(moviePrintDataSet);
-        undoPosition = previousMoviePrintDataSet.size()-1;
-        ofLog(OF_LOG_VERBOSE, "ADD INBETWEEN undoPosition:" + ofToString(undoPosition));
     }
+}
+
+//--------------------------------------------------------------
+bool testApp::hasChangedMoviePrintDataSet(){
+    if (previousMoviePrintDataSet.size() > 0) {
+        if (
+            previousMoviePrintDataSet[undoPosition].printGridColumns == moviePrintDataSet.printGridColumns &&
+            previousMoviePrintDataSet[undoPosition].printGridRows == moviePrintDataSet.printGridRows &&
+            previousMoviePrintDataSet[undoPosition].printGridMargin == moviePrintDataSet.printGridMargin &&
+            previousMoviePrintDataSet[undoPosition].printDisplayVideoAudioInfo == moviePrintDataSet.printDisplayVideoAudioInfo &&
+            previousMoviePrintDataSet[undoPosition].printDisplayTimecodeFramesOff == moviePrintDataSet.printDisplayTimecodeFramesOff &&
+            previousMoviePrintDataSet[undoPosition].printSingleFrames == moviePrintDataSet.printSingleFrames &&
+            previousMoviePrintDataSet[undoPosition].printFormat == moviePrintDataSet.printFormat &&
+            previousMoviePrintDataSet[undoPosition].printSizeWidth == moviePrintDataSet.printSizeWidth
+            ) {
+            return false;
+        } else {
+            return true;
+        }
+    } else {
+    }
+
 }
 
 //--------------------------------------------------------------

@@ -106,6 +106,7 @@ public:
     void handlingEventOverlays();
     
     void applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet);
+    bool hasChangedMoviePrintDataSet();
     void addMoviePrintDataSet(int _undoPosition);
     void undoStep();
     void redoStep();
