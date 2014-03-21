@@ -113,6 +113,7 @@ public:
     void applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet);
     bool hasChangedMoviePrintDataSet();
     void addMoviePrintDataSet(int _undoPosition);
+    void addGridTimeArrayToMoviePrintDataSet();
     void undoStep();
     void redoStep();
 
@@ -187,6 +188,8 @@ public:
     bool lockedDueToPrinting;
     bool updateNewPrintGrid;
     bool updateMovieFromList;
+    
+    bool updateGridTimeArrayToMoviePrintDataSet;
     
     bool scrollGrid;
     bool scrollList;

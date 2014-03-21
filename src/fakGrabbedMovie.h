@@ -362,8 +362,8 @@ public:
     }
     
     void setAllLimitsUpper(int _upperLimit){
-        ofLog(OF_LOG_VERBOSE, "igmNumberOfStills" + ofToString(gmNumberOfStills));
-        ofLog(OF_LOG_VERBOSE, "grabbedStill" + ofToString(grabbedStill.size()));
+//        ofLog(OF_LOG_VERBOSE, "gmNumberOfStills" + ofToString(gmNumberOfStills));
+//        ofLog(OF_LOG_VERBOSE, "grabbedStill" + ofToString(grabbedStill.size()));
         gmUpperLimitY = _upperLimit;
         for (int i=0; i<grabbedStill.size(); i++) {
             grabbedStill[i].gsUpperLimitY = gmUpperLimitY;
@@ -492,6 +492,12 @@ public:
     }
 
     bool getAllFrameNumbers(int _gridTimeArray[], int _gridTimeArraySize){
+//        ofLog(OF_LOG_VERBOSE, "_gridTimeArraySize:" + ofToString(_gridTimeArraySize));
+//        ofLog(OF_LOG_VERBOSE, "gmNumberOfStills:" + ofToString(gmNumberOfStills));
+//        ofLog(OF_LOG_VERBOSE, "grabbedStill.size():" + ofToString(grabbedStill.size()));
+            while (gmCurrAllocating) {
+                ofLog(OF_LOG_VERBOSE, "waiting for allocating to end:" + ofToString(gmCurrAllocating));
+            }
         if((_gridTimeArraySize == gmNumberOfStills) && (gmNumberOfStills == grabbedStill.size())){
             for (int i = 0; i<gmNumberOfStills; i++) {
                 _gridTimeArray[i] = grabbedStill[i].gsFrameNumber;
@@ -552,10 +558,10 @@ public:
                         ofSleepMillis(TimeToWaitForMovie);
                     }
                 }
-                ofLog(OF_LOG_VERBOSE, "setFrame: " + ofToString(gmMovie.getCurrentFrame())+ " f: " + ofToString(f) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
+//                ofLog(OF_LOG_VERBOSE, "setFrame: " + ofToString(gmMovie.getCurrentFrame())+ " f: " + ofToString(f) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
             }
-            ofLog(OF_LOG_VERBOSE, "gsImage Size: " + ofToString(grabbedStill[i].gsImage.width)+ " x " + ofToString(grabbedStill[i].gsImage.height));
-            ofLog(OF_LOG_VERBOSE, "gmMovie Size: " + ofToString(gmMovie.getWidth())+ " x " + ofToString(gmMovie.getHeight()));
+//            ofLog(OF_LOG_VERBOSE, "gsImage Size: " + ofToString(grabbedStill[i].gsImage.width)+ " x " + ofToString(grabbedStill[i].gsImage.height));
+//            ofLog(OF_LOG_VERBOSE, "gmMovie Size: " + ofToString(gmMovie.getWidth())+ " x " + ofToString(gmMovie.getHeight()));
             if (grabbedStill[i].gsImage.isAllocated() && !gmCurrAllocating) {
                 grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixelsRef());
                 grabbedStill[i].gsToBeGrabbed = FALSE;

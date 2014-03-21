@@ -61,6 +61,8 @@ void testApp::setup(){
     allMenusAreClosedOnce = 0;
     switchFromLogoToDropZone = false;
     
+    updateGridTimeArrayToMoviePrintDataSet = false;
+    
     // UI Values
     leftMargin = 5;
     rightMargin = 5;
@@ -330,7 +332,7 @@ void testApp::calculateNewPrintSize(){
     } else {
         printGridHeight = (thumbHeight + moviePrintDataSet.printGridMargin) * moviePrintDataSet.printGridRows + moviePrintDataSet.printGridMargin;
     }
-    ofLog(OF_LOG_VERBOSE, "printGridSize" + ofToString(printGridWidth) + "x" + ofToString(printGridHeight));
+//    ofLog(OF_LOG_VERBOSE, "printGridSize" + ofToString(printGridWidth) + "x" + ofToString(printGridHeight));
 }
 
 //--------------------------------------------------------------
@@ -397,9 +399,9 @@ void testApp::updateDisplayGrid(){
     displayGridWidth = (gridColumns * (thumbWidth + displayGridMargin) - displayGridMargin);
     gridRows = ceil(numberOfStills/(float)gridColumns);
     displayGridHeight = (gridRows * (thumbHeight + displayGridMargin)) - displayGridMargin;
-    ofLog(OF_LOG_VERBOSE, "displayGridMargin: " + ofToString(displayGridMargin));
-    ofLog(OF_LOG_VERBOSE, "displayGridHeight: " + ofToString(thumbHeight));
-    ofLog(OF_LOG_VERBOSE, "gridAreaHeight: " + ofToString(displayGridHeight));
+//    ofLog(OF_LOG_VERBOSE, "displayGridMargin: " + ofToString(displayGridMargin));
+//    ofLog(OF_LOG_VERBOSE, "displayGridHeight: " + ofToString(thumbHeight));
+//    ofLog(OF_LOG_VERBOSE, "gridAreaHeight: " + ofToString(displayGridHeight));
     
     updateAllLimits();
     updateTheScrollBar();
@@ -823,6 +825,7 @@ void testApp::update(){
             loadNewMovieToBeScrubbedBool = FALSE;
         }
     }
+
 }
 
 //--------------------------------------------------------------
@@ -997,9 +1000,11 @@ void testApp::keyPressed(int key){
             case 'c':
             {
                 if (loadedMovie.getAllFrameNumbers(moviePrintDataSet.gridTimeArray, numberOfStills)){
-                    for (int i = 0; i<numberOfStills; i++) {
-                        ofLog(OF_LOG_VERBOSE, "GridTimeArray" +  ofToString(moviePrintDataSet.gridTimeArray[i]));
+                    string tempString = "";
+                    for (int j=0; j < numberOfStills; j++) {
+                        tempString = tempString + ", " + ofToString(moviePrintDataSet.gridTimeArray[j]);
                     }
+                    ofLog(OF_LOG_VERBOSE, "MoviePrintDataSet" +  tempString);
                 }
             }
                 break;
@@ -1095,7 +1100,7 @@ void testApp::mouseDragged(int x, int y, int button){
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
     if (!lockedDueToInteraction && !lockedDueToPrinting) {
-        ofLog(OF_LOG_VERBOSE, "which button is clicked:" + ofToString(button));
+//        ofLog(OF_LOG_VERBOSE, "which button is clicked:" + ofToString(button));
         
         if (loadedMovie.isMovieLoaded && loadedMovie.gmMovieScrub.isLoaded()) {
             if(button == 0){
@@ -1137,7 +1142,7 @@ void testApp::mousePressed(int x, int y, int button){
             }
         }
         
-        ofLog(OF_LOG_VERBOSE, "mousePressed - Button:" + ofToString(button) );
+//        ofLog(OF_LOG_VERBOSE, "mousePressed - Button:" + ofToString(button) );
     } else {
         ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
     }
@@ -1235,7 +1240,7 @@ void testApp::updateTimeline(){
         guiTimeline->setPosition(leftMargin - OFX_UI_GLOBAL_WIDGET_SPACING, ofGetWindowHeight()  - footerHeight/2 +1 - (footerHeight/4) * menuTimeline.getRelSizeH());
         guiTimeline->setWidth(ofGetWindowWidth());
         uiRangeSliderTimeline->setWidth(displayGridWidth);
-        ofLog(OF_LOG_VERBOSE, "Timeslider Width:" + ofToString(uiRangeSliderTimeline->getWidth()));
+//        ofLog(OF_LOG_VERBOSE, "Timeslider Width:" + ofToString(uiRangeSliderTimeline->getWidth()));
     }
 }
 
@@ -1377,7 +1382,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         else if(name == "PrintColumns")
         {
             ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-            ofLog(OF_LOG_VERBOSE, "PrintColumns " + ofToString(slider->getScaledValue()));
+//            ofLog(OF_LOG_VERBOSE, "PrintColumns " + ofToString(slider->getScaledValue()));
             moviePrintDataSet.printGridColumns = (int)slider->getScaledValue();
             if (printGridSetWithColumnsAndRows) {
                 printNumberOfThumbs = moviePrintDataSet.printGridColumns * moviePrintDataSet.printGridRows;
@@ -1391,7 +1396,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         else if(name == "PrintRows")
         {
             ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-            ofLog(OF_LOG_VERBOSE, "PrintRows " + ofToString(slider->getScaledValue()));
+//            ofLog(OF_LOG_VERBOSE, "PrintRows " + ofToString(slider->getScaledValue()));
             moviePrintDataSet.printGridRows = (int)slider->getScaledValue();
             printNumberOfThumbs = moviePrintDataSet.printGridColumns * moviePrintDataSet.printGridRows;
             calculateNewPrintGrid();
@@ -1400,7 +1405,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         else if(name == "PrintNumber")
         {
             ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-            ofLog(OF_LOG_VERBOSE, "PrintNumber " + ofToString(slider->getScaledValue()));
+//            ofLog(OF_LOG_VERBOSE, "PrintNumber " + ofToString(slider->getScaledValue()));
             printNumberOfThumbs = (int)slider->getScaledValue();
             calculateNewPrintGrid();
         }
@@ -1457,7 +1462,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         else if(name == "PrintMargin")
         {
             ofxUIIntSlider *slider = (ofxUIIntSlider *) e.widget;
-            ofLog(OF_LOG_VERBOSE, "PrintMargin " + ofToString(slider->getScaledValue()));
+//            ofLog(OF_LOG_VERBOSE, "PrintMargin " + ofToString(slider->getScaledValue()));
             moviePrintDataSet.printGridMargin = (int)slider->getScaledValue();
             calculateNewPrintSize();
             addToUndo = true;
@@ -1589,15 +1594,16 @@ void testApp::addMoviePrintDataSet(int _undoPosition){
     ofLog(OF_LOG_VERBOSE, "addMoviePrintDataSet:" + ofToString(undoPosition));
     if (previousMoviePrintDataSet.size() == 0) { // save initial settings without increasing undoPosition
         previousMoviePrintDataSet.push_back(moviePrintDataSet);
-        ofLog(OF_LOG_VERBOSE, "ADD INIT undoPosition:" + ofToString(undoPosition));
+        updateGridTimeArrayToMoviePrintDataSet = true;
+//        ofLog(OF_LOG_VERBOSE, "ADD INIT undoPosition:" + ofToString(undoPosition));
     } else {
         if (hasChangedMoviePrintDataSet()) {
             if (_undoPosition >= (previousMoviePrintDataSet.size()-1)) { // add undo step when undoPosition at end
                 previousMoviePrintDataSet.push_back(moviePrintDataSet);
-                ofLog(OF_LOG_VERBOSE, "ADD AT END undoPosition:" + ofToString(undoPosition));
+//                ofLog(OF_LOG_VERBOSE, "ADD AT END undoPosition:" + ofToString(undoPosition));
                 if (previousMoviePrintDataSet.size() > maxUndoSteps) {
                     previousMoviePrintDataSet.pop_front();
-                    ofLog(OF_LOG_VERBOSE, "REMOVE FIRST undoPosition:" + ofToString(undoPosition));
+//                    ofLog(OF_LOG_VERBOSE, "REMOVE FIRST undoPosition:" + ofToString(undoPosition));
                 } else {
                     undoPosition++;
                 }
@@ -1607,31 +1613,35 @@ void testApp::addMoviePrintDataSet(int _undoPosition){
                 previousMoviePrintDataSet.erase(previousMoviePrintDataSet.end() - tempStepsToDelete,previousMoviePrintDataSet.end());
                 previousMoviePrintDataSet.push_back(moviePrintDataSet);
                 undoPosition = previousMoviePrintDataSet.size()-1;
-                ofLog(OF_LOG_VERBOSE, "ADD INBETWEEN undoPosition:" + ofToString(undoPosition));
+//                ofLog(OF_LOG_VERBOSE, "ADD INBETWEEN undoPosition:" + ofToString(undoPosition));
             }
+            updateGridTimeArrayToMoviePrintDataSet = true;
         }
     }
-    ofLog(OF_LOG_VERBOSE, "numberOfStills:" + ofToString(numberOfStills));
-    ofLog(OF_LOG_VERBOSE, "loadedMovie.gmNumberOfStills:" + ofToString(loadedMovie.gmNumberOfStills));
-    ofLog(OF_LOG_VERBOSE, "loadedMovie.grabbedStill.size():" + ofToString(loadedMovie.grabbedStill.size()));
-    if (previousMoviePrintDataSet.size() != 0) { //
+}
+
+//--------------------------------------------------------------
+void testApp::addGridTimeArrayToMoviePrintDataSet(){ // adds the GridTimeArray to the last previousMoviePrintDataSet
+    ofLog(OF_LOG_VERBOSE, "addGridTimeArrayToMoviePrintDataSet:" + ofToString(undoPosition));
+    if (previousMoviePrintDataSet.size() != 0) { // first update the manipulated frames and get the frameNumbers into the gridTimeArray
         loadedMovie.getAllFrameNumbers(moviePrintDataSet.gridTimeArray, numberOfStills);
     }
-    for (int i = 0; i<numberOfStills; i++) {
-        previousMoviePrintDataSet.back().gridTimeArray = new (nothrow) int[numberOfStills];
-        if (previousMoviePrintDataSet.back().gridTimeArray == 0){
-            ofLog(OF_LOG_VERBOSE, "Error: memory could not be allocated" );
+    previousMoviePrintDataSet.back().gridTimeArray = new (nothrow) int[numberOfStills];
+    if (previousMoviePrintDataSet.back().gridTimeArray == 0){
+        ofLog(OF_LOG_VERBOSE, "Error: memory could not be allocated" );
+    } else {
+        if (!(moviePrintDataSet.gridTimeArray == 0)){
+            for (int i=0; i<numberOfStills; i++) {
+                ofLog(OF_LOG_VERBOSE, "moviePrintDataSet.gridTimeArray[i]:" + ofToString(moviePrintDataSet.gridTimeArray[i]));
+                previousMoviePrintDataSet.back().gridTimeArray[i] = moviePrintDataSet.gridTimeArray[i];
+            }
         } else {
-            if (!(moviePrintDataSet.gridTimeArray == 0)){
-                for (int i=0; i<numberOfStills; i++) {
-                    previousMoviePrintDataSet.back().gridTimeArray[i] = moviePrintDataSet.gridTimeArray[i];
-                }
-            } else {
+            for (int i=0; i<numberOfStills; i++) {
                 previousMoviePrintDataSet.back().gridTimeArray[i] = i;
             }
         }
     }
-    
+    updateGridTimeArrayToMoviePrintDataSet = false;
 }
 
 //--------------------------------------------------------------
@@ -2458,36 +2468,42 @@ void testApp::updateTimeSlider(bool _wholeRange) {
 
 //--------------------------------------------------------------
 void testApp::updateAllStills(){
-        ofLog(OF_LOG_VERBOSE, "Start Updating------------------------------------------------");
-        finishedUpdating = FALSE;
-        showUpdateScreen = TRUE;
-        
-        if (uiSliderValueLow < 0) {
-            uiSliderValueLow = 0;
+    ofLog(OF_LOG_VERBOSE, "Start Updating------------------------------------------------");
+    finishedUpdating = FALSE;
+    showUpdateScreen = TRUE;
+    
+    if (uiSliderValueLow < 0) {
+        uiSliderValueLow = 0;
+    }
+    if (uiSliderValueHigh > (totalFrames-1)) {
+        uiSliderValueHigh = (totalFrames-1);
+    }
+    
+    
+    for (int i=0; i<numberOfStills; i++) {
+        if (numberOfStills == 1) {
+            moviePrintDataSet.gridTimeArray[i] = ofMap(0.5, 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
+            
+        } else {
+            moviePrintDataSet.gridTimeArray[i] = ofMap(float(i)/(numberOfStills - 1), 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
         }
-        if (uiSliderValueHigh > (totalFrames-1)) {
-            uiSliderValueHigh = (totalFrames-1);
-        }
-        
-        
-        for (int i=0; i<numberOfStills; i++) {
-            if (numberOfStills == 1) {
-                moviePrintDataSet.gridTimeArray[i] = ofMap(0.5, 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
-                
-            } else {
-                moviePrintDataSet.gridTimeArray[i] = ofMap(float(i)/(numberOfStills - 1), 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
-            }
-        }
-        loadedMovie.updateAllFrameNumbers(moviePrintDataSet.gridTimeArray);
-        movieIsBeingGrabbed = TRUE;
-        loadedMovie.start();
-        
-        ofxNotify() << "Thread is started - " + ofToString(numberOfStills) + " Stills are being updated";
+    }
+    
+    loadedMovie.updateAllFrameNumbers(moviePrintDataSet.gridTimeArray);
+
+    if (updateGridTimeArrayToMoviePrintDataSet) {
+        addGridTimeArrayToMoviePrintDataSet();
+    }
+
+    movieIsBeingGrabbed = TRUE;
+    loadedMovie.start();
+    
+    ofxNotify() << "Thread is started - " + ofToString(numberOfStills) + " Stills are being updated";
 }
 
 //--------------------------------------------------------------
 void testApp::menuIsOpened(int &e){
-    ofLog(OF_LOG_VERBOSE, "menuIsOpened:" + ofToString(e));
+//    ofLog(OF_LOG_VERBOSE, "menuIsOpened:" + ofToString(e));
     if (e == 5) {
         setVisibilityMoviePrintPreview(true);
     }
@@ -2497,20 +2513,20 @@ void testApp::menuIsOpened(int &e){
 
 //--------------------------------------------------------------
 void testApp::menuIsClosed(int &e){
-    ofLog(OF_LOG_VERBOSE, "menuIsClosed:" + ofToString(e));
+//    ofLog(OF_LOG_VERBOSE, "menuIsClosed:" + ofToString(e));
     if (e == 5) {
         setVisibilityMoviePrintPreview(false);
     }
     if (!menuMovieInfo.getMenuActivated() && !menuMoviePrintSettings.getMenuActivated() && !menuHelp.getMenuActivated()) {
         allMenusAreClosed = true;
         allMenusAreClosedOnce = 0;
-        ofLog(OF_LOG_VERBOSE, "allMenusAreClosed:" + ofToString(allMenusAreClosedOnce));
+//        ofLog(OF_LOG_VERBOSE, "allMenusAreClosed:" + ofToString(allMenusAreClosedOnce));
     }
 }
 
 //--------------------------------------------------------------
 void testApp::menuIsClicked(int &e){
-    ofLog(OF_LOG_VERBOSE, "menuIsClicked:" + ofToString(e));
+//    ofLog(OF_LOG_VERBOSE, "menuIsClicked:" + ofToString(e));
     if (e == 6) {
         if (droppedFiles.size() > 1) {
             if (loadedMovie.isMovieLoaded) {
