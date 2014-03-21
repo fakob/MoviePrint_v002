@@ -49,6 +49,11 @@ public:
         bool printSingleFrames;
         ofImageFormat printFormat;
         int printSizeWidth;
+        
+//        ~moviePrintDataStruct()
+//        {
+//            if (gridTimeArray) delete[] gridTimeArray;
+//        }
     };
     
     moviePrintDataStruct moviePrintDataSet;

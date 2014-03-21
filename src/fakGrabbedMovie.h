@@ -492,7 +492,7 @@ public:
     }
 
     bool getAllFrameNumbers(int _gridTimeArray[], int _gridTimeArraySize){
-        if(_gridTimeArraySize == gmNumberOfStills){
+        if((_gridTimeArraySize == gmNumberOfStills) && (gmNumberOfStills == grabbedStill.size())){
             for (int i = 0; i<gmNumberOfStills; i++) {
                 _gridTimeArray[i] = grabbedStill[i].gsFrameNumber;
             }

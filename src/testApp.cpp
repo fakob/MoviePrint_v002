@@ -467,6 +467,9 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
     ofLog(OF_LOG_VERBOSE, "_loadInBackground: " + ofToString(_loadInBackground));
     ofLog(OF_LOG_VERBOSE, "Finished Loading Movie--------------------------------------------");
     
+    // reset all undo steps and save initial DataSet
+    addMoviePrintDataSet(0);
+    
     if (!loadedMovie.isMovieLoaded) {
         guiTimeline->setVisible(FALSE);
         scrollBar.unregisterMouseEvents();
@@ -977,6 +980,19 @@ void testApp::keyPressed(int key){
             }
                 break;
                 
+            case 'v':
+            {
+                for (int i=0; i < previousMoviePrintDataSet.size(); i++) {
+                    ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet Adress" +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
+                    string tempString = "";
+                    for (int j=0; j < previousMoviePrintDataSet[i].printGridColumns * previousMoviePrintDataSet[i].printGridRows; j++) {
+                        tempString = tempString + ", " + ofToString(previousMoviePrintDataSet[i].gridTimeArray[j]);
+                    }
+                    ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet" +  tempString);
+                }
+            }
+                break;
+                
             case 'c':
             {
                 if (loadedMovie.getAllFrameNumbers(moviePrintDataSet.gridTimeArray, numberOfStills)){
@@ -990,8 +1006,6 @@ void testApp::keyPressed(int key){
             case 'w':
             {
                 if (setupFinished) {
-                    
-                    loadNewMovie("", FALSE, TRUE, FALSE);
                     
                     printListNotImage = FALSE;
                     showListView = FALSE;
@@ -1571,6 +1585,7 @@ void testApp::redoStep(){
 
 //--------------------------------------------------------------
 void testApp::addMoviePrintDataSet(int _undoPosition){
+    ofLog(OF_LOG_VERBOSE, "AaddMoviePrintDataSet:" + ofToString(undoPosition));
     if (previousMoviePrintDataSet.size() == 0) { // save initial settings without increasing undoPosition
         previousMoviePrintDataSet.push_back(moviePrintDataSet);
         ofLog(OF_LOG_VERBOSE, "ADD INIT undoPosition:" + ofToString(undoPosition));
@@ -1595,6 +1610,27 @@ void testApp::addMoviePrintDataSet(int _undoPosition){
             }
         }
     }
+    ofLog(OF_LOG_VERBOSE, "numberOfStills:" + ofToString(numberOfStills));
+    ofLog(OF_LOG_VERBOSE, "loadedMovie.gmNumberOfStills:" + ofToString(loadedMovie.gmNumberOfStills));
+    ofLog(OF_LOG_VERBOSE, "loadedMovie.grabbedStill.size():" + ofToString(loadedMovie.grabbedStill.size()));
+    if (previousMoviePrintDataSet.size() != 0) { //
+        loadedMovie.getAllFrameNumbers(moviePrintDataSet.gridTimeArray, numberOfStills);
+    }
+    for (int i = 0; i<numberOfStills; i++) {
+        previousMoviePrintDataSet.back().gridTimeArray = new (nothrow) int[numberOfStills];
+        if (previousMoviePrintDataSet.back().gridTimeArray == 0){
+            ofLog(OF_LOG_VERBOSE, "Error: memory could not be allocated" );
+        } else {
+            if (!(moviePrintDataSet.gridTimeArray == 0)){
+                for (int i=0; i<numberOfStills; i++) {
+                    previousMoviePrintDataSet.back().gridTimeArray[i] = moviePrintDataSet.gridTimeArray[i];
+                }
+            } else {
+                previousMoviePrintDataSet.back().gridTimeArray[i] = i;
+            }
+        }
+    }
+    
 }
 
 //--------------------------------------------------------------
@@ -1610,11 +1646,13 @@ bool testApp::hasChangedMoviePrintDataSet(){
             previousMoviePrintDataSet[undoPosition].printFormat == moviePrintDataSet.printFormat &&
             previousMoviePrintDataSet[undoPosition].printSizeWidth == moviePrintDataSet.printSizeWidth
             ) {
-            return false;
+            return true;
+//            return false;
         } else {
             return true;
         }
     } else {
+        return false;
     }
 
 }
@@ -1624,113 +1662,124 @@ void testApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet)
     string tempName;
     ofxUIWidget *tempWidget;
 
-    moviePrintDataSet.printGridColumns = _newMoviePrintDataSet.printGridColumns;
-    moviePrintDataSet.printGridRows = _newMoviePrintDataSet.printGridRows;
-    moviePrintDataSet.printGridMargin = _newMoviePrintDataSet.printGridMargin;
-    moviePrintDataSet.printDisplayVideoAudioInfo = _newMoviePrintDataSet.printDisplayVideoAudioInfo;
-    moviePrintDataSet.printDisplayTimecodeFramesOff = _newMoviePrintDataSet.printDisplayTimecodeFramesOff;
-    moviePrintDataSet.printSingleFrames = _newMoviePrintDataSet.printSingleFrames;
-    moviePrintDataSet.printFormat = _newMoviePrintDataSet.printFormat;
-    moviePrintDataSet.printSizeWidth = _newMoviePrintDataSet.printSizeWidth;
-
-    
     // printGridColumns
-    uiSliderPrintColumns->setValue(moviePrintDataSet.printGridColumns);
-    tempWidget = guiSettingsMoviePrint->getWidget("PrintColumns");
-    guiSettingsMoviePrint->triggerEvent(tempWidget);
+    if (moviePrintDataSet.printGridColumns != _newMoviePrintDataSet.printGridColumns) {
+        moviePrintDataSet.printGridColumns = _newMoviePrintDataSet.printGridColumns;
+        uiSliderPrintColumns->setValue(moviePrintDataSet.printGridColumns);
+        tempWidget = guiSettingsMoviePrint->getWidget("PrintColumns");
+        guiSettingsMoviePrint->triggerEvent(tempWidget);
+    }
     
     // printGridRows
-    uiSliderPrintRows->setValue(moviePrintDataSet.printGridRows);
-    tempWidget = guiSettingsMoviePrint->getWidget("PrintRows");
-    guiSettingsMoviePrint->triggerEvent(tempWidget);
+    if (moviePrintDataSet.printGridRows != _newMoviePrintDataSet.printGridRows) {
+        moviePrintDataSet.printGridRows = _newMoviePrintDataSet.printGridRows;
+        uiSliderPrintRows->setValue(moviePrintDataSet.printGridRows);
+        tempWidget = guiSettingsMoviePrint->getWidget("PrintRows");
+        guiSettingsMoviePrint->triggerEvent(tempWidget);
+    }
     
     // printGridMargin
-    uiSliderPrintMargin->setValue(moviePrintDataSet.printGridMargin);
-    tempWidget = guiSettingsMoviePrint->getWidget("PrintMargin");
-    guiSettingsMoviePrint->triggerEvent(tempWidget);
+    if(moviePrintDataSet.printGridMargin != _newMoviePrintDataSet.printGridMargin){
+        moviePrintDataSet.printGridMargin = _newMoviePrintDataSet.printGridMargin;
+        uiSliderPrintMargin->setValue(moviePrintDataSet.printGridMargin);
+        tempWidget = guiSettingsMoviePrint->getWidget("PrintMargin");
+        guiSettingsMoviePrint->triggerEvent(tempWidget);
+    }
     
     // printDisplayVideoAudioInfo
-    uiToggleHeaderDisplay->setValue(moviePrintDataSet.printDisplayVideoAudioInfo);
-    tempWidget = guiSettingsMoviePrint->getWidget("Display Header");
-    guiSettingsMoviePrint->triggerEvent(tempWidget);
+    if(moviePrintDataSet.printDisplayVideoAudioInfo != _newMoviePrintDataSet.printDisplayVideoAudioInfo){
+        moviePrintDataSet.printDisplayVideoAudioInfo = _newMoviePrintDataSet.printDisplayVideoAudioInfo;
+        uiToggleHeaderDisplay->setValue(moviePrintDataSet.printDisplayVideoAudioInfo);
+        tempWidget = guiSettingsMoviePrint->getWidget("Display Header");
+        guiSettingsMoviePrint->triggerEvent(tempWidget);
+    }
     
     // printDisplayTimecodeFramesOff
-    switch (moviePrintDataSet.printDisplayTimecodeFramesOff) {
-        case 0:
-            tempName = "off";
-            break;
-        case 1:
-            tempName = "Display TimeCode";
-            break;
-        case 2:
-            tempName = "Display Frames";
-            break;
-        default:
-            tempName = "off";
-            break;
+    if(moviePrintDataSet.printDisplayTimecodeFramesOff != _newMoviePrintDataSet.printDisplayTimecodeFramesOff){
+        moviePrintDataSet.printDisplayTimecodeFramesOff = _newMoviePrintDataSet.printDisplayTimecodeFramesOff;
+        switch (moviePrintDataSet.printDisplayTimecodeFramesOff) {
+            case 0:
+                tempName = "off";
+                break;
+            case 1:
+                tempName = "Display TimeCode";
+                break;
+            case 2:
+                tempName = "Display Frames";
+                break;
+            default:
+                tempName = "off";
+                break;
+        }
+        uiRadioSetFrameDisplay->activateToggle(tempName);
+        tempWidget = guiSettingsMoviePrint->getWidget(tempName);
+        guiSettingsMoviePrint->triggerEvent(tempWidget);
     }
-    uiRadioSetFrameDisplay->activateToggle(tempName);
-    tempWidget = guiSettingsMoviePrint->getWidget(tempName);
-    guiSettingsMoviePrint->triggerEvent(tempWidget);
     
     // printSingleFrames
-    uiToggleSingleFrames->setValue(moviePrintDataSet.printSingleFrames);
-    tempWidget = guiSettingsMoviePrint->getWidget("Save also individual frames");
-    guiSettingsMoviePrint->triggerEvent(tempWidget);
+    if(moviePrintDataSet.printSingleFrames != _newMoviePrintDataSet.printSingleFrames){
+        moviePrintDataSet.printSingleFrames = _newMoviePrintDataSet.printSingleFrames;
+        uiToggleSingleFrames->setValue(moviePrintDataSet.printSingleFrames);
+        tempWidget = guiSettingsMoviePrint->getWidget("Save also individual frames");
+        guiSettingsMoviePrint->triggerEvent(tempWidget);
+    }
     
     // printFormat
-    switch (moviePrintDataSet.printFormat) {
-        case OF_IMAGE_FORMAT_PNG:
-            tempName = "png with alpha";
-            break;
-        case OF_IMAGE_FORMAT_JPEG:
-            tempName = "jpg";
-            break;
-        default:
-            tempName = "png with alpha";
-            break;
+    if(moviePrintDataSet.printFormat != _newMoviePrintDataSet.printFormat){
+        moviePrintDataSet.printFormat = _newMoviePrintDataSet.printFormat;
+        switch (moviePrintDataSet.printFormat) {
+            case OF_IMAGE_FORMAT_PNG:
+                tempName = "png with alpha";
+                break;
+            case OF_IMAGE_FORMAT_JPEG:
+                tempName = "jpg";
+                break;
+            default:
+                tempName = "png with alpha";
+                break;
+        }
+        uiRadioPrintOutputFormat->activateToggle(tempName);
+        tempWidget = guiSettingsMoviePrint->getWidget(tempName);
+        guiSettingsMoviePrint->triggerEvent(tempWidget);
     }
-    uiRadioPrintOutputFormat->activateToggle(tempName);
-    tempWidget = guiSettingsMoviePrint->getWidget(tempName);
-    guiSettingsMoviePrint->triggerEvent(tempWidget);
-
-    // printSizeWidth
-    switch (moviePrintDataSet.printSizeWidth) {
-        case 1024:
-            tempName = "1024px width";
-            break;
-        case 2048:
-            tempName = "2048px width";
-            break;
-        case 3072:
-            tempName = "3072px width";
-            break;
-        case 4096:
-            tempName = "4096px width";
-            break;
-        default:
-            tempName = "1024px width";
-            break;
-    }
-    uiRadioPrintOutputWidth->activateToggle(tempName);
-    tempWidget = guiSettingsMoviePrint->getWidget(tempName);
-    guiSettingsMoviePrint->triggerEvent(tempWidget);
     
-//    if (loadedMovie.getAllFrameNumbers(moviePrintDataSet.gridTimeArray, numberOfStills)){
-//        for (int i = 0; i<numberOfStills; i++) {
-//            if (!(moviePrintDataSet.gridTimeArray == 0)){
-//                delete[] moviePrintDataSet.gridTimeArray;
-//            }
-//            moviePrintDataSet.gridTimeArray = new (nothrow) int[numberOfStills];
-//            if (moviePrintDataSet.gridTimeArray == 0){
-//                ofLog(OF_LOG_VERBOSE, "Error: memory could not be allocated" );
-//            } else {
-//                for (int i=0; i<numberOfStills; i++) {
-//                    moviePrintDataSet.gridTimeArray[i] = i;
-//                }
-//            }
-//        }
-//    }
+    // printSizeWidth
+    if(moviePrintDataSet.printSizeWidth != _newMoviePrintDataSet.printSizeWidth){
+        moviePrintDataSet.printSizeWidth = _newMoviePrintDataSet.printSizeWidth;
+        switch (moviePrintDataSet.printSizeWidth) {
+            case 1024:
+                tempName = "1024px width";
+                break;
+            case 2048:
+                tempName = "2048px width";
+                break;
+            case 3072:
+                tempName = "3072px width";
+                break;
+            case 4096:
+                tempName = "4096px width";
+                break;
+            default:
+                tempName = "1024px width";
+                break;
+        }
+        uiRadioPrintOutputWidth->activateToggle(tempName);
+        tempWidget = guiSettingsMoviePrint->getWidget(tempName);
+        guiSettingsMoviePrint->triggerEvent(tempWidget);
+    }
+    
+    for (int i = 0; i<numberOfStills; i++) {
+        if (moviePrintDataSet.gridTimeArray[i] != _newMoviePrintDataSet.gridTimeArray[i]) {
+            moviePrintDataSet.gridTimeArray[i] = _newMoviePrintDataSet.gridTimeArray[i];
+            loadedMovie.grabbedStill[i].gsFrameNumber = _newMoviePrintDataSet.gridTimeArray[i];
+            loadedMovie.grabbedStill[i].gsToBeGrabbed = TRUE;
+            loadedMovie.grabbedStill[i].gsToBeUpdated = TRUE;
+            if (!loadedMovie.isThreadRunning()) {
+                loadedMovie.start();
+            }
+            ofLog(OF_LOG_VERBOSE, "Still:" + ofToString(i) + " is being updated:" +  ofToString(_newMoviePrintDataSet.gridTimeArray[i]));
+        }
+    }
 }
 
 //--------------------------------------------------------------
@@ -2336,9 +2385,9 @@ void testApp::updateOneThumb(int _thumbID, int _newFrameNumber){
     
     // get the recent frameNumbers into GridTimeArray
     if (loadedMovie.getAllFrameNumbers(moviePrintDataSet.gridTimeArray, numberOfStills)){
-        for (int i = 0; i<numberOfStills; i++) {
-            ofLog(OF_LOG_VERBOSE, "Updated: GridTimeArray" +  ofToString(moviePrintDataSet.gridTimeArray[i]));
-        }
+//        for (int i = 0; i<numberOfStills; i++) {
+//            ofLog(OF_LOG_VERBOSE, "Updated: GridTimeArray" +  ofToString(moviePrintDataSet.gridTimeArray[i]));
+//        }
     }
     
     if (!loadedMovie.isThreadRunning()) {
