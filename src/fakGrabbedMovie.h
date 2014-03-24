@@ -499,17 +499,17 @@ public:
         }
         
         
-        for (int i = 0; i<gmNumberOfStills; i++) {
+//        for (int i = 0; i<gmNumberOfStills; i++) {
 //            ofLog(OF_LOG_VERBOSE, "before gmOrderNumberVector:" + ofToString(gmOrderNumberVector.at(i)));
-        }
+//        }
         sort(gmOrderNumberVector.begin(), gmOrderNumberVector.end(), compareYOperator);
-        for (int i = 0; i<gmNumberOfStills; i++) {
+//        for (int i = 0; i<gmNumberOfStills; i++) {
 //            ofLog(OF_LOG_VERBOSE, "after gmOrderNumberVector:" + ofToString(gmOrderNumberVector.at(i)));
-        }
+//        }
 
         for (int i = 0; i<gmNumberOfStills; i++) {
-//            grabbedStill[i].gsUpdateOrderNumber = gmOrderNumberVector.at(i).x;
-            ofLog(OF_LOG_VERBOSE, "gsUpdateOrderNumber:" + ofToString(grabbedStill[i].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[i].gsFrameNumber) + " i:" + ofToString(i));
+            grabbedStill[i].gsUpdateOrderNumber = gmOrderNumberVector.at(i).x;
+//            ofLog(OF_LOG_VERBOSE, "gsUpdateOrderNumber:" + ofToString(grabbedStill[i].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[i].gsFrameNumber) + " i:" + ofToString(i));
         }
     }
     
@@ -936,7 +936,7 @@ public:
 //                    }
 //                }
 
-                for (int i = 0; i<gmOrderNumberVector.size(); i++) {
+                for (int i = 0; i<gmOrderNumberVector.size(); i++) { // frames are being updated in the order of their framenumber
                     if (grabbedStill[gmOrderNumberVector.at(i).x].gsToBeGrabbed) {
                         gmThreadCounter++;
 //                        ofLog(OF_LOG_VERBOSE, "In Thread Function - gsUpdateOrderNumber:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber) + " gmOrderNumberVector.at(i).x:" + ofToString(gmOrderNumberVector.at(i).x));

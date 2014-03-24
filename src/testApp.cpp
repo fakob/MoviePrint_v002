@@ -1303,14 +1303,15 @@ void testApp::exit(){
 }
 //--------------------------------------------------------------
 void testApp::logPreviousMoviePrintDataSet(){
-
-for (int i=0; i < previousMoviePrintDataSet.size(); i++) {
-    if (undoPosition == i) {
-        ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet RECENT  " +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
-    } else {
-        ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet Address " +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
+    
+    for (int i=0; i < previousMoviePrintDataSet.size(); i++) {
+        if (undoPosition == i) {
+            ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet RECENT  " +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
+        } else {
+            ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet Address " +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
+        }
     }
-}
+    ofLog(OF_LOG_VERBOSE, "moviePrintDataSet Address " +  ofToString(moviePrintDataSet.gridTimeArray));
 }
 
 //--------------------------------------------------------------
@@ -1604,32 +1605,34 @@ void testApp::redoStep(){
 }
 
 //--------------------------------------------------------------
-void testApp::addMoviePrintDataSet(int _undoPosition){
+void testApp::addMoviePrintDataSet(int _addToPosition){
     ofLog(OF_LOG_VERBOSE, "addMoviePrintDataSet:" + ofToString(undoPosition));
     ofLog(OF_LOG_VERBOSE, "moviePrintDataSet Adress" +  ofToString(moviePrintDataSet.gridTimeArray));
     if (previousMoviePrintDataSet.size() == 0) { // save initial settings without increasing undoPosition
         previousMoviePrintDataSet.push_back(moviePrintDataSet);
+        ofLog(OF_LOG_VERBOSE, "________________updateGridTimeArrayToMoviePrintDataSet " +  ofToString(updateGridTimeArrayToMoviePrintDataSet));
         updateGridTimeArrayToMoviePrintDataSet = true;
-//        ofLog(OF_LOG_VERBOSE, "ADD INIT undoPosition:" + ofToString(undoPosition));
+        ofLog(OF_LOG_VERBOSE, "ADD INIT undoPosition:" + ofToString(undoPosition));
     } else {
         if (hasChangedMoviePrintDataSet()) {
-            if (_undoPosition >= (previousMoviePrintDataSet.size()-1)) { // add undo step when undoPosition at end
+            if (_addToPosition >= (previousMoviePrintDataSet.size()-1)) { // add undo step when undoPosition at end
                 previousMoviePrintDataSet.push_back(moviePrintDataSet);
-//                ofLog(OF_LOG_VERBOSE, "ADD AT END undoPosition:" + ofToString(undoPosition));
+                undoPosition++;
+                ofLog(OF_LOG_VERBOSE, "ADD AT END undoPosition:" + ofToString(undoPosition));
                 if (previousMoviePrintDataSet.size() > maxUndoSteps) {
                     previousMoviePrintDataSet.pop_front();
-//                    ofLog(OF_LOG_VERBOSE, "REMOVE FIRST undoPosition:" + ofToString(undoPosition));
-                } else {
-                    undoPosition++;
+                    undoPosition--;
+                    ofLog(OF_LOG_VERBOSE, "REMOVE FIRST undoPosition:" + ofToString(undoPosition));
                 }
             } else { // if undoPosition lower than first delete all later undo Steps and then add new undo step
-                int tempStepsToDelete = (previousMoviePrintDataSet.size() - 1 - _undoPosition);
+                int tempStepsToDelete = (previousMoviePrintDataSet.size() - 1 - _addToPosition);
                 tempStepsToDelete = fmin(tempStepsToDelete, previousMoviePrintDataSet.size() - 1); // make sure not to delete more than whats there
                 previousMoviePrintDataSet.erase(previousMoviePrintDataSet.end() - tempStepsToDelete,previousMoviePrintDataSet.end());
                 previousMoviePrintDataSet.push_back(moviePrintDataSet);
                 undoPosition = previousMoviePrintDataSet.size()-1;
-//                ofLog(OF_LOG_VERBOSE, "ADD INBETWEEN undoPosition:" + ofToString(undoPosition));
+                ofLog(OF_LOG_VERBOSE, "ADD INBETWEEN undoPosition:" + ofToString(undoPosition));
             }
+            ofLog(OF_LOG_VERBOSE, "________________updateGridTimeArrayToMoviePrintDataSet " +  ofToString(updateGridTimeArrayToMoviePrintDataSet));
             updateGridTimeArrayToMoviePrintDataSet = true;
         }
     }
@@ -1667,7 +1670,7 @@ void testApp::addGridTimeArrayToMoviePrintDataSet(){ // adds the GridTimeArray t
     } else {
         if (!(moviePrintDataSet.gridTimeArray.empty())){
             for (int i=0; i<numberOfStills; i++) {
-                ofLog(OF_LOG_VERBOSE, "moviePrintDataSet.gridTimeArray[i]:" + ofToString(moviePrintDataSet.gridTimeArray[i]));
+//                ofLog(OF_LOG_VERBOSE, "moviePrintDataSet.gridTimeArray[i]:" + ofToString(moviePrintDataSet.gridTimeArray[i]));
                 previousMoviePrintDataSet.back().gridTimeArray[i] = moviePrintDataSet.gridTimeArray[i];
             }
         } else {
@@ -1677,10 +1680,12 @@ void testApp::addGridTimeArrayToMoviePrintDataSet(){ // adds the GridTimeArray t
         }
     }
     updateGridTimeArrayToMoviePrintDataSet = false;
+    ofLog(OF_LOG_VERBOSE, "________________updateGridTimeArrayToMoviePrintDataSet " +  ofToString(updateGridTimeArrayToMoviePrintDataSet));
 }
 
 //--------------------------------------------------------------
 bool testApp::hasChangedMoviePrintDataSet(){
+    ofLog(OF_LOG_VERBOSE, "hasChangedMoviePrintDataSet:" + ofToString(undoPosition));
     if (previousMoviePrintDataSet.size() > 0) {
         if (
             previousMoviePrintDataSet[undoPosition].printGridColumns == moviePrintDataSet.printGridColumns &&
