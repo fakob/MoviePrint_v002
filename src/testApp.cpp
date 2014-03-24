@@ -1490,7 +1490,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
             if (val) {
-                moviePrintDataSet.printDisplayTimecodeFramesOff = 2;
+                moviePrintDataSet.printDisplayTimecodeFramesOff = 1;
                 loadedMovie.gmShowFramesUI = TRUE;
                 loadedMovie.vfFramesToTimeSwitch = TRUE;
                 addToUndo = true;
@@ -1501,7 +1501,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
             ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
             bool val = toggle->getValue();
             if (val) {
-                moviePrintDataSet.printDisplayTimecodeFramesOff = 1;
+                moviePrintDataSet.printDisplayTimecodeFramesOff = 2;
                 loadedMovie.gmShowFramesUI = TRUE;
                 loadedMovie.vfFramesToTimeSwitch = FALSE;
                 addToUndo = true;
@@ -1830,21 +1830,21 @@ void testApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet)
         tempWidget = guiSettingsMoviePrint->getWidget(tempName);
         guiSettingsMoviePrint->triggerEvent(tempWidget);
     }
-    
-    for (int i = 0; i<numberOfStills; i++) {
-        if ((tempHasTheNumberOfThumbsChanged == true) || (moviePrintDataSet.gridTimeArray[i] != _newMoviePrintDataSet.gridTimeArray[i])) { // when the number of Thumbs has changed, all get updated - otherwise only the changed ones get updated
-            moviePrintDataSet.gridTimeArray[i] = _newMoviePrintDataSet.gridTimeArray[i];
-            loadedMovie.grabbedStill[i].gsFrameNumber = _newMoviePrintDataSet.gridTimeArray[i];
-            loadedMovie.grabbedStill[i].gsToBeGrabbed = TRUE;
-            loadedMovie.grabbedStill[i].gsToBeUpdated = TRUE;
-            ofLog(OF_LOG_VERBOSE, "Still:" + ofToString(i) + " will be updated:" +  ofToString(_newMoviePrintDataSet.gridTimeArray[i]));
+    if (loadedMovie.isMovieLoaded) {
+        for (int i = 0; i<numberOfStills; i++) {
+            if ((tempHasTheNumberOfThumbsChanged == true) || (moviePrintDataSet.gridTimeArray[i] != _newMoviePrintDataSet.gridTimeArray[i])) { // when the number of Thumbs has changed, all get updated - otherwise only the changed ones get updated
+                moviePrintDataSet.gridTimeArray[i] = _newMoviePrintDataSet.gridTimeArray[i];
+                loadedMovie.grabbedStill[i].gsFrameNumber = _newMoviePrintDataSet.gridTimeArray[i];
+                loadedMovie.grabbedStill[i].gsToBeGrabbed = TRUE;
+                loadedMovie.grabbedStill[i].gsToBeUpdated = TRUE;
+                ofLog(OF_LOG_VERBOSE, "Still:" + ofToString(i) + " will be updated:" +  ofToString(_newMoviePrintDataSet.gridTimeArray[i]));
+            }
+        }
+        loadedMovie.updateOrderNumber();
+        if (!loadedMovie.isThreadRunning()) {
+            loadedMovie.start();
         }
     }
-    loadedMovie.updateOrderNumber();
-    if (!loadedMovie.isThreadRunning()) {
-        loadedMovie.start();
-    }
-
 }
 
 //--------------------------------------------------------------
