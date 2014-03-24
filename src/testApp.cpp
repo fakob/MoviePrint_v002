@@ -664,7 +664,7 @@ void testApp::update(){
             
                 scrubDelta = (float)scrubDelta/60.0;
 
-            ofLog(OF_LOG_VERBOSE, "scrubDelta:" + ofToString(scrubDelta));
+//            ofLog(OF_LOG_VERBOSE, "scrubDelta:" + ofToString(scrubDelta));
             // new Frame Number is being cropped by the movies first and last frame
             int newFrameNumber = scrubDelta + 0.5 + loadedMovie.grabbedStill[i].gsFrameNumber;
             if (newFrameNumber > loadedMovie.gmTotalFrames-1) {
@@ -1018,9 +1018,14 @@ void testApp::keyPressed(int key){
                     }
                     updateMovieFromDrop = FALSE;
                     
-                    
                 }
                 
+            }
+                break;
+                
+            case 'r':
+            {
+                updateAllStills();
             }
                 break;
                 
@@ -1610,8 +1615,9 @@ void testApp::addMoviePrintDataSet(int _addToPosition){
     ofLog(OF_LOG_VERBOSE, "moviePrintDataSet Adress" +  ofToString(moviePrintDataSet.gridTimeArray));
     if (previousMoviePrintDataSet.size() == 0) { // save initial settings without increasing undoPosition
         previousMoviePrintDataSet.push_back(moviePrintDataSet);
-        ofLog(OF_LOG_VERBOSE, "________________updateGridTimeArrayToMoviePrintDataSet " +  ofToString(updateGridTimeArrayToMoviePrintDataSet));
-        updateGridTimeArrayToMoviePrintDataSet = true;
+//        ofLog(OF_LOG_VERBOSE, "________________updateGridTimeArrayToMoviePrintDataSet " +  ofToString(updateGridTimeArrayToMoviePrintDataSet));
+//        updateGridTimeArrayToMoviePrintDataSet = true;
+        addGridTimeArrayToMoviePrintDataSet();
         ofLog(OF_LOG_VERBOSE, "ADD INIT undoPosition:" + ofToString(undoPosition));
     } else {
         if (hasChangedMoviePrintDataSet()) {
@@ -1632,8 +1638,9 @@ void testApp::addMoviePrintDataSet(int _addToPosition){
                 undoPosition = previousMoviePrintDataSet.size()-1;
                 ofLog(OF_LOG_VERBOSE, "ADD INBETWEEN undoPosition:" + ofToString(undoPosition));
             }
-            ofLog(OF_LOG_VERBOSE, "________________updateGridTimeArrayToMoviePrintDataSet " +  ofToString(updateGridTimeArrayToMoviePrintDataSet));
-            updateGridTimeArrayToMoviePrintDataSet = true;
+//            ofLog(OF_LOG_VERBOSE, "________________updateGridTimeArrayToMoviePrintDataSet " +  ofToString(updateGridTimeArrayToMoviePrintDataSet));
+//            updateGridTimeArrayToMoviePrintDataSet = true;
+            addGridTimeArrayToMoviePrintDataSet();
         }
     }
 }
@@ -1660,18 +1667,20 @@ bool testApp::getAllFrameNumbers(){
 //--------------------------------------------------------------
 void testApp::addGridTimeArrayToMoviePrintDataSet(){ // adds the GridTimeArray to the last previousMoviePrintDataSet
     ofLog(OF_LOG_VERBOSE, "addGridTimeArrayToMoviePrintDataSet:" + ofToString(undoPosition));
-    if (previousMoviePrintDataSet.size() != 0) { // first update the manipulated frames and get the frameNumbers into the gridTimeArray
-        getAllFrameNumbers();
-    }
+//    if (previousMoviePrintDataSet.size() != 0) { // first update the manipulated frames and get the frameNumbers into the gridTimeArray
+//        getAllFrameNumbers();
+//    }
     previousMoviePrintDataSet.back().gridTimeArray.clear();
     previousMoviePrintDataSet.back().gridTimeArray.resize(numberOfStills,0);
     if (previousMoviePrintDataSet.back().gridTimeArray.empty()){
         ofLog(OF_LOG_VERBOSE, "Error: memory could not be allocated" );
     } else {
-        if (!(moviePrintDataSet.gridTimeArray.empty())){
+        if ((!moviePrintDataSet.gridTimeArray.empty()) && loadedMovie.isMovieLoaded){
             for (int i=0; i<numberOfStills; i++) {
 //                ofLog(OF_LOG_VERBOSE, "moviePrintDataSet.gridTimeArray[i]:" + ofToString(moviePrintDataSet.gridTimeArray[i]));
+//                moviePrintDataSet.gridTimeArray[i] = loadedMovie.grabbedStill[i].gsFrameNumber;
                 previousMoviePrintDataSet.back().gridTimeArray[i] = moviePrintDataSet.gridTimeArray[i];
+//                previousMoviePrintDataSet.back().gridTimeArray[i] = loadedMovie.grabbedStill[i].gsFrameNumber;
             }
         } else {
             for (int i=0; i<numberOfStills; i++) {
@@ -1712,6 +1721,7 @@ bool testApp::hasChangedMoviePrintDataSet(){
 void testApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet){
     string tempName;
     ofxUIWidget *tempWidget;
+    bool tempHasTheNumberOfThumbsChanged = false;
 
     // printGridColumns
     if (moviePrintDataSet.printGridColumns != _newMoviePrintDataSet.printGridColumns) {
@@ -1719,6 +1729,7 @@ void testApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet)
         uiSliderPrintColumns->setValue(moviePrintDataSet.printGridColumns);
         tempWidget = guiSettingsMoviePrint->getWidget("PrintColumns");
         guiSettingsMoviePrint->triggerEvent(tempWidget);
+        tempHasTheNumberOfThumbsChanged = true;
     }
     
     // printGridRows
@@ -1727,6 +1738,7 @@ void testApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet)
         uiSliderPrintRows->setValue(moviePrintDataSet.printGridRows);
         tempWidget = guiSettingsMoviePrint->getWidget("PrintRows");
         guiSettingsMoviePrint->triggerEvent(tempWidget);
+        tempHasTheNumberOfThumbsChanged = true;
     }
     
     // printGridMargin
@@ -1820,18 +1832,19 @@ void testApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet)
     }
     
     for (int i = 0; i<numberOfStills; i++) {
-        if (moviePrintDataSet.gridTimeArray[i] != _newMoviePrintDataSet.gridTimeArray[i]) {
+        if ((tempHasTheNumberOfThumbsChanged == true) || (moviePrintDataSet.gridTimeArray[i] != _newMoviePrintDataSet.gridTimeArray[i])) { // when the number of Thumbs has changed, all get updated - otherwise only the changed ones get updated
             moviePrintDataSet.gridTimeArray[i] = _newMoviePrintDataSet.gridTimeArray[i];
             loadedMovie.grabbedStill[i].gsFrameNumber = _newMoviePrintDataSet.gridTimeArray[i];
             loadedMovie.grabbedStill[i].gsToBeGrabbed = TRUE;
             loadedMovie.grabbedStill[i].gsToBeUpdated = TRUE;
-            loadedMovie.updateOrderNumber();
-            if (!loadedMovie.isThreadRunning()) {
-                loadedMovie.start();
-            }
-            ofLog(OF_LOG_VERBOSE, "Still:" + ofToString(i) + " is being updated:" +  ofToString(_newMoviePrintDataSet.gridTimeArray[i]));
+            ofLog(OF_LOG_VERBOSE, "Still:" + ofToString(i) + " will be updated:" +  ofToString(_newMoviePrintDataSet.gridTimeArray[i]));
         }
     }
+    loadedMovie.updateOrderNumber();
+    if (!loadedMovie.isThreadRunning()) {
+        loadedMovie.start();
+    }
+
 }
 
 //--------------------------------------------------------------
@@ -2532,9 +2545,9 @@ void testApp::updateAllStills(){
    
     loadedMovie.updateAllFrameNumbers(&moviePrintDataSet.gridTimeArray);
 
-    if (updateGridTimeArrayToMoviePrintDataSet) {
-        addGridTimeArrayToMoviePrintDataSet();
-    }
+//    if (updateGridTimeArrayToMoviePrintDataSet) {
+//        addGridTimeArrayToMoviePrintDataSet();
+//    }
 
     movieIsBeingGrabbed = TRUE;
     loadedMovie.start();
