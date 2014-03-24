@@ -570,10 +570,7 @@ public:
                         ofSleepMillis(TimeToWaitForMovie);
                     }
                 }
-//                ofLog(OF_LOG_VERBOSE, "setFrame: " + ofToString(gmMovie.getCurrentFrame())+ " f: " + ofToString(f) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
             }
-//            ofLog(OF_LOG_VERBOSE, "gsImage Size: " + ofToString(grabbedStill[i].gsImage.width)+ " x " + ofToString(grabbedStill[i].gsImage.height));
-//            ofLog(OF_LOG_VERBOSE, "gmMovie Size: " + ofToString(gmMovie.getWidth())+ " x " + ofToString(gmMovie.getHeight()));
             if (grabbedStill[i].gsImage.isAllocated() && !gmCurrAllocating) {
                 grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixelsRef());
                 grabbedStill[i].gsToBeGrabbed = FALSE;

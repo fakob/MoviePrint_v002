@@ -989,13 +989,7 @@ void testApp::keyPressed(int key){
                 
             case 'v':
             {
-                for (int i=0; i < previousMoviePrintDataSet.size(); i++) {
-                    if (undoPosition == i) {
-                        ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet RECENT  " +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
-                    } else {
-                        ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet Address " +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
-                    }
-                }
+                logPreviousMoviePrintDataSet();
             }
                 break;
                 
@@ -1307,6 +1301,17 @@ void testApp::exit(){
 
 
 }
+//--------------------------------------------------------------
+void testApp::logPreviousMoviePrintDataSet(){
+
+for (int i=0; i < previousMoviePrintDataSet.size(); i++) {
+    if (undoPosition == i) {
+        ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet RECENT  " +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
+    } else {
+        ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet Address " +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
+    }
+}
+}
 
 //--------------------------------------------------------------
 void testApp::guiEvent(ofxUIEventArgs &e){
@@ -1585,6 +1590,7 @@ void testApp::undoStep(){
         applyMoviePrintDataSet(previousMoviePrintDataSet[undoPosition]);
     }
     ofLog(OF_LOG_VERBOSE, "UNDO undoPosition:" + ofToString(undoPosition));
+    logPreviousMoviePrintDataSet();
 }
 
 //--------------------------------------------------------------
@@ -1594,6 +1600,7 @@ void testApp::redoStep(){
         applyMoviePrintDataSet(previousMoviePrintDataSet[undoPosition]);
     }
     ofLog(OF_LOG_VERBOSE, "REDO undoPosition:" + ofToString(undoPosition));
+    logPreviousMoviePrintDataSet();
 }
 
 //--------------------------------------------------------------

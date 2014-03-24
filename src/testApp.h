@@ -118,6 +118,7 @@ public:
     void redoStep();
     bool getAllFrameNumbers();
     void updateGridTimeArrayWithAutomaticInterval();
+    void logPreviousMoviePrintDataSet();
     
     void updateTimeSlider(bool _wholeRange);
     void drawPrintScreen();
