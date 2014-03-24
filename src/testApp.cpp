@@ -2430,7 +2430,7 @@ void testApp::updateOneThumb(int _thumbID, int _newFrameNumber){
     loadedMovie.grabbedStill[_thumbID].gsManipulated = TRUE;
     loadedMovie.grabbedStill[_thumbID].gsToBeGrabbed = TRUE;
     loadedMovie.grabbedStill[_thumbID].gsToBeUpdated = TRUE;
-//    loadedMovie.updateOrderNumber();
+    loadedMovie.updateOrderNumber();
     
     if (!loadedMovie.isThreadRunning()) {
         loadedMovie.start();

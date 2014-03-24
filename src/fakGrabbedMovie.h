@@ -72,6 +72,8 @@ public:
     
     void setup(string vfMovieName, int _numberOfStills, int _gmThumbWidth, int _gmThumbHeight, bool _showPlaceHolder){
         
+        gmOrderNumberVector.clear();
+        
         gmThumbWidth = _gmThumbWidth;
         gmThumbHeight = _gmThumbHeight;
         gmMouseEventsEnabled = false;
@@ -490,22 +492,25 @@ public:
     
     void updateOrderNumber(){
         
-        vector<ofVec2f> gmOrderNumberVector;
         gmOrderNumberVector.clear();
         
         for (int i = 0; i<gmNumberOfStills; i++) {
             gmOrderNumberVector.push_back(ofVec2f(i,grabbedStill[i].gsFrameNumber));
         }
         
-        sort(gmOrderNumberVector.begin(), gmOrderNumberVector.end(), compareYOperator);
         
         for (int i = 0; i<gmNumberOfStills; i++) {
-            grabbedStill[i].gsUpdateOrderNumber = gmOrderNumberVector.at(i).x;
-//            ofLog(OF_LOG_VERBOSE, "gsUpdateOrderNumber:" + ofToString(grabbedStill[i].gsUpdateOrderNumber) + " i:" + ofToString(i));
+//            ofLog(OF_LOG_VERBOSE, "before gmOrderNumberVector:" + ofToString(gmOrderNumberVector.at(i)));
         }
-        
-        gmOrderNumberVector.clear();
+        sort(gmOrderNumberVector.begin(), gmOrderNumberVector.end(), compareYOperator);
+        for (int i = 0; i<gmNumberOfStills; i++) {
+//            ofLog(OF_LOG_VERBOSE, "after gmOrderNumberVector:" + ofToString(gmOrderNumberVector.at(i)));
+        }
 
+        for (int i = 0; i<gmNumberOfStills; i++) {
+//            grabbedStill[i].gsUpdateOrderNumber = gmOrderNumberVector.at(i).x;
+            ofLog(OF_LOG_VERBOSE, "gsUpdateOrderNumber:" + ofToString(grabbedStill[i].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[i].gsFrameNumber) + " i:" + ofToString(i));
+        }
     }
     
     void updateAllFrameNumbers(vector<int>* _gridTimeArray){
@@ -924,12 +929,21 @@ public:
         if (gmSetupFinished && isMovieLoaded) { // only start when setup is finished and movie is loaded
             lock();
             do {
-                for (int i = 0; i<gmNumberOfStills; i++) {
-                    if (grabbedStill[i].gsToBeGrabbed) {
+//                for (int i = 0; i<gmNumberOfStills; i++) {
+//                    if (grabbedStill[i].gsToBeGrabbed) {
+//                        gmThreadCounter++;
+//                        grabToImage(i, grabbedStill[i].gsFrameNumber);
+//                    }
+//                }
+
+                for (int i = 0; i<gmOrderNumberVector.size(); i++) {
+                    if (grabbedStill[gmOrderNumberVector.at(i).x].gsToBeGrabbed) {
                         gmThreadCounter++;
-                        grabToImage(i, grabbedStill[i].gsFrameNumber);
+//                        ofLog(OF_LOG_VERBOSE, "In Thread Function - gsUpdateOrderNumber:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber) + " gmOrderNumberVector.at(i).x:" + ofToString(gmOrderNumberVector.at(i).x));
+                        grabToImage(gmOrderNumberVector.at(i).x, grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber);
                     }
                 }
+
             } while (!allGrabbed());
             unlock();
         }
@@ -960,6 +974,7 @@ public:
     ofVideoPlayer gmMovieScrub;
     
     vector<fakGrabbedMovieStill> grabbedStill;
+    vector<ofVec2f> gmOrderNumberVector;
     
     bool devTurnOffMovieSwitch = FALSE;
     bool isMovieLoaded = FALSE;
