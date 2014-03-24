@@ -987,12 +987,11 @@ void testApp::keyPressed(int key){
             case 'v':
             {
                 for (int i=0; i < previousMoviePrintDataSet.size(); i++) {
-                    ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet Adress" +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
-//                    string tempString = "";
-//                    for (int j=0; j < previousMoviePrintDataSet[i].printGridColumns * previousMoviePrintDataSet[i].printGridRows; j++) {
-//                        tempString = tempString + ", " + ofToString(previousMoviePrintDataSet[i].gridTimeArray[j]);
-//                    }
-//                    ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet" +  tempString);
+                    if (undoPosition == i) {
+                        ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet Address" +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
+                    } else {
+                        ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet RECENT " +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
+                    }
                 }
             }
                 break;
@@ -1017,7 +1016,8 @@ void testApp::keyPressed(int key){
                     showListView = FALSE;
                     finishedLoadingMovie = FALSE;
                     showLoadMovieScreen = TRUE;
-                    loadNewMovie("/Users/fakob/Movies/Daft Punk - Get Lucky by Shortology.mp4", TRUE, FALSE, TRUE);
+//                    loadNewMovie("/Users/fakob/Movies/Daft Punk - Get Lucky by Shortology.mp4", TRUE, FALSE, TRUE);
+                    loadNewMovie("/Users/fakob/Movies/FrameTestMovie_v001.mov", TRUE, FALSE, TRUE);
                     if (loadedMovie.isMovieLoaded) {
                         moveToMovie();
                     }
@@ -1596,6 +1596,7 @@ void testApp::redoStep(){
 //--------------------------------------------------------------
 void testApp::addMoviePrintDataSet(int _undoPosition){
     ofLog(OF_LOG_VERBOSE, "addMoviePrintDataSet:" + ofToString(undoPosition));
+    ofLog(OF_LOG_VERBOSE, "moviePrintDataSet Adress" +  ofToString(moviePrintDataSet.gridTimeArray));
     if (previousMoviePrintDataSet.size() == 0) { // save initial settings without increasing undoPosition
         previousMoviePrintDataSet.push_back(moviePrintDataSet);
         updateGridTimeArrayToMoviePrintDataSet = true;
@@ -1809,6 +1810,7 @@ void testApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet)
             loadedMovie.grabbedStill[i].gsFrameNumber = _newMoviePrintDataSet.gridTimeArray[i];
             loadedMovie.grabbedStill[i].gsToBeGrabbed = TRUE;
             loadedMovie.grabbedStill[i].gsToBeUpdated = TRUE;
+            loadedMovie.updateOrderNumber();
             if (!loadedMovie.isThreadRunning()) {
                 loadedMovie.start();
             }
@@ -2413,17 +2415,12 @@ void testApp::rollOverButtonsClicked(int _rollOverMovieID, int _rollOverMovieBut
 
 //--------------------------------------------------------------
 void testApp::updateOneThumb(int _thumbID, int _newFrameNumber){
+    moviePrintDataSet.gridTimeArray[_thumbID] = _newFrameNumber;
     loadedMovie.grabbedStill[_thumbID].gsFrameNumber = _newFrameNumber;
     loadedMovie.grabbedStill[_thumbID].gsManipulated = TRUE;
     loadedMovie.grabbedStill[_thumbID].gsToBeGrabbed = TRUE;
     loadedMovie.grabbedStill[_thumbID].gsToBeUpdated = TRUE;
-    
-    // get the recent frameNumbers into GridTimeArray
-    if (getAllFrameNumbers()){
-//        for (int i = 0; i<numberOfStills; i++) {
-//            ofLog(OF_LOG_VERBOSE, "Updated: GridTimeArray" +  ofToString(moviePrintDataSet.gridTimeArray[i]));
-//        }
-    }
+//    loadedMovie.updateOrderNumber();
     
     if (!loadedMovie.isThreadRunning()) {
         loadedMovie.start();

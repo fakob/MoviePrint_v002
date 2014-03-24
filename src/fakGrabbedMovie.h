@@ -480,35 +480,47 @@ public:
         }
     }
     
+    struct compareOnlyYValueStruct
+    {
+        bool operator()(const ofVec2f &a, const ofVec2f &b)
+        {
+            return a.y < b.y;
+        }
+    } compareYOperator;
+    
+    void updateOrderNumber(){
+        
+        vector<ofVec2f> gmOrderNumberVector;
+        gmOrderNumberVector.clear();
+        
+        for (int i = 0; i<gmNumberOfStills; i++) {
+            gmOrderNumberVector.push_back(ofVec2f(i,grabbedStill[i].gsFrameNumber));
+        }
+        
+        sort(gmOrderNumberVector.begin(), gmOrderNumberVector.end(), compareYOperator);
+        
+        for (int i = 0; i<gmNumberOfStills; i++) {
+            grabbedStill[i].gsUpdateOrderNumber = gmOrderNumberVector.at(i).x;
+//            ofLog(OF_LOG_VERBOSE, "gsUpdateOrderNumber:" + ofToString(grabbedStill[i].gsUpdateOrderNumber) + " i:" + ofToString(i));
+        }
+        
+        gmOrderNumberVector.clear();
+
+    }
+    
     void updateAllFrameNumbers(vector<int>* _gridTimeArray){
         if (isMovieLoaded) {
             for (int i = 0; i<gmNumberOfStills; i++) {
                 grabbedStill[i].gsFrameNumber = _gridTimeArray->at(i);
+                grabbedStill[i].gsUpdateOrderNumber = i;
                 grabbedStill[i].gsToBeUpdated = TRUE;
                 grabbedStill[i].gsToBeGrabbed = TRUE;
                 grabbedStill[i].gsManipulated = FALSE;
             }
+            updateOrderNumber();
         }
     }
 
-//    bool getAllFrameNumbers(vector<int>* _gridTimeArray, int _gridTimeArraySize){
-////        ofLog(OF_LOG_VERBOSE, "_gridTimeArraySize:" + ofToString(_gridTimeArraySize));
-////        ofLog(OF_LOG_VERBOSE, "gmNumberOfStills:" + ofToString(gmNumberOfStills));
-////        ofLog(OF_LOG_VERBOSE, "grabbedStill.size():" + ofToString(grabbedStill.size()));
-//            while (gmCurrAllocating) {
-//                ofLog(OF_LOG_VERBOSE, "waiting for allocating to end:" + ofToString(gmCurrAllocating));
-//            }
-//        if((_gridTimeArraySize == gmNumberOfStills) && (gmNumberOfStills == grabbedStill.size())){
-//            for (int i = 0; i<gmNumberOfStills; i++) {
-//                _gridTimeArray[i] = grabbedStill[i].gsFrameNumber;
-//            }
-//            return true;
-//        }
-//        else {
-//            return false;
-//        }
-//    }
-    
     string framesToTime(int _frames){
         
         int frames  =    _frames % gmFrameRate;
