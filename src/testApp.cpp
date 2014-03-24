@@ -376,7 +376,9 @@ void testApp::calculateNewPrintGrid(){
             moviePrintDataSet.gridTimeArray[i] = i;
         }
     }
-    
+
+    updateGridTimeArrayWithAutomaticInterval();
+
     loadedMovie.gmThumbWidth = thumbWidth;
     loadedMovie.gmThumbHeight = thumbHeight;
     
@@ -440,6 +442,7 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
     ofLog(OF_LOG_VERBOSE, "totalFrames" + ofToString(totalFrames) );
     
     updateTimeSlider(_wholeRange);
+    updateGridTimeArrayWithAutomaticInterval();
     updateAllStills();
 
     if (_loadScrubMovie) {
@@ -988,9 +991,9 @@ void testApp::keyPressed(int key){
             {
                 for (int i=0; i < previousMoviePrintDataSet.size(); i++) {
                     if (undoPosition == i) {
-                        ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet Address" +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
+                        ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet RECENT  " +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
                     } else {
-                        ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet RECENT " +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
+                        ofLog(OF_LOG_VERBOSE, "previousMoviePrintDataSet Address " +  ofToString(previousMoviePrintDataSet[i].gridTimeArray));
                     }
                 }
             }
@@ -998,13 +1001,11 @@ void testApp::keyPressed(int key){
                 
             case 'c':
             {
-//                if (loadedMovie.getAllFrameNumbers(moviePrintDataSet.gridTimeArray, numberOfStills)){
                     string tempString = "";
                     for (int j=0; j < numberOfStills; j++) {
                         tempString = tempString + ", " + ofToString(moviePrintDataSet.gridTimeArray[j]);
                     }
                     ofLog(OF_LOG_VERBOSE, "MoviePrintDataSet" +  tempString);
-//                }
             }
                 break;
                 
@@ -1054,6 +1055,7 @@ void testApp::keyReleased(int key){
             if (key == OF_KEY_RIGHT || key == OF_KEY_LEFT || key == OF_KEY_UP || key == OF_KEY_DOWN) {
                 uiSliderValueLow = uiRangeSliderTimeline->getScaledValueLow();
                 uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
+                updateGridTimeArrayWithAutomaticInterval();
                 updateAllStills();
                 ofLog(OF_LOG_VERBOSE, "ArrowKey Manipulation of Timeline Slider" );
                 
@@ -1161,6 +1163,7 @@ void testApp::mouseReleased(int x, int y, int button){
                 if (updateInOut) {
                     ofLog(OF_LOG_VERBOSE, "mouseReleased - updateInOut True" );
                     tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
+                    updateGridTimeArrayWithAutomaticInterval();
                     updateAllStills();
                     addToUndo = true;
                 }
@@ -2443,6 +2446,7 @@ void testApp::setInPoint(int _inPoint){
     uiRangeSliderTimeline->setValueHigh(j);
     uiSliderValueLow = i;
     uiSliderValueHigh = j;
+    updateGridTimeArrayWithAutomaticInterval();
     updateAllStills();
     ofLog(OF_LOG_VERBOSE, "manipulated InPoint" );
 }
@@ -2463,6 +2467,7 @@ void testApp::setOutPoint(int _outPoint){
     uiRangeSliderTimeline->setValueHigh(j);
     uiSliderValueLow = i;
     uiSliderValueHigh = j;
+    updateGridTimeArrayWithAutomaticInterval();
     updateAllStills();
     ofLog(OF_LOG_VERBOSE, "manipulated OutPoint" );
 }
@@ -2488,18 +2493,14 @@ void testApp::updateTimeSlider(bool _wholeRange) {
 }
 
 //--------------------------------------------------------------
-void testApp::updateAllStills(){
-    ofLog(OF_LOG_VERBOSE, "Start Updating------------------------------------------------");
-    finishedUpdating = FALSE;
-    showUpdateScreen = TRUE;
-    
+void testApp::updateGridTimeArrayWithAutomaticInterval(){
+
     if (uiSliderValueLow < 0) {
         uiSliderValueLow = 0;
     }
     if (uiSliderValueHigh > (totalFrames-1)) {
         uiSliderValueHigh = (totalFrames-1);
     }
-    
     
     for (int i=0; i<numberOfStills; i++) {
         if (numberOfStills == 1) {
@@ -2509,7 +2510,14 @@ void testApp::updateAllStills(){
             moviePrintDataSet.gridTimeArray[i] = ofMap(float(i)/(numberOfStills - 1), 0.0, 1.0, uiSliderValueLow, uiSliderValueHigh, TRUE);
         }
     }
-    
+}
+
+//--------------------------------------------------------------
+void testApp::updateAllStills(){
+    ofLog(OF_LOG_VERBOSE, "Start Updating------------------------------------------------");
+    finishedUpdating = FALSE;
+    showUpdateScreen = TRUE;
+   
     loadedMovie.updateAllFrameNumbers(&moviePrintDataSet.gridTimeArray);
 
     if (updateGridTimeArrayToMoviePrintDataSet) {

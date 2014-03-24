@@ -117,6 +117,7 @@ public:
     void undoStep();
     void redoStep();
     bool getAllFrameNumbers();
+    void updateGridTimeArrayWithAutomaticInterval();
     
     void updateTimeSlider(bool _wholeRange);
     void drawPrintScreen();
