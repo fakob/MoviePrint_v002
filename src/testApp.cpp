@@ -1092,6 +1092,12 @@ void testApp::keyReleased(int key){
                 uiSliderValueHigh = uiRangeSliderTimeline->getScaledValueHigh();
                 updateGridTimeArrayWithAutomaticInterval();
                 updateAllStills();
+                tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,0,0);
+                addToUndo = true;
+                if (addToUndo) {
+                    addMoviePrintDataSet(undoPosition);
+                    addToUndo = false;
+                }
                 ofLog(OF_LOG_VERBOSE, "ArrowKey Manipulation of Timeline Slider" );
                 
             }
@@ -1099,6 +1105,7 @@ void testApp::keyReleased(int key){
         
         manipulateSlider = FALSE;
         loadedMovie.gmScrubMovie = FALSE;
+        loadedMovie.gmRollOver = FALSE;
         
         superKeyPressed = FALSE;
         shiftKeyPressed = FALSE;
