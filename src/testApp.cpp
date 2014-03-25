@@ -1102,6 +1102,28 @@ void testApp::keyReleased(int key){
                 
             }
         }
+        if (!showListView && loadedMovie.isMovieLoaded) {
+            if (key == OF_KEY_RIGHT || key == OF_KEY_LEFT || key == 105 || key == 111) {
+                if (key == OF_KEY_LEFT){
+                    rollOverButtonsClicked(rollOverMovieID, 1);
+                } else if (key == OF_KEY_RIGHT){
+                    rollOverButtonsClicked(rollOverMovieID, 2);
+                } else if (key == 105){
+                    rollOverButtonsClicked(rollOverMovieID, 3);
+                } else if (key == 111){
+                    rollOverButtonsClicked(rollOverMovieID, 4);
+                }
+                addToUndo = true;
+                tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,0,0);
+                addToUndo = true;
+                if (addToUndo) {
+                    addMoviePrintDataSet(undoPosition);
+                    addToUndo = false;
+                }
+                ofLog(OF_LOG_VERBOSE, "Key Manipulation over Thumb" );
+            }
+        }
+
         
         manipulateSlider = FALSE;
         loadedMovie.gmScrubMovie = FALSE;
@@ -1131,6 +1153,19 @@ void testApp::mouseMoved(int x, int y ){
                 finishedTimeline = TRUE;
             }
         }
+        
+        if (!showListView && loadedMovie.isMovieLoaded) {
+            if (!(menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated())) {
+                if (loadedMovie.grabbedStill[loadedMovie.gmRollOverMovieID].gsRollOver){
+                    
+                    rollOverMovieID = loadedMovie.gmRollOverMovieID;
+                    rollOverMovieButtonID = loadedMovie.gmRollOverMovieButtonID;
+                    ofLog(OF_LOG_VERBOSE, "moved in rolloverstate ID =" + ofToString(loadedMovie.gmRollOverMovieID));
+                    
+                }
+            }
+        }
+        
     } else {
         ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
     }
