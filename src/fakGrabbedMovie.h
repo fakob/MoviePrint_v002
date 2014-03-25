@@ -644,11 +644,23 @@ public:
             
             // drawing overlay graphics
                 if (grabbedStill[i].gsRollOver) {
+                    
+                    ofSetColor(255, 5);
+                    if (grabbedStill[i].gsRollOver3) {
+                        ofSetColor(255, 20);
+                    }
+                    ofRectRounded(grabbedStill[i].gsX, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
                     ofSetColor(255, 50);
                     if (grabbedStill[i].gsRollOver3) {
                         ofSetColor(255);
                     }
-                    setInPointImage.draw(grabbedStill[i].gsX, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);                    
+                    setInPointImage.draw(grabbedStill[i].gsX, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
+                    
+                    ofSetColor(255, 5);
+                    if (grabbedStill[i].gsRollOver4) {
+                        ofSetColor(255, 20);
+                    }
+                    ofRectRounded(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
                     ofSetColor(255, 50);
                     if (grabbedStill[i].gsRollOver4) {
                         ofSetColor(255);
@@ -667,9 +679,13 @@ public:
 //                    ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
 //                    scrubImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight/2, scrubImage.getWidth()/2, scrubImage.getHeight()/2);
 //                    ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
-                    scrubImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2 - scrubImage.getWidth()/2, grabbedStill[i].gsY, scrubImage.getWidth(), scrubImage.getHeight());
+                    scrubImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2 - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight, grabbedStill[i].gsDrawHeight);
 
-
+                    ofSetColor(255, 5);
+                    if (grabbedStill[i].gsRollOver1) {
+                        ofSetColor(255, 20);
+                    }
+                    ofRectRounded(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
                     ofSetColor(255, 50);
                     if (grabbedStill[i].gsRollOver1) {
                         ofSetColor(255);
@@ -682,6 +698,11 @@ public:
                         frameBackwardImage.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
                     }
                     
+                    ofSetColor(255, 5);
+                    if (grabbedStill[i].gsRollOver2) {
+                        ofSetColor(255, 20);
+                    }
+                    ofRectRounded(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
                     ofSetColor(255, 50);
                     if (grabbedStill[i].gsRollOver2) {
                         ofSetColor(255);
