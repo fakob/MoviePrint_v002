@@ -113,6 +113,7 @@ public:
     ofTexture gsTexture; //texture into which the grabbedStill is copied - this is drawn to screen - this is also resized if necessary
     int gsID; // ID in Array
     int gsFrameNumber; // current Framenumber
+    int gsUpdateOrderNumber; // order which is used to update frames, reordering dependend on framenumber, so the playhead doesnt jump back and forth
     bool gsManipulated = FALSE; // indicating if the framenumber is automatically assigned or if it was manually manipulated
     bool gsToBeUpdated = TRUE; // This frame has changed somehow, it needs to be redrawn
     bool gsToBeGrabbed = TRUE; // The framenumber has changed so the frame has to be grabbed again (threadable)

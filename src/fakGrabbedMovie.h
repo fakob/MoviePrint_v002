@@ -72,6 +72,8 @@ public:
     
     void setup(string vfMovieName, int _numberOfStills, int _gmThumbWidth, int _gmThumbHeight, bool _showPlaceHolder){
         
+        gmOrderNumberVector.clear();
+        
         gmThumbWidth = _gmThumbWidth;
         gmThumbHeight = _gmThumbHeight;
         gmMouseEventsEnabled = false;
@@ -101,10 +103,10 @@ public:
         frameBackwardImage.loadImage("MoviePrint_FrameBackward_v001_00000.png");
         frameBackward2Image.loadImage("MoviePrint_FrameBackward_v001_00001.png");
         frameBackward3Image.loadImage("MoviePrint_FrameBackward_v001_00002.png");
-        scrubImage.loadImage("MoviePrint_Scrubb_v001_00000.png");
+        scrubImage.loadImage("MoviePrint_Scrubb_v002_00000.png");
         corruptImage.loadImage("MoviePrint_Corrupt_v001_00000.jpg");
         emptyImage.loadImage("MoviePrint_Corrupt_00000.jpg");
-        updatingStill.loadImage("MoviePrint_StillUpdating_v001_00000.png");
+        updatingStill.loadImage("MoviePrint_StillUpdating_v002_00000.png");
         headerImage.loadImage("MoviePrint_Layout_Header_v001_00000.png");
         
         setNumberOfStills(_numberOfStills);
@@ -163,7 +165,7 @@ public:
         }
         allocateNewNumberOfStills(gmNumberOfStills, gmThumbWidth, gmThumbHeight, _showPlaceHolder, _addListener);
         
-        updatingStill.resize(gmThumbWidth, gmThumbHeight);
+//        updatingStill.resize(gmThumbWidth, gmThumbHeight);
         
         getMovieInformation(vfMovieName);
 
@@ -362,8 +364,8 @@ public:
     }
     
     void setAllLimitsUpper(int _upperLimit){
-        ofLog(OF_LOG_VERBOSE, "igmNumberOfStills" + ofToString(gmNumberOfStills));
-        ofLog(OF_LOG_VERBOSE, "grabbedStill" + ofToString(grabbedStill.size()));
+//        ofLog(OF_LOG_VERBOSE, "gmNumberOfStills" + ofToString(gmNumberOfStills));
+//        ofLog(OF_LOG_VERBOSE, "grabbedStill" + ofToString(grabbedStill.size()));
         gmUpperLimitY = _upperLimit;
         for (int i=0; i<grabbedStill.size(); i++) {
             grabbedStill[i].gsUpperLimitY = gmUpperLimitY;
@@ -480,14 +482,47 @@ public:
         }
     }
     
-    void updateAllFrameNumbers(int gridTimeArray[]){
+    struct compareOnlyYValueStruct
+    {
+        bool operator()(const ofVec2f &a, const ofVec2f &b)
+        {
+            return a.y < b.y;
+        }
+    } compareYOperator;
+    
+    void updateOrderNumber(){
+        
+        gmOrderNumberVector.clear();
+        
+        for (int i = 0; i<gmNumberOfStills; i++) {
+            gmOrderNumberVector.push_back(ofVec2f(i,grabbedStill[i].gsFrameNumber));
+        }
+        
+        
+//        for (int i = 0; i<gmNumberOfStills; i++) {
+//            ofLog(OF_LOG_VERBOSE, "before gmOrderNumberVector:" + ofToString(gmOrderNumberVector.at(i)));
+//        }
+        sort(gmOrderNumberVector.begin(), gmOrderNumberVector.end(), compareYOperator);
+//        for (int i = 0; i<gmNumberOfStills; i++) {
+//            ofLog(OF_LOG_VERBOSE, "after gmOrderNumberVector:" + ofToString(gmOrderNumberVector.at(i)));
+//        }
+
+        for (int i = 0; i<gmNumberOfStills; i++) {
+            grabbedStill[i].gsUpdateOrderNumber = gmOrderNumberVector.at(i).x;
+//            ofLog(OF_LOG_VERBOSE, "gsUpdateOrderNumber:" + ofToString(grabbedStill[i].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[i].gsFrameNumber) + " i:" + ofToString(i));
+        }
+    }
+    
+    void updateAllFrameNumbers(vector<int>* _gridTimeArray){
         if (isMovieLoaded) {
             for (int i = 0; i<gmNumberOfStills; i++) {
-                grabbedStill[i].gsFrameNumber = gridTimeArray[i];
+                grabbedStill[i].gsFrameNumber = _gridTimeArray->at(i);
+                grabbedStill[i].gsUpdateOrderNumber = i;
                 grabbedStill[i].gsToBeUpdated = TRUE;
                 grabbedStill[i].gsToBeGrabbed = TRUE;
                 grabbedStill[i].gsManipulated = FALSE;
             }
+            updateOrderNumber();
         }
     }
     
@@ -540,10 +575,7 @@ public:
                         ofSleepMillis(TimeToWaitForMovie);
                     }
                 }
-                ofLog(OF_LOG_VERBOSE, "setFrame: " + ofToString(gmMovie.getCurrentFrame())+ " f: " + ofToString(f) + " getCurrentFrame: " + ofToString(gmMovie.getCurrentFrame()));
             }
-            ofLog(OF_LOG_VERBOSE, "gsImage Size: " + ofToString(grabbedStill[i].gsImage.width)+ " x " + ofToString(grabbedStill[i].gsImage.height));
-            ofLog(OF_LOG_VERBOSE, "gmMovie Size: " + ofToString(gmMovie.getWidth())+ " x " + ofToString(gmMovie.getHeight()));
             if (grabbedStill[i].gsImage.isAllocated() && !gmCurrAllocating) {
                 grabbedStill[i].gsImage.setFromPixels(gmMovie.getPixelsRef());
                 grabbedStill[i].gsToBeGrabbed = FALSE;
@@ -602,7 +634,6 @@ public:
                 ofRect(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight);
                 ofSetColor(255, 255, 255, 200);
                 updatingStill.drawSubsection(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawWidth, grabbedStill[i].gsDrawHeight,updatingStill.width/2 - grabbedStill[i].gsDrawWidth/2, updatingStill.height/2 - grabbedStill[i].gsDrawHeight/2);
-//                }
                 ofPopStyle();
                 ofPopMatrix();
             }
@@ -613,11 +644,23 @@ public:
             
             // drawing overlay graphics
                 if (grabbedStill[i].gsRollOver) {
+                    
+                    ofSetColor(255, 5);
+                    if (grabbedStill[i].gsRollOver3) {
+                        ofSetColor(255, 20);
+                    }
+                    ofRectRounded(grabbedStill[i].gsX, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
                     ofSetColor(255, 50);
                     if (grabbedStill[i].gsRollOver3) {
                         ofSetColor(255);
                     }
-                    setInPointImage.draw(grabbedStill[i].gsX, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);                    
+                    setInPointImage.draw(grabbedStill[i].gsX, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
+                    
+                    ofSetColor(255, 5);
+                    if (grabbedStill[i].gsRollOver4) {
+                        ofSetColor(255, 20);
+                    }
+                    ofRectRounded(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
                     ofSetColor(255, 50);
                     if (grabbedStill[i].gsRollOver4) {
                         ofSetColor(255);
@@ -633,11 +676,16 @@ public:
                     if (grabbedStill[i].gsRollOver0) {
                         ofSetColor(255);
                     }
-                    ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
-                    scrubImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight/2, scrubImage.getWidth()/2, scrubImage.getHeight()/2);
-                    ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
-                    
+//                    ofSetRectMode(OF_RECTMODE_CENTER); //set rectangle mode to the center
+//                    scrubImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2, grabbedStill[i].gsY + grabbedStill[i].gsDrawHeight/2, scrubImage.getWidth()/2, scrubImage.getHeight()/2);
+//                    ofSetRectMode(OF_RECTMODE_CORNER); //set rectangle mode to the corner
+                    scrubImage.draw(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth/2 - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight, grabbedStill[i].gsDrawHeight);
 
+                    ofSetColor(255, 5);
+                    if (grabbedStill[i].gsRollOver1) {
+                        ofSetColor(255, 20);
+                    }
+                    ofRectRounded(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
                     ofSetColor(255, 50);
                     if (grabbedStill[i].gsRollOver1) {
                         ofSetColor(255);
@@ -650,6 +698,11 @@ public:
                         frameBackwardImage.draw(grabbedStill[i].gsX, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2);
                     }
                     
+                    ofSetColor(255, 5);
+                    if (grabbedStill[i].gsRollOver2) {
+                        ofSetColor(255, 20);
+                    }
+                    ofRectRounded(grabbedStill[i].gsX + grabbedStill[i].gsDrawWidth - grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsY, grabbedStill[i].gsDrawHeight/2, grabbedStill[i].gsDrawHeight/2, grabbedStill[0].gsDrawWidth/64);
                     ofSetColor(255, 50);
                     if (grabbedStill[i].gsRollOver2) {
                         ofSetColor(255);
@@ -897,12 +950,21 @@ public:
         if (gmSetupFinished && isMovieLoaded) { // only start when setup is finished and movie is loaded
             lock();
             do {
-                for (int i = 0; i<gmNumberOfStills; i++) {
-                    if (grabbedStill[i].gsToBeGrabbed) {
+//                for (int i = 0; i<gmNumberOfStills; i++) {
+//                    if (grabbedStill[i].gsToBeGrabbed) {
+//                        gmThreadCounter++;
+//                        grabToImage(i, grabbedStill[i].gsFrameNumber);
+//                    }
+//                }
+
+                for (int i = 0; i<gmOrderNumberVector.size(); i++) { // frames are being updated in the order of their framenumber
+                    if (grabbedStill[gmOrderNumberVector.at(i).x].gsToBeGrabbed) {
                         gmThreadCounter++;
-                        grabToImage(i, grabbedStill[i].gsFrameNumber);
+//                        ofLog(OF_LOG_VERBOSE, "In Thread Function - gsUpdateOrderNumber:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber) + " gmOrderNumberVector.at(i).x:" + ofToString(gmOrderNumberVector.at(i).x));
+                        grabToImage(gmOrderNumberVector.at(i).x, grabbedStill[gmOrderNumberVector.at(i).x].gsFrameNumber);
                     }
                 }
+
             } while (!allGrabbed());
             unlock();
         }
@@ -933,6 +995,7 @@ public:
     ofVideoPlayer gmMovieScrub;
     
     vector<fakGrabbedMovieStill> grabbedStill;
+    vector<ofVec2f> gmOrderNumberVector;
     
     bool devTurnOffMovieSwitch = FALSE;
     bool isMovieLoaded = FALSE;

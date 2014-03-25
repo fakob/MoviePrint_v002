@@ -38,6 +38,30 @@ public:
     void gotMessage(ofMessage msg);
     void guiEvent(ofxUIEventArgs &e);
     
+    //--------------------------------------------------------------
+    struct moviePrintDataStruct {
+        vector<int> gridTimeArray;
+        int printGridColumns;
+        int printGridRows;
+        int printGridMargin;
+        bool printDisplayVideoAudioInfo;
+        int printDisplayTimecodeFramesOff; // 0=off, 1=timecode, 2=frames
+        bool printSingleFrames;
+        ofImageFormat printFormat;
+        int printSizeWidth;
+        
+//        ~moviePrintDataStruct()
+//        {
+//            if (gridTimeArray) delete[] gridTimeArray;
+//        }
+    };
+    
+    moviePrintDataStruct moviePrintDataSet;
+    deque<moviePrintDataStruct> previousMoviePrintDataSet;
+    int undoPosition;
+    int maxUndoSteps;
+
+    
     void updateAllStills();
     void calculateNewPrintGrid();
     void calculateNewPrintSize();
@@ -85,7 +109,19 @@ public:
     void startListPrinting();
     void stopListPrinting();
     void handlingEventOverlays();
-
+    int getLowestFrameNumber();
+    int getHighestFrameNumber();
+    
+    void applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet);
+    bool hasChangedMoviePrintDataSet();
+    void addMoviePrintDataSet(int _undoPosition);
+    void addGridTimeArrayToMoviePrintDataSet();
+    void undoStep();
+    void redoStep();
+    bool getAllFrameNumbers();
+    void updateGridTimeArrayWithAutomaticInterval();
+    void logPreviousMoviePrintDataSet();
+    
     void updateTimeSlider(bool _wholeRange);
     void drawPrintScreen();
     void drawLoadMovieScreen();
@@ -95,6 +131,7 @@ public:
     void moveInOutTimeline();
     void setInPoint(int _inPoint);
     void setOutPoint(int _outPoint);
+    void updateOneThumb(int _thumbID, int _newFrameNumber);
     bool checkExtension(string _tempExtension);
     bool writeMoviePrint;
   
@@ -107,9 +144,8 @@ public:
     fakGrabbedMovie loadedMovie;
     vector<string> stringMovieInfo;
     vector<string> stringMovieData;
-    
-    int * gridTimeArray;
 
+    
     // Images
     ofImage startImage;
     ofImage dropZoneImage;
@@ -128,6 +164,8 @@ public:
     bool shiftKeyPressed = FALSE;
     
     bool threadIsRunning;
+    
+    bool addToUndo;
     
     bool showPrintScreen;
     bool finishedPrinting;
@@ -156,6 +194,8 @@ public:
     bool updateNewPrintGrid;
     bool updateMovieFromList;
     
+    bool updateGridTimeArrayToMoviePrintDataSet;
+    
     bool scrollGrid;
     bool scrollList;
 
@@ -176,6 +216,7 @@ public:
     // ofxUI Design
     ofxUICanvas *guiTimeline;
     ofxUICanvas *guiSettingsMoviePrint;
+    ofxUICanvas *guiSettings;
     ofxUICanvas *guiHelp1;
     
     // ofxUICanvas *guiTimeline
@@ -213,6 +254,8 @@ public:
     ofxUIIntSlider *uiSliderPrintColumns;
 //    ofxUIIntSlider *uiSliderThumbWidth;
     ofxUIIntSlider *uiSliderPrintMargin;
+    ofxUIToggle *uiToggleHeaderDisplay;
+    ofxUIToggle *uiToggleSingleFrames;
     ofxUIRadio *uiRadioSetFrameDisplay;
     ofxUIRadio *uiRadioSetFitManually;
     ofxUIIntSlider *uiSliderNumberOfThumbs;
@@ -221,8 +264,9 @@ public:
     ofxUIRadio *uiRadioPrintOutputFormat;
     ofxUIRadio *uiRadioPrintOutputWidth;
     ofxUILabel *uiLabelOutputFolder;
-
-
+    ofxUIButton *uiButtonUndo;
+    ofxUIButton *uiButtonRedo;
+    
     
     // ofxUICanvas *guiHelp1
     ofxUITextArea *helpText;
@@ -260,7 +304,6 @@ public:
     int headerHeight;
     int footerHeight;
     int displayGridMargin;
-    int printGridMargin;
     int scrollBarWidth;
     int scrollBarMargin;
     int loaderBarHeight;
@@ -282,6 +325,7 @@ public:
     
     // Menu
     fakMenu menuMovieInfo;
+    fakMenu menuSettings;
     fakMenu menuMoviePrintSettings;
     fakMenu menuHelp;
     fakMenu menuTimeline;
@@ -293,14 +337,8 @@ public:
     
     // Printing
     float printScale;
-    int printSizeWidth;
-    ofImageFormat printFormat;
     ofFbo fboToPreview;
     bool printHideInPrint;
-    bool printSingleFrames;
-    bool printDisplayVideoAudioInfo;
-    int printGridColumns;
-    int printGridRows;
     int printNumberOfThumbs;
     bool showMoviePrintPreview;
 
