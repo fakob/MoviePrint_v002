@@ -2036,7 +2036,7 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     int menuHeightInRows = 4;
     int originalThumbHeight = 144;
     
-    tempXPos = gridColumns-3;
+    tempXPos = gridColumns/2;
     menuSettings.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuSettings.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*1 - displayGridMargin);
     menuSettings.drawMenu();
