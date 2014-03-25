@@ -1917,6 +1917,10 @@ void testApp::applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet)
         if (!loadedMovie.isThreadRunning()) {
             loadedMovie.start();
         }
+        
+        uiRangeSliderTimeline->setValueLow(getLowestFrameNumber());
+        uiRangeSliderTimeline->setValueHigh(getHighestFrameNumber());
+
     }
 }
 
@@ -2544,6 +2548,10 @@ void testApp::updateOneThumb(int _thumbID, int _newFrameNumber){
     if (!loadedMovie.isThreadRunning()) {
         loadedMovie.start();
     }
+
+    uiRangeSliderTimeline->setValueLow(getLowestFrameNumber());
+    uiRangeSliderTimeline->setValueHigh(getHighestFrameNumber());
+
     ofLog(OF_LOG_VERBOSE, "manipulated one thumb" );
 }
 
