@@ -109,6 +109,8 @@ public:
     void startListPrinting();
     void stopListPrinting();
     void handlingEventOverlays();
+    int getLowestFrameNumber();
+    int getHighestFrameNumber();
     
     void applyMoviePrintDataSet(moviePrintDataStruct _newMoviePrintDataSet);
     bool hasChangedMoviePrintDataSet();

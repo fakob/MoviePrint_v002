@@ -864,7 +864,7 @@ void testApp::update(){
             loadNewMovieToBeScrubbedBool = FALSE;
         }
     }
-
+    
 }
 
 //--------------------------------------------------------------
@@ -2520,6 +2520,16 @@ void testApp::rollOverButtonsClicked(int _rollOverMovieID, int _rollOverMovieBut
         updateOneThumb(_rollOverMovieID, j);
     }
     rollOverClicked = FALSE;
+}
+
+//--------------------------------------------------------------
+int testApp::getLowestFrameNumber(){
+    return *min_element(moviePrintDataSet.gridTimeArray.begin(), moviePrintDataSet.gridTimeArray.end());
+}
+
+//--------------------------------------------------------------
+int testApp::getHighestFrameNumber(){
+    return *max_element(moviePrintDataSet.gridTimeArray.begin(), moviePrintDataSet.gridTimeArray.end());
 }
 
 //--------------------------------------------------------------
