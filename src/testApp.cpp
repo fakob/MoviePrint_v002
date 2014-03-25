@@ -910,7 +910,7 @@ void testApp::draw(){
     } else if (showPrintScreen) {
         drawPrintScreen();
     } else {
-        if(showUpdateScreen){
+        if(showUpdateScreen && loadedMovie.isMovieLoaded){
             drawUpdateScreen();
         }
     }
