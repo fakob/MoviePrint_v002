@@ -214,6 +214,7 @@ public:
     // ofxUI Design
     ofxUICanvas *guiTimeline;
     ofxUICanvas *guiSettingsMoviePrint;
+    ofxUICanvas *guiSettings;
     ofxUICanvas *guiHelp1;
     
     // ofxUICanvas *guiTimeline
@@ -261,8 +262,9 @@ public:
     ofxUIRadio *uiRadioPrintOutputFormat;
     ofxUIRadio *uiRadioPrintOutputWidth;
     ofxUILabel *uiLabelOutputFolder;
-
-
+    ofxUIButton *uiButtonUndo;
+    ofxUIButton *uiButtonRedo;
+    
     
     // ofxUICanvas *guiHelp1
     ofxUITextArea *helpText;
@@ -321,6 +323,7 @@ public:
     
     // Menu
     fakMenu menuMovieInfo;
+    fakMenu menuSettings;
     fakMenu menuMoviePrintSettings;
     fakMenu menuHelp;
     fakMenu menuTimeline;

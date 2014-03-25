@@ -190,9 +190,7 @@ void testApp::setup(){
     ofAddListener(scrollBarList.sbScrollingGoingOn, this, &testApp::scrollEvent);
     
     setGUITimeline();
-//    setGUISettings();
-//    setGUIMoviePrintPreview();
-//    guiSettings1->loadSettings("guiSettings1.xml");
+    setGUISettings();
     setGUISettingsMoviePrint();
     guiSettingsMoviePrint->loadSettings("guiMoviePrintSettings.xml");
 
@@ -201,11 +199,16 @@ void testApp::setup(){
     menuMovieInfo.registerMouseEvents();
     ofAddListener(menuMovieInfo.mMenuIsBeingOpened, this, &testApp::menuIsOpened);
     ofAddListener(menuMovieInfo.mMenuIsBeingClosed, this, &testApp::menuIsClosed);
-    
+
     menuMoviePrintSettings.setupMenu(5,0,0,0,0,headerHeight, true, 'T', false);
     menuMoviePrintSettings.registerMouseEvents();
     ofAddListener(menuMoviePrintSettings.mMenuIsBeingOpened, this, &testApp::menuIsOpened);
     ofAddListener(menuMoviePrintSettings.mMenuIsBeingClosed, this, &testApp::menuIsClosed);
+    
+    menuSettings.setupMenu(3,0,0,0,0,headerHeight, true, 'T', false);
+    menuSettings.registerMouseEvents();
+    ofAddListener(menuSettings.mMenuIsBeingOpened, this, &testApp::menuIsOpened);
+    ofAddListener(menuSettings.mMenuIsBeingClosed, this, &testApp::menuIsClosed);
     
     menuHelp.setupMenu(2,0,0,0,0,headerHeight, true, 'T', false);
     menuHelp.registerMouseEvents();
@@ -322,6 +325,35 @@ void testApp::setGUISettingsMoviePrint(){
     
     guiSettingsMoviePrint->setColorBack(FAK_TRANSPARENT);
 	ofAddListener(guiSettingsMoviePrint->newGUIEvent,this,&testApp::guiEvent);
+}
+
+//--------------------------------------------------------------
+void testApp::setGUISettings(){
+	
+	float dim = 16;
+	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING*2;
+    float length = menuWidth-xInit;
+    
+    guiSettings = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
+    guiSettings->setFont("HelveticaNeueLTCom-LtCn.ttf");
+    guiSettings->setWidgetSpacing(10);
+
+    guiSettings->addLabelButton("Refresh", false,length-xInit,dim);
+
+    guiSettings->addLabelButton("Undo", false,length/2-xInit*1,dim);
+    guiSettings->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+    guiSettings->addLabelButton("Redo", false,length/2-OFX_UI_GLOBAL_WIDGET_SPACING*3,dim);
+    guiSettings->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+
+    uiButtonUndo =(ofxUIButton *) guiSettings->getWidget("Undo");
+    uiButtonRedo =(ofxUIButton *) guiSettings->getWidget("Redo");
+    
+    guiSettings->addLabelButton("Show MoviePrint Preview", false,length-xInit,dim);
+    
+    guiSettings->setColorBack(FAK_TRANSPARENT);
+	ofAddListener(guiSettings->newGUIEvent,this,&testApp::guiEvent);
+
+
 }
 
 //--------------------------------------------------------------
@@ -624,7 +656,11 @@ void testApp::update(){
     // calculate rollout of ofxUI pos, scal
     guiSettingsMoviePrint->setPosition(menuMoviePrintSettings.getPositionX(), menuMoviePrintSettings.getPositionY()+headerHeight);
     guiSettingsMoviePrint->setHeight(menuMoviePrintSettings.getSizeH()-headerHeight);
-    
+
+    guiSettings->setPosition(menuSettings.getPositionX(), menuSettings.getPositionY()+headerHeight);
+    guiSettings->setHeight(menuSettings.getSizeH()-headerHeight);
+//    guiSettings->setHeight(menuSettings.getSizeH()-headerHeight);
+
     guiTimeline->setPosition(leftMargin - OFX_UI_GLOBAL_WIDGET_SPACING, ofGetWindowHeight() - footerHeight/2 +1 - (footerHeight/4) * menuTimeline.getRelSizeH());
     
     
@@ -1301,6 +1337,9 @@ void testApp::exit(){
     
     delete guiTimeline;
     
+    delete guiSettings;
+
+    
     guiSettingsMoviePrint->saveSettings("guiMoviePrintSettings.xml");
 	delete guiSettingsMoviePrint;
 
@@ -1582,7 +1621,41 @@ void testApp::guiEvent(ofxUIEventArgs &e){
                 }
             }
         }
-        
+        else if(name == "Undo")
+        {
+            ofxUILabelButton *button = (ofxUILabelButton *) e.widget;
+            if (button->getValue()) {
+                if (loadedMovie.isMovieLoaded || showListView) {
+                    undoStep();
+                }
+            }
+        }
+        else if(name == "Redo")
+        {
+            ofxUILabelButton *button = (ofxUILabelButton *) e.widget;
+            if (button->getValue()) {
+                if (loadedMovie.isMovieLoaded || showListView) {
+                    redoStep();
+                }
+            }
+        }
+        else if(name == "Refresh")
+        {
+            ofxUILabelButton *button = (ofxUILabelButton *) e.widget;
+            if (button->getValue()) {
+                if (loadedMovie.isMovieLoaded || showListView) {
+                    updateAllStills();
+                }
+            }
+        }
+        else if(name == "Show MoviePrint Preview")
+        {
+            ofxUILabelButton *button = (ofxUILabelButton *) e.widget;
+            if (button->getValue()) {
+                toggleMoviePrintPreview();
+            }
+        }
+
     } else {
         ofLog(OF_LOG_VERBOSE, "lockedDueToInteraction------------------------------------------------");
     }
@@ -1917,6 +1990,11 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     int menuHeightInRows = 4;
     int originalThumbHeight = 144;
     
+    tempXPos = gridColumns-3;
+    menuSettings.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
+    menuSettings.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*1 - displayGridMargin);
+    menuSettings.drawMenu();
+    
     if (loadedMovie.isMovieLoaded) {
         tempXPos = 0;
         menuMovieInfo.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
@@ -1945,7 +2023,8 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     menuMoviePrintSettings.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
     menuMoviePrintSettings.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*menuHeightInRows - displayGridMargin);
     menuMoviePrintSettings.drawMenu();
-    
+
+
     ofSetColor(255, 255, 255, 255);
     
     if (!showListView) {
@@ -2408,13 +2487,14 @@ void testApp::rollOverButtonsClicked(int _rollOverMovieID, int _rollOverMovieBut
         } else if (j > (totalFrames-1)) {
             j = (totalFrames-1);
         }
-        if (_rollOverMovieID == 0) {
-            setInPoint(j);
-        } else if (_rollOverMovieID == (numberOfStills-1)) {
-            setOutPoint(j);
-        } else {
-            updateOneThumb(_rollOverMovieID, j);
-        }
+//        if (_rollOverMovieID == 0) {
+//            setInPoint(j);
+//        } else if (_rollOverMovieID == (numberOfStills-1)) {
+//            setOutPoint(j);
+//        } else {
+//            updateOneThumb(_rollOverMovieID, j);
+//        }
+        updateOneThumb(_rollOverMovieID, j);
     } else if (_rollOverMovieButtonID == 2) {
         ofLog(OF_LOG_VERBOSE, "frame forward" );
         int j = loadedMovie.grabbedStill[_rollOverMovieID].gsFrameNumber;
@@ -2430,13 +2510,14 @@ void testApp::rollOverButtonsClicked(int _rollOverMovieID, int _rollOverMovieBut
         } else if (j > (totalFrames-1)) {
             j = (totalFrames-1);
         }
-        if (_rollOverMovieID == 0) {
-            setInPoint(j);
-        } else if (_rollOverMovieID == (numberOfStills-1)) {
-            setOutPoint(j);
-        } else {
-            updateOneThumb(_rollOverMovieID, j);
-        }
+//        if (_rollOverMovieID == 0) {
+//            setInPoint(j);
+//        } else if (_rollOverMovieID == (numberOfStills-1)) {
+//            setOutPoint(j);
+//        } else {
+//            updateOneThumb(_rollOverMovieID, j);
+//        }
+        updateOneThumb(_rollOverMovieID, j);
     }
     rollOverClicked = FALSE;
 }
@@ -2692,7 +2773,7 @@ void testApp::moveToList(){
 //--------------------------------------------------------------
 void testApp::handlingEventOverlays(){
     // check if one of the topMenus is active and in this case turn of the mouseEvents for the thumbs
-    if (menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated()) {
+    if (menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated() || menuSettings.getMenuActivated()) {
         if (loadedMovie.getMouseEventsEnabled()) {
             loadedMovie.disableMouseEvents();
         }
