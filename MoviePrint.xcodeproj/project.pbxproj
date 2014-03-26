@@ -389,7 +389,7 @@
 		3AAF41DC17623EC600F94546 /* MoviePrint_Logo_v002_00000.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = MoviePrint_Logo_v002_00000.icns; sourceTree = "<group>"; };
 		3AAF41E317624CE800F94546 /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = Credits.rtf; path = src/Credits.rtf; sourceTree = "<group>"; };
 		3AD8AE8218CF72750083BD2D /* MoviePrint_PreviewBackground_v001_00000.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = MoviePrint_PreviewBackground_v001_00000.png; path = ../../../../../../../05_Graphics/99_Graphics_Out/140307/MoviePrint_PreviewBackground_v001_00000.png; sourceTree = "<group>"; };
-		3AFB4E2218B2296C008ABC0C /* MultitouchSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MultitouchSupport.framework; path = ../../../../../../../../../../../../System/Library/PrivateFrameworks/MultitouchSupport.framework; sourceTree = "<group>"; };
+		3AFB4E2218B2296C008ABC0C /* MultitouchSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MultitouchSupport.framework; path = /System/Library/PrivateFrameworks/MultitouchSupport.framework; sourceTree = "<absolute>"; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
@@ -933,6 +933,7 @@
 		BBAB23C913894ECA00AA2426 /* system frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3AFB4E2218B2296C008ABC0C /* MultitouchSupport.framework */,
 				E7F985F515E0DE99003869B5 /* Accelerate.framework */,
 				E4C2424410CC5A17004149E2 /* AppKit.framework */,
 				E4C2424510CC5A17004149E2 /* Cocoa.framework */,
@@ -980,7 +981,6 @@
 		E4B69B4A0A3A1720003C02F2 = {
 			isa = PBXGroup;
 			children = (
-				3AFB4E2218B2296C008ABC0C /* MultitouchSupport.framework */,
 				E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */,
 				E4EB6923138AFD0F00A09F29 /* Project.xcconfig */,
 				E4B69E1C0A3A1BDC003C02F2 /* src */,
