@@ -147,6 +147,7 @@ public:
     void draw(float _x, float _y, float _w){
 
         float tempSize = 14;
+        float tempMargin = 2;
         
         ofPushStyle();
         
@@ -173,8 +174,8 @@ public:
                 ofSetColor(35, 35, 35, 255);
             }
         }
-        ofRectRounded(gliX, gliY, gliIDWidth-1, gliHeight, gliHeight/8);
-        ofRectRounded(gliX + gliIDWidth, gliY, gliNameWidth-1, gliHeight, gliHeight/8);
+        ofRectRounded(gliX, gliY, gliIDWidth-tempMargin, gliHeight, gliHeight/8);
+        ofRectRounded(gliX + gliIDWidth, gliY, gliNameWidth-tempMargin, gliHeight, gliHeight/8);
 //        ofRectRounded(gliX + gliIDWidth + gliNameWidth, gliY, gliPrintedWidth-1, gliHeight, gliHeight/8);
         ofRectRounded(gliX + gliIDWidth + gliNameWidth, gliY, gliPrintedWidth-1, gliHeight, gliHeight/8);
         ofSetColor(255,255,255,255);
