@@ -271,7 +271,7 @@ public:
             if (_addListener) {
                 enableMouseEvents();
             }
-            for(int i=0; i<gmNumberOfStills; i++)
+            for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
             {
                 if (_addListener) {
                     ofAddListener(grabbedStill[i].gsClickedInside, this, &fakGrabbedMovie::scrubMovie);
@@ -396,7 +396,7 @@ public:
     int numberLoaded(){
         gmNumberLoadedCounter = 0;
         if (isMovieLoaded) {
-            for(int i=0; i<gmNumberOfStills; i++)
+            for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
             {
                 if(!grabbedStill[i].gsToBeUpdated){
                     gmNumberLoadedCounter++;
@@ -409,7 +409,7 @@ public:
     int numberGrabbed(){
         gmNumberGrabbedCounter = 0;
         if (isMovieLoaded) {
-            for(int i=0; i<gmNumberOfStills; i++)
+            for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
             {
                 if(!grabbedStill[i].gsToBeGrabbed){
                     gmNumberGrabbedCounter++;
@@ -428,7 +428,7 @@ public:
         int allGrabbed = 0;
         if (isMovieLoaded) {
             
-            for(int i=0; i<gmNumberOfStills; i++)
+            for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
             {
                 if(!grabbedStill[i].gsToBeGrabbed){
                     allGrabbed++;
@@ -446,7 +446,7 @@ public:
     
     void setAllToBeGrabbedAndToBeUpdated(){
         if (isMovieLoaded) {
-            for (int i=0; i<gmNumberOfStills; i++) {
+            for (int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
                 grabbedStill[i].gsToBeUpdated = TRUE;
                 grabbedStill[i].gsToBeGrabbed = TRUE;
                 grabbedStill[i].gsManipulated = FALSE;
@@ -454,9 +454,18 @@ public:
         }
     }
     
+    int returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(){
+        int tempNumberOfStills = gmNumberOfStills;
+        if (gmNumberOfStills != grabbedStill.size()) {
+            ofLog(OF_LOG_VERBOSE, "XXX___ Size of gmNumberOfStills and grabbedStill.size() differs -> grabbedStill.size() is used");
+            tempNumberOfStills = grabbedStill.size();
+        }
+        return tempNumberOfStills;
+    }
+    
     void disableMouseEvents(){
         gmMouseEventsEnabled = false;
-        for (int i=0; i<fmin(gmNumberOfStills, grabbedStill.size()); i++) {
+        for (int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
             grabbedStill[i].unregisterMouseEvents();
         }
     }
@@ -468,7 +477,7 @@ public:
     void enableMouseEvents(){
         if (isMovieLoaded) {
             gmMouseEventsEnabled = true;
-            for (int i=0; i<gmNumberOfStills; i++) {
+            for (int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
                 grabbedStill[i].registerMouseEvents();
             }
         }
@@ -492,28 +501,18 @@ public:
         
         gmOrderNumberVector.clear();
         
-        for (int i = 0; i<gmNumberOfStills; i++) {
+        for (int i = 0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
             gmOrderNumberVector.push_back(ofVec2f(i,grabbedStill[i].gsFrameNumber));
         }
-        
-        
-//        for (int i = 0; i<gmNumberOfStills; i++) {
-//            ofLog(OF_LOG_VERBOSE, "before gmOrderNumberVector:" + ofToString(gmOrderNumberVector.at(i)));
-//        }
         sort(gmOrderNumberVector.begin(), gmOrderNumberVector.end(), compareYOperator);
-//        for (int i = 0; i<gmNumberOfStills; i++) {
-//            ofLog(OF_LOG_VERBOSE, "after gmOrderNumberVector:" + ofToString(gmOrderNumberVector.at(i)));
-//        }
-
         for (int i = 0; i<gmNumberOfStills; i++) {
             grabbedStill[i].gsUpdateOrderNumber = gmOrderNumberVector.at(i).x;
-//            ofLog(OF_LOG_VERBOSE, "gsUpdateOrderNumber:" + ofToString(grabbedStill[i].gsUpdateOrderNumber) + " Frame:" + ofToString(grabbedStill[i].gsFrameNumber) + " i:" + ofToString(i));
         }
     }
     
     void updateAllFrameNumbers(vector<int>* _gridTimeArray){
         if (isMovieLoaded) {
-            for (int i = 0; i<gmNumberOfStills; i++) {
+            for (int i = 0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++) {
                 grabbedStill[i].gsFrameNumber = _gridTimeArray->at(i);
                 grabbedStill[i].gsUpdateOrderNumber = i;
                 grabbedStill[i].gsToBeUpdated = TRUE;
@@ -801,7 +800,7 @@ public:
         ofSetColor(FAK_ORANGECOLOR); // draw title rect
        
         ofSetColor(255, 255, 255, 255); // draw stills
-        for(int i=0; i<gmNumberOfStills; i++)
+        for(int i=0; i<returnSizeOfGrabbedStillAndLogIfItDiffersFromGmNumberOfStills(); i++)
         {
             float tempX = (_x + (gmThumbWidth+_gridMargin)*(i%_gridColumns)) * _scaleFactor;
             float tempY = (_y + (gmThumbHeight+_gridMargin)*(i/_gridColumns)) * _scaleFactor;
