@@ -91,8 +91,6 @@ void testApp::setup(){
     
     threadIsRunning = FALSE;
     
-    addToUndo = false;
-    undoPosition = 0;
     maxUndoSteps = 10 + 1;
     
     showPrintScreen = FALSE;
@@ -226,6 +224,8 @@ void testApp::setup(){
 
     
     previousMoviePrintDataSet.clear();
+    addToUndo = false;
+    undoPosition = 0;
     addMoviePrintDataSet(undoPosition); // add loaded settings as first undo step
 
     setupFinished = TRUE;
@@ -506,6 +506,8 @@ void testApp::loadNewMovie(string _newMoviePath, bool _wholeRange, bool _loadInB
     
     // reset all undo steps and save initial DataSet
     previousMoviePrintDataSet.clear();
+    addToUndo = false;
+    undoPosition = 0;
     addMoviePrintDataSet(0);
     
     if (!loadedMovie.isMovieLoaded) {
@@ -1160,7 +1162,7 @@ void testApp::mouseMoved(int x, int y ){
                     
                     rollOverMovieID = loadedMovie.gmRollOverMovieID;
                     rollOverMovieButtonID = loadedMovie.gmRollOverMovieButtonID;
-                    ofLog(OF_LOG_VERBOSE, "moved in rolloverstate ID =" + ofToString(loadedMovie.gmRollOverMovieID));
+//                    ofLog(OF_LOG_VERBOSE, "moved in rolloverstate ID =" + ofToString(loadedMovie.gmRollOverMovieID));
                     
                 }
             }
