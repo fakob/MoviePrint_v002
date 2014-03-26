@@ -156,6 +156,7 @@ public:
     void closeMenuManually(){
         mIsOpenManually = false;
         if (tweenMenuInOut.update() != 0.0){
+            mInsideMenuHead = false;
             setTweenOut();
         }
     }

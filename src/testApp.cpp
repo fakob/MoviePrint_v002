@@ -1157,7 +1157,7 @@ void testApp::mouseMoved(int x, int y ){
         }
         
         if (!showListView && loadedMovie.isMovieLoaded) {
-            if (!(menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated())) {
+            if (!(menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated()) || menuSettings.getMenuActivated()) {
                 if (loadedMovie.grabbedStill[loadedMovie.gmRollOverMovieID].gsRollOver){
                     
                     rollOverMovieID = loadedMovie.gmRollOverMovieID;
@@ -1205,7 +1205,7 @@ void testApp::mousePressed(int x, int y, int button){
                 
                 
                 if (!showListView) {
-                    if (!(menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated())) {
+                    if (!(menuMovieInfo.getMenuActivated() || menuMoviePrintSettings.getMenuActivated() || menuHelp.getMenuActivated()) || menuSettings.getMenuActivated()) {
                         if (loadedMovie.grabbedStill[loadedMovie.gmRollOverMovieID].gsRollOver){
                             
                             rollOverMovieID = loadedMovie.gmRollOverMovieID;
@@ -2705,6 +2705,9 @@ void testApp::menuIsOpened(int &e){
     if (e == 5) {
         setVisibilityMoviePrintPreview(true);
     }
+    if (e == 3) {
+        setVisibilityMoviePrintPreview(false);
+    }
     allMenusAreClosed = false;
     allMenusAreClosedOnce = 1;
 }
@@ -2715,7 +2718,7 @@ void testApp::menuIsClosed(int &e){
     if (e == 5) {
         setVisibilityMoviePrintPreview(false);
     }
-    if (!menuMovieInfo.getMenuActivated() && !menuMoviePrintSettings.getMenuActivated() && !menuHelp.getMenuActivated()) {
+    if (!menuMovieInfo.getMenuActivated() && !menuMoviePrintSettings.getMenuActivated() && !menuHelp.getMenuActivated() && !menuSettings.getMenuActivated()) {
         allMenusAreClosed = true;
         allMenusAreClosedOnce = 0;
 //        ofLog(OF_LOG_VERBOSE, "allMenusAreClosed:" + ofToString(allMenusAreClosedOnce));
