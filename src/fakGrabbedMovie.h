@@ -455,11 +455,9 @@ public:
     }
     
     void disableMouseEvents(){
-        if (isMovieLoaded) {
-            gmMouseEventsEnabled = false;
-            for (int i=0; i<gmNumberOfStills; i++) {
-                grabbedStill[i].unregisterMouseEvents();
-            }
+        gmMouseEventsEnabled = false;
+        for (int i=0; i<fmin(gmNumberOfStills, grabbedStill.size()); i++) {
+            grabbedStill[i].unregisterMouseEvents();
         }
     }
     

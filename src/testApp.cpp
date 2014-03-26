@@ -2750,7 +2750,6 @@ void testApp::stopPrinting(){
     timer.setStartTime();
     finishedPrinting = TRUE;
     activateAllMenus();
-    droppedList.enableMouseEvents();
     lockedDueToPrinting = false;
     ofLog(OF_LOG_VERBOSE, "Finished Printing-------------------------------------------- ");
 }
@@ -2778,6 +2777,7 @@ void testApp::stopListPrinting(){
 
 //--------------------------------------------------------------
 void testApp::moveToMovie(){
+    ofLog(OF_LOG_VERBOSE, "moveToMovie()-------------------------------------------");
     lockedDueToInteraction = true;
     closeAllMenus();
     
@@ -2807,6 +2807,7 @@ void testApp::moveToMovie(){
 
 //--------------------------------------------------------------
 void testApp::moveToList(){
+    ofLog(OF_LOG_VERBOSE, "moveToList()-------------------------------------------");
     lockedDueToInteraction = true;
     closeAllMenus();
     
