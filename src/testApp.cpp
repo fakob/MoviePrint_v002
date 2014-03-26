@@ -1694,6 +1694,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         {
             ofxUILabelButton *button = (ofxUILabelButton *) e.widget;
             if (button->getValue()) {
+                menuSettings.closeMenuManually();
                 toggleMoviePrintPreview();
             }
         }
@@ -2858,6 +2859,7 @@ void testApp::handlingEventOverlays(){
 //--------------------------------------------------------------
 void testApp::closeAllMenus(){
     menuMoviePrintSettings.closeMenuManually();
+    menuSettings.closeMenuManually();
     menuMovieInfo.closeMenuManually();
     menuHelp.closeMenuManually();
     ofLog(OF_LOG_VERBOSE, "closeMenuManually-------------------------------------------");
@@ -2866,6 +2868,7 @@ void testApp::closeAllMenus(){
 //--------------------------------------------------------------
 void testApp::inactivateAllMenus(){
     menuMoviePrintSettings.setMenuInactive();
+    menuSettings.setMenuInactive();
     menuMovieInfo.setMenuInactive();
     menuHelp.setMenuInactive();
     ofLog(OF_LOG_VERBOSE, "inactivateAllMenus-------------------------------------------");
@@ -2874,6 +2877,7 @@ void testApp::inactivateAllMenus(){
 //--------------------------------------------------------------
 void testApp::activateAllMenus(){
     menuMoviePrintSettings.setMenuActive();
+    menuSettings.setMenuActive();
     menuMovieInfo.setMenuActive();
     menuHelp.setMenuActive();
     ofLog(OF_LOG_VERBOSE, "activateAllMenus-------------------------------------------");
