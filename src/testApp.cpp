@@ -26,7 +26,7 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 
-    ofSetLogLevel(OF_LOG_VERBOSE);
+//    ofSetLogLevel(OF_LOG_VERBOSE);
     drawNotify = false; // ofxNotify
     showPlaceHolder = false; // added for developing
     
@@ -1038,41 +1038,41 @@ void testApp::keyPressed(int key){
             }
                 break;
                 
-            case 'v':
-            {
-                logPreviousMoviePrintDataSet();
-            }
-                break;
-                
-            case 'c':
-            {
-                    string tempString = "";
-                    for (int j=0; j < numberOfStills; j++) {
-                        tempString = tempString + ", " + ofToString(moviePrintDataSet.gridTimeArray[j]);
-                    }
-                    ofLog(OF_LOG_VERBOSE, "MoviePrintDataSet" +  tempString);
-            }
-                break;
-                
-            case 'w':
-            {
-                if (setupFinished) {
-                    
-                    printListNotImage = FALSE;
-                    showListView = FALSE;
-                    finishedLoadingMovie = FALSE;
-                    showLoadMovieScreen = TRUE;
-//                    loadNewMovie("/Users/fakob/Movies/Daft Punk - Get Lucky by Shortology.mp4", TRUE, FALSE, TRUE);
-                    loadNewMovie("/Users/fakob/Movies/FrameTestMovie_v001.mov", TRUE, FALSE, TRUE);
-                    if (loadedMovie.isMovieLoaded) {
-                        moveToMovie();
-                    }
-                    updateMovieFromDrop = FALSE;
-                    
-                }
-                
-            }
-                break;
+//            case 'v':
+//            {
+//                logPreviousMoviePrintDataSet();
+//            }
+//                break;
+//                
+//            case 'c':
+//            {
+//                    string tempString = "";
+//                    for (int j=0; j < numberOfStills; j++) {
+//                        tempString = tempString + ", " + ofToString(moviePrintDataSet.gridTimeArray[j]);
+//                    }
+//                    ofLog(OF_LOG_VERBOSE, "MoviePrintDataSet" +  tempString);
+//            }
+//                break;
+//                
+//            case 'w':
+//            {
+//                if (setupFinished) {
+//                    
+//                    printListNotImage = FALSE;
+//                    showListView = FALSE;
+//                    finishedLoadingMovie = FALSE;
+//                    showLoadMovieScreen = TRUE;
+////                    loadNewMovie("/Users/fakob/Movies/Daft Punk - Get Lucky by Shortology.mp4", TRUE, FALSE, TRUE);
+//                    loadNewMovie("/Users/fakob/Movies/FrameTestMovie_v001.mov", TRUE, FALSE, TRUE);
+//                    if (loadedMovie.isMovieLoaded) {
+//                        moveToMovie();
+//                    }
+//                    updateMovieFromDrop = FALSE;
+//                    
+//                }
+//                
+//            }
+//                break;
                 
             case 'r':
             {
