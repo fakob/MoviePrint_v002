@@ -122,8 +122,8 @@ public:
     int gsY; //y position of grabbedStill
     int gsWidth; //original width of grabbedStill
     int gsHeight; //original height of grabbedStill
-    int gsDrawWidth; //drawn width of grabbedStill
-    int gsDrawHeight; //drawn height of grabbedStill
+    float gsDrawWidth; //drawn width of grabbedStill
+    float gsDrawHeight; //drawn height of grabbedStill
     int gsUpperLimitY; // Lower Limit for turning off mouseevent testing if over the header
     int gsLowerLimitY; // Higher Limit for turning off mouseevent testing if over the footer
     int gsLeftLimitX; // Left Limit for turning off mouseevent testing if over the left menu
