@@ -53,6 +53,7 @@ void testApp::setup(){
     scrubWindowW = 640;
     scrubWindowGridNumber = 0;
     scrubDelta = 0;
+    scrubbingJustStarted = true;
     totalFrames = 0;
     itemToPrint = 0;
     loadNewMovieToBeScrubbedBool = FALSE;
@@ -671,41 +672,52 @@ void testApp::update(){
         
         // update while scrubbing
         if (loadedMovie.gmScrubMovie) {
+
             updateInOut = FALSE;
             updateScrub = TRUE;
             int i = loadedMovie.gmScrubID;
-            
-            scrubDelta = (ofGetMouseX() - loadedMovie.grabbedStill[i].gsX - thumbWidth/2); // used this before i let the mouse jump in the middle
-//            scrubDelta = (ofGetMouseX() - ofGetWidth()/2);  // used this with mouse jump in the middle
-            if (abs(scrubDelta) >= 0 && abs(scrubDelta) < thumbWidth/4) {
-                scrubDelta = 0;
+
+            if (scrubbingJustStarted) {
+                scrubbingJustStarted = false;
+                scrubDelta = 0.0;
+                scrubMouseDelta = 0.0;
+                scrubInitialFrame = loadedMovie.grabbedStill[i].gsFrameNumber;
             }
-            if (scrubDelta >= thumbWidth/4) {
-                scrubDelta = scrubDelta - thumbWidth/4;
-            } else if (scrubDelta <= -thumbWidth/4) {
-                scrubDelta = scrubDelta + thumbWidth/4;
+            
+            scrubMouseDelta = (ofGetMouseX() - loadedMovie.grabbedStill[i].gsX - thumbWidth/2);
+            
+            if (abs(scrubMouseDelta) >= 0 && abs(scrubMouseDelta) < thumbWidth/4) {
+                scrubMouseDelta = 0;
+            }
+            if (scrubMouseDelta >= thumbWidth/4.0) {
+                scrubMouseDelta = scrubMouseDelta - thumbWidth/4.0;
+            } else if (scrubMouseDelta <= -thumbWidth/4.0) {
+                scrubMouseDelta = scrubMouseDelta + thumbWidth/4.0;
+            }
+            
+            ofLog(OF_LOG_VERBOSE, "scrubMouseDelta before:" + ofToString(scrubMouseDelta));
+
+            
+            if (scrubMouseDelta < 0) {
+                scrubMouseDelta = exp(fmin(6.0,(abs(scrubMouseDelta)/20.0) - 0)) * -1;
+            } else {
+                scrubMouseDelta = exp(fmin(6.0,(scrubMouseDelta/20.0) - 0));
+            }
+            
+            scrubDelta = scrubDelta + scrubMouseDelta/100.0;
+
+            if ((scrubDelta + scrubInitialFrame) > loadedMovie.gmTotalFrames-1) {
+                scrubDelta = loadedMovie.gmTotalFrames-1 - scrubInitialFrame;
+            }
+            if ((scrubDelta + scrubInitialFrame) < 0) {
+                scrubDelta = 0 - scrubInitialFrame;
             }
 
-//            if (abs(scrubDelta) > gridWidth/2) {
-//                scrubDelta = (float)scrubDelta/30.0;
-//            } else if ((abs(scrubDelta) > gridWidth/4) && (abs(scrubDelta) <= gridWidth/2)) {
-//                scrubDelta = (float)scrubDelta/60.0;
-//            } else {
-//                scrubDelta = (float)scrubDelta/200.0;
-//            }
             
-            
-//            if (scrubDelta > 0) {
-//                scrubDelta = log ((float)scrubDelta/30.0);
-//            } else if (scrubDelta < 0){
-//                scrubDelta = log(abs((float)scrubDelta/30.0))*-1;
-//            }
-            
-                scrubDelta = (float)scrubDelta/60.0;
-
-//            ofLog(OF_LOG_VERBOSE, "scrubDelta:" + ofToString(scrubDelta));
+            ofLog(OF_LOG_VERBOSE, "scrubMouseDelta after:" + ofToString(scrubMouseDelta));
+            ofLog(OF_LOG_VERBOSE, "scrubDelta:" + ofToString(scrubDelta));
             // new Frame Number is being cropped by the movies first and last frame
-            int newFrameNumber = scrubDelta + 0.5 + loadedMovie.grabbedStill[i].gsFrameNumber;
+            int newFrameNumber = scrubDelta + scrubInitialFrame;
             if (newFrameNumber > loadedMovie.gmTotalFrames-1) {
                 newFrameNumber = loadedMovie.gmTotalFrames-1;
             }
@@ -1251,8 +1263,10 @@ void testApp::mouseReleased(int x, int y, int button){
                     tweenFading.setParameters(1,easinglinear,ofxTween::easeInOut,255.0,0.0,500,0);
                     
                     int i = loadedMovie.gmScrubID;
-                    updateOneThumb(i, loadedMovie.grabbedStill[i].gsFrameNumber);
-                    addToUndo = true;
+                    if (scrubInitialFrame != loadedMovie.grabbedStill[i].gsFrameNumber) {
+                        updateOneThumb(i, loadedMovie.grabbedStill[i].gsFrameNumber);
+                        addToUndo = true;
+                    }
 
                 }
                 if (rollOverClicked) {
@@ -2309,7 +2323,7 @@ void testApp::drawScrubScreen(float _scaleFactor){
 
     // draw the scrubSpeed
     ofSetColor(FAK_ORANGECOLOR,(int)tweenFading.update());
-    ofRect(ofGetWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2+scrubWindowH/2+tempFrameWidth*3, scrubDelta*30.0, loaderBarHeight/2);
+    ofRect(ofGetWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2+scrubWindowH/2+tempFrameWidth*3, scrubMouseDelta*3.0, loaderBarHeight/2);
     ofSetColor(255,255,255,(int)tweenFading.update());
     
     ofDisableAlphaBlending();
@@ -2317,6 +2331,7 @@ void testApp::drawScrubScreen(float _scaleFactor){
     if(tweenFading.update() < 5){
         updateScrub = FALSE;
         loadedMovie.gmScrubMovie = FALSE;
+        scrubbingJustStarted = true;
     }
     ofPopStyle();
 

@@ -376,10 +376,13 @@ public:
     // scrubbing
     int scrubWindowGridNumber;
     float scrubDelta;
+    float scrubMouseDelta;
     float   uiSliderValueLow;
     float   uiSliderValueHigh;
     int     uiID;
     bool loadNewMovieToBeScrubbedBool;
+    bool scrubbingJustStarted;
+    int scrubInitialFrame;
     
     // roll over
     void rollOverButtonsClicked(int _rollOverMovieID, int _rollOverMovieButtonID);
