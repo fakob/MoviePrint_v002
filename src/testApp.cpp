@@ -318,9 +318,6 @@ void testApp::setGUISettingsMoviePrint(){
     names4.push_back("4096px width");
     guiSettingsMoviePrint->addRadio("MoviePrint Width", names4, OFX_UI_ORIENTATION_VERTICAL, dim*1.5, dim);
     uiRadioPrintOutputWidth =(ofxUIRadio *) guiSettingsMoviePrint->getWidget("MoviePrint Width");
-    
-    guiSettingsMoviePrint->addSpacer(length-xInit, 1);
-    guiSettingsMoviePrint->addLabelButton("Save MoviePrint", false,length-xInit,dim);
 
     
     guiSettingsMoviePrint->setColorBack(FAK_TRANSPARENT);
@@ -337,6 +334,10 @@ void testApp::setGUISettings(){
     guiSettings = new ofxUICanvas(0, 0, length+xInit, ofGetHeight());
     guiSettings->setFont("HelveticaNeueLTCom-LtCn.ttf");
     guiSettings->setWidgetSpacing(10);
+    
+    
+    guiSettings->addLabelButton("Save MoviePrint", false,length-xInit,dim*8);
+    guiSettings->addSpacer(length-xInit, 1);
 
     guiSettings->addLabelButton("Refresh", false,length-xInit,dim);
 
@@ -2041,7 +2042,7 @@ void testApp::drawUI(int _scaleFactor, bool _hideInPrint){
     
     tempXPos = gridColumns/2;
     menuSettings.setPosition((leftMargin + (thumbWidth + displayGridMargin)*tempXPos) * _scaleFactor, tempY);
-    menuSettings.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*1 - displayGridMargin);
+    menuSettings.setSize(thumbWidth, headerHeight + topMargin + (originalThumbHeight + displayGridMargin)*2 - displayGridMargin);
     menuSettings.drawMenu();
     
     if (loadedMovie.isMovieLoaded) {
