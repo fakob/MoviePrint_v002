@@ -686,26 +686,31 @@ void testApp::update(){
             
             scrubMouseDelta = (ofGetMouseX() - loadedMovie.grabbedStill[i].gsX - thumbWidth/2);
             
-            if (abs(scrubMouseDelta) >= 0 && abs(scrubMouseDelta) < thumbWidth/4) {
+            if (abs(scrubMouseDelta) >= 0 && (abs(scrubMouseDelta) < thumbWidth/6.0)) {
                 scrubMouseDelta = 0;
             }
-            if (scrubMouseDelta >= thumbWidth/4.0) {
-                scrubMouseDelta = scrubMouseDelta - thumbWidth/4.0;
-            } else if (scrubMouseDelta <= -thumbWidth/4.0) {
-                scrubMouseDelta = scrubMouseDelta + thumbWidth/4.0;
+            if (scrubMouseDelta >= thumbWidth/6.0) {
+                scrubMouseDelta = scrubMouseDelta - thumbWidth/6.0;
+            } else if (scrubMouseDelta <= -thumbWidth/6.0) {
+                scrubMouseDelta = scrubMouseDelta + thumbWidth/6.0;
             }
             
             ofLog(OF_LOG_VERBOSE, "scrubMouseDelta before:" + ofToString(scrubMouseDelta));
 
+            float expScrubMouseDelta;
             
             if (scrubMouseDelta < 0) {
-                scrubMouseDelta = exp(fmin(6.0,(abs(scrubMouseDelta)/20.0) - 0)) * -1;
+                expScrubMouseDelta = exp(fmin(6.0,(abs(scrubMouseDelta)/20.0) - 0)) * -1;
             } else {
-                scrubMouseDelta = exp(fmin(6.0,(scrubMouseDelta/20.0) - 0));
+                expScrubMouseDelta = exp(fmin(6.0,(scrubMouseDelta/20.0) - 0));
             }
             
-            scrubDelta = scrubDelta + scrubMouseDelta/100.0;
-
+            if(shiftKeyPressed) {
+                scrubDelta = scrubDelta + expScrubMouseDelta/10.0;
+            } else{
+                scrubDelta = scrubDelta + expScrubMouseDelta/100.0;
+            }
+            
             if ((scrubDelta + scrubInitialFrame) > loadedMovie.gmTotalFrames-1) {
                 scrubDelta = loadedMovie.gmTotalFrames-1 - scrubInitialFrame;
             }
@@ -714,7 +719,7 @@ void testApp::update(){
             }
 
             
-            ofLog(OF_LOG_VERBOSE, "scrubMouseDelta after:" + ofToString(scrubMouseDelta));
+            ofLog(OF_LOG_VERBOSE, "scrubMouseDelta after:" + ofToString(expScrubMouseDelta));
             ofLog(OF_LOG_VERBOSE, "scrubDelta:" + ofToString(scrubDelta));
             // new Frame Number is being cropped by the movies first and last frame
             int newFrameNumber = scrubDelta + scrubInitialFrame;
@@ -1141,7 +1146,7 @@ void testApp::keyReleased(int key){
 
         
         manipulateSlider = FALSE;
-        loadedMovie.gmScrubMovie = FALSE;
+//        loadedMovie.gmScrubMovie = FALSE; // deactivated so shiftKeyPressed and released works in scrubView
         loadedMovie.gmRollOver = FALSE;
         
         superKeyPressed = FALSE;
@@ -2322,8 +2327,17 @@ void testApp::drawScrubScreen(float _scaleFactor){
     ofRect(tempX, tempY + _scaleFactor * scrubWindowH + tempFrameWidth, _scaleFactor * scrubWindowW + tempFrameWidth, tempFrameWidth);
 
     // draw the scrubSpeed
-    ofSetColor(FAK_ORANGECOLOR,(int)tweenFading.update());
-    ofRect(ofGetWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2+scrubWindowH/2+tempFrameWidth*3, scrubMouseDelta*3.0, loaderBarHeight/2);
+    ofSetColor(FAK_GRAY,255*(tweenFading.update()/255.0));
+    ofRect(tempX - tempFrameWidth, tempY + _scaleFactor * scrubWindowH + tempFrameWidth*2, _scaleFactor * scrubWindowW + tempFrameWidth*2, loaderBarHeight - tempFrameWidth);
+    // drawing shadow
+    ofSetColor(0,200*(tweenFading.update()/255.0));
+    ofRect(tempX + _scaleFactor * scrubWindowW + tempFrameWidth, tempY + _scaleFactor * scrubWindowH + tempFrameWidth*2, tempFrameWidth, loaderBarHeight - tempFrameWidth);
+    ofRect(tempX, tempY + _scaleFactor * scrubWindowH + tempFrameWidth*2 + loaderBarHeight - tempFrameWidth, _scaleFactor * scrubWindowW + tempFrameWidth*2, tempFrameWidth);
+    float tempScrubWidth = ofClamp(scrubMouseDelta*3.0, -scrubWindowW/2, scrubWindowW/2);
+    ofColor tempScrubColor(FAK_ORANGECOLOR);
+    tempScrubColor.setSaturation(ofMap(abs(scrubMouseDelta),0.0,110.0,0.0,255.0));
+    ofSetColor(tempScrubColor,(int)tweenFading.update());
+    ofRect(ofGetWidth()/2 + listWidth * tweenListInOut.update(), ofGetHeight()/2+scrubWindowH/2+tempFrameWidth*3, tempScrubWidth, loaderBarHeight/2);
     ofSetColor(255,255,255,(int)tweenFading.update());
     
     ofDisableAlphaBlending();
