@@ -1152,7 +1152,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "appname=MoviePrint_0.3.0.app\npathname=/Users/fakob/Desktop\n\nif [!-d] ; then\n#    mkdir -p $TARGET_BUILD_DIR/${appname}\nmkdir -p ${pathname}/${appname}\nfi\n#if [ -f ${pathname}/${appname}] ; then\n#rm ${pathname}/${appname}\n#fi\n#rm -f ${pathname}/${appname}\n# cp -r $TARGET_BUILD_DIR/$PRODUCT_NAME.app $TARGET_BUILD_DIR/${appname}\ncp -r $TARGET_BUILD_DIR/$PRODUCT_NAME.app ${pathname}/${appname}";
+			shellScript = "appname=MoviePrint_0.3.1.app\npathname=/Users/fakob/Desktop\n\nif [!-d] ; then\n#    mkdir -p $TARGET_BUILD_DIR/${appname}\nmkdir -p ${pathname}/${appname}\nfi\n#if [ -f ${pathname}/${appname}] ; then\n#rm ${pathname}/${appname}\n#fi\n#rm -f ${pathname}/${appname}\n# cp -r $TARGET_BUILD_DIR/$PRODUCT_NAME.app $TARGET_BUILD_DIR/${appname}\ncp -r $TARGET_BUILD_DIR/$PRODUCT_NAME.app ${pathname}/${appname}";
 		};
 		E4B6FFFD0C3F9AB9008CF71C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
