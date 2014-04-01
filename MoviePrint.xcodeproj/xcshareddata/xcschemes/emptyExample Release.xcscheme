@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0500"
+   LastUpgradeVersion = "0460"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -18,20 +18,6 @@
                BuildableName = "MoviePrint.app"
                BlueprintName = "MoviePrint"
                ReferencedContainer = "container:MoviePrint.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "NO"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E4B69B5A0A3A1756003C02F2"
-               BuildableName = "MoviePrint_v001.app"
-               BlueprintName = "MoviePrint_v001"
-               ReferencedContainer = "container:MoviePrin.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -84,9 +70,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4B69B5A0A3A1756003C02F2"
-            BuildableName = "MoviePrint_v001.app"
-            BlueprintName = "MoviePrint_v001"
-            ReferencedContainer = "container:MoviePrin.xcodeproj">
+            BuildableName = "MoviePrint.app"
+            BlueprintName = "MoviePrint"
+            ReferencedContainer = "container:MoviePrint.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

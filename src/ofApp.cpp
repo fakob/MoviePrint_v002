@@ -1,4 +1,4 @@
-#include "testApp.h"
+#include "ofApp.h"
 #include "ofxXmlSettings.h"
 
 #define FAK_ORANGECOLOR ofColor(238, 71, 0, 255)
