@@ -26,7 +26,7 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 
-//    ofSetLogLevel(OF_LOG_VERBOSE); 
+    ofSetLogLevel(OF_LOG_VERBOSE); 
     drawNotify = false; // ofxNotify
     showPlaceHolder = false; // added for developing
     
