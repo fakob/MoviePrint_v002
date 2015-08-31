@@ -79,6 +79,8 @@ void testApp::setup(){
     printNumberOfThumbs = 20;
     menuWidth = 255;
     listWidth = 1320;
+    
+    overwriteMoviePrint = false;
 
     moviePrintDataSet.printGridColumns = 4;
     moviePrintDataSet.printGridRows = 5;
@@ -275,6 +277,9 @@ void testApp::setGUISettingsMoviePrint(){
     uiLabelOutputFolder = (ofxUILabel *) guiSettingsMoviePrint->getWidget("SelectedOutputFolder");
     uiLabelOutputFolder->setLabel(cropFrontOfString(saveMoviePrintPath, 40, "..."));
 
+    guiSettingsMoviePrint->addToggle("Overwrite MoviePrint", &overwriteMoviePrint, dim*1.5, dim);
+    uiToggleOverwriteMoviePrint = (ofxUIToggle *) guiSettingsMoviePrint->getWidget("Overwrite MoviePrint");
+    
     guiSettingsMoviePrint->addSpacer(length-xInit, 1);
 //    guiSettingsMoviePrint->addLabel("SET RASTER", OFX_UI_FONT_MEDIUM);
 	guiSettingsMoviePrint->addIntSlider("PrintColumns", 1, 10, &moviePrintDataSet.printGridColumns, length-xInit,dim);
@@ -2457,8 +2462,21 @@ void testApp::printImageToFile(int _printSizeWidth){
         } else {
             formatExtension = "png";
         }
-        string imageName = fileName + "_MoviePrint." + formatExtension;
+        string imageName = fileName + "_MoviePrint" + "." + formatExtension;
         imageName = saveMoviePrintPath + imageName;
+        
+        if (!overwriteMoviePrint) {
+            ofFile fileToSave;
+            if (fileToSave.doesFileExist(imageName)) {
+                for (int i=1; i<1000; i++) {
+                    imageName = fileName + "_MoviePrint copy " + ofToString(i) + "." + formatExtension;
+                    imageName = saveMoviePrintPath + imageName;
+                    if (!fileToSave.doesFileExist(imageName)) {
+                        break;
+                    }
+                }
+            }
+        }
         
         if (moviePrintDataSet.printSingleFrames) {
             string singleImagePath = saveMoviePrintPath+fileName+"/";

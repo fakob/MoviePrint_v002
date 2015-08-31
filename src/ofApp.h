@@ -256,6 +256,7 @@ public:
     ofxUIIntSlider *uiSliderPrintMargin;
     ofxUIToggle *uiToggleHeaderDisplay;
     ofxUIToggle *uiToggleSingleFrames;
+    ofxUIToggle *uiToggleOverwriteMoviePrint;
     ofxUIRadio *uiRadioSetFrameDisplay;
     ofxUIRadio *uiRadioSetFitManually;
     ofxUIIntSlider *uiSliderNumberOfThumbs;
@@ -341,6 +342,7 @@ public:
     bool printHideInPrint;
     int printNumberOfThumbs;
     bool showMoviePrintPreview;
+    bool overwriteMoviePrint;
 
     // draw List
     string loadedFile;

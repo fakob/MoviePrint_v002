@@ -9,17 +9,17 @@
 	<key>CFBundleIconFile</key>
 	<string>MoviePrint_Logo_v002_00000</string>
 	<key>CFBundleIdentifier</key>
-	<string>www.fakob.com</string>
+	<string>com.fakob.MoviePrint</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.3.2.1</string>
+	<string>0.3.2.2</string>
 	<key>CFBundleSignature</key>
-	<string>????</string>
+	<string>mvpr</string>
 	<key>CFBundleVersion</key>
-	<string>0.3.2.1</string>
+	<string>0.3.2.2</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.video</string>
 </dict>

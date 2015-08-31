@@ -1054,6 +1054,11 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0460;
+				TargetAttributes = {
+					E4B69B5A0A3A1756003C02F2 = {
+						DevelopmentTeam = 2AVQ69TL9H;
+					};
+				};
 			};
 			buildConfigurationList = E4B69B4D0A3A1720003C02F2 /* Build configuration list for PBXProject "MoviePrint" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1160,7 +1165,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "appname=MoviePrint_0.3.2.1.app\npathname=/Users/fakob/Desktop\n\nif [!-d] ; then\n#    mkdir -p $TARGET_BUILD_DIR/${appname}\nmkdir -p ${pathname}/${appname}\nfi\n#if [ -f ${pathname}/${appname}] ; then\n#rm ${pathname}/${appname}\n#fi\n#rm -f ${pathname}/${appname}\n# cp -r $TARGET_BUILD_DIR/$PRODUCT_NAME.app $TARGET_BUILD_DIR/${appname}\ncp -r $TARGET_BUILD_DIR/$PRODUCT_NAME.app ${pathname}/${appname}";
+			shellScript = "appname=MoviePrint_0.3.2.2.app\npathname=/Users/fakob/Desktop\n\nif [!-d] ; then\n#    mkdir -p $TARGET_BUILD_DIR/${appname}\nmkdir -p ${pathname}/${appname}\nfi\n#if [ -f ${pathname}/${appname}] ; then\n#rm ${pathname}/${appname}\n#fi\n#rm -f ${pathname}/${appname}\n# cp -r $TARGET_BUILD_DIR/$PRODUCT_NAME.app $TARGET_BUILD_DIR/${appname}\ncp -r $TARGET_BUILD_DIR/$PRODUCT_NAME.app ${pathname}/${appname}";
 		};
 		E4B6FFFD0C3F9AB9008CF71C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1341,6 +1346,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1429,6 +1435,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = MoviePrintDebug;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx10.9;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1438,6 +1445,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1525,6 +1533,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = MoviePrint;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx10.9;
 				WRAPPER_EXTENSION = app;
 			};
