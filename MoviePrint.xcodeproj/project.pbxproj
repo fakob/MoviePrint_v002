@@ -117,7 +117,6 @@
 		3A0251FC18EAD55F007554ED /* MoviePrint_Scrubb_v002_00000.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A0251B118EAD492007554ED /* MoviePrint_Scrubb_v002_00000.png */; };
 		3A0251FD18EAD55F007554ED /* MoviePrint_SetOutPoint_v001_00000.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A0251B218EAD492007554ED /* MoviePrint_SetOutPoint_v001_00000.png */; };
 		3A0251FE18EAD55F007554ED /* MoviePrint_StillUpdating_v002_00000.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A0251B318EAD492007554ED /* MoviePrint_StillUpdating_v002_00000.png */; };
-		3A0251FF18EAD55F007554ED /* MoviePrint_Scrubb_v002_00000.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A0251B418EAD492007554ED /* MoviePrint_Scrubb_v002_00000.png */; };
 		3A02520018EAD55F007554ED /* MoviePrint_Background_v002_00000.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 3A0251B518EAD492007554ED /* MoviePrint_Background_v002_00000.jpg */; };
 		3A02520118EAD55F007554ED /* MoviePrint_DropZone_v002_00000.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A0251B618EAD492007554ED /* MoviePrint_DropZone_v002_00000.png */; };
 		3A02520218EAD55F007554ED /* MoviePrint_Loading_v002_00000.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A0251B718EAD492007554ED /* MoviePrint_Loading_v002_00000.png */; };
@@ -125,7 +124,6 @@
 		3A02520418EAD55F007554ED /* MoviePrint_PrintList_v002_00000.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A0251B918EAD492007554ED /* MoviePrint_PrintList_v002_00000.png */; };
 		3A02520518EAD55F007554ED /* MoviePrint_Updating_v002_00000.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A0251BA18EAD492007554ED /* MoviePrint_Updating_v002_00000.png */; };
 		3A02520618EAD55F007554ED /* MoviePrint_Logo_v002_00000.icns in Resources */ = {isa = PBXBuildFile; fileRef = 3A0251A318EACC33007554ED /* MoviePrint_Logo_v002_00000.icns */; };
-		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9710E8CC7DD009D7055 /* AGL.framework */; };
 		E45BE97C0E8CC7DD009D7055 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9720E8CC7DD009D7055 /* ApplicationServices.framework */; };
@@ -140,7 +138,6 @@
 		E4C2424710CC5A17004149E2 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4C2424410CC5A17004149E2 /* AppKit.framework */; };
 		E4C2424810CC5A17004149E2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4C2424510CC5A17004149E2 /* Cocoa.framework */; };
 		E4C2424910CC5A17004149E2 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4C2424610CC5A17004149E2 /* IOKit.framework */; };
-		E4EB6799138ADC1D00A09F29 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		E7E077E515D3B63C0020DFD4 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7E077E415D3B63C0020DFD4 /* CoreVideo.framework */; };
 		E7E077E815D3B6510020DFD4 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7E077E715D3B6510020DFD4 /* QTKit.framework */; };
 		E7F985F815E0DEA3003869B5 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7F985F515E0DE99003869B5 /* Accelerate.framework */; };
@@ -162,19 +159,6 @@
 			remoteInfo = openFrameworks;
 		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		E4C2427710CC5ABF004149E2 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		3A024F9318EAC964007554ED /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
@@ -426,7 +410,6 @@
 				3A0251A618EACD31007554ED /* MultitouchSupport.framework in Frameworks */,
 				E7F985F815E0DEA3003869B5 /* Accelerate.framework in Frameworks */,
 				E7E077E815D3B6510020DFD4 /* QTKit.framework in Frameworks */,
-				E4EB6799138ADC1D00A09F29 /* GLUT.framework in Frameworks */,
 				E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */,
 				E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */,
 				E45BE97C0E8CC7DD009D7055 /* ApplicationServices.framework in Frameworks */,
@@ -1033,7 +1016,7 @@
 				E4B69B580A3A1756003C02F2 /* Sources */,
 				E4B69B590A3A1756003C02F2 /* Frameworks */,
 				E4B6FFFD0C3F9AB9008CF71C /* ShellScript */,
-				E4C2427710CC5ABF004149E2 /* CopyFiles */,
+				3A9CC7181B97829F00280C55 /* Run Script */,
 				3A0251D718EAD53B007554ED /* Resources */,
 				3A0251A718EACDEA007554ED /* ShellScript */,
 			);
@@ -1053,7 +1036,7 @@
 		E4B69B4C0A3A1720003C02F2 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0620;
 				TargetAttributes = {
 					E4B69B5A0A3A1756003C02F2 = {
 						DevelopmentTeam = 2AVQ69TL9H;
@@ -1140,7 +1123,6 @@
 				3A0251FC18EAD55F007554ED /* MoviePrint_Scrubb_v002_00000.png in Resources */,
 				3A0251FD18EAD55F007554ED /* MoviePrint_SetOutPoint_v001_00000.png in Resources */,
 				3A0251FE18EAD55F007554ED /* MoviePrint_StillUpdating_v002_00000.png in Resources */,
-				3A0251FF18EAD55F007554ED /* MoviePrint_Scrubb_v002_00000.png in Resources */,
 				3A02520018EAD55F007554ED /* MoviePrint_Background_v002_00000.jpg in Resources */,
 				3A02520118EAD55F007554ED /* MoviePrint_DropZone_v002_00000.png in Resources */,
 				3A02520218EAD55F007554ED /* MoviePrint_Loading_v002_00000.png in Resources */,
@@ -1166,6 +1148,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "appname=MoviePrint_0.3.2.2.app\npathname=/Users/fakob/Desktop\n\nif [!-d] ; then\n#    mkdir -p $TARGET_BUILD_DIR/${appname}\nmkdir -p ${pathname}/${appname}\nfi\n#if [ -f ${pathname}/${appname}] ; then\n#rm ${pathname}/${appname}\n#fi\n#rm -f ${pathname}/${appname}\n# cp -r $TARGET_BUILD_DIR/$PRODUCT_NAME.app $TARGET_BUILD_DIR/${appname}\ncp -r $TARGET_BUILD_DIR/$PRODUCT_NAME.app ${pathname}/${appname}";
+		};
+		3A9CC7181B97829F00280C55 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "LOCATION=\"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS\"\nIDENTITY=\"Developer ID Application: Jakob Schindegger (2AVQ69TL9H)\"\ncodesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/libfmodex.dylib\"\ncodesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/$PRODUCT_NAME\"\ncodesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/libmediainfo.0.0.0.dylib\"";
 		};
 		E4B6FFFD0C3F9AB9008CF71C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1277,7 +1273,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E4EB6923138AFD0F00A09F29 /* Project.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
 				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/bin/";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
@@ -1297,13 +1292,14 @@
 					"$(OF_CORE_HEADERS)",
 					src,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__MACOSX_CORE__",
 					"-lpthread",
 					"-mtune=native",
 				);
-				SDKROOT = macosx;
+				SDKROOT = macosx10.9;
 			};
 			name = Debug;
 		};
@@ -1311,7 +1307,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E4EB6923138AFD0F00A09F29 /* Project.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
 				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/bin/";
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
@@ -1332,13 +1327,13 @@
 					"$(OF_CORE_HEADERS)",
 					src,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__MACOSX_CORE__",
 					"-lpthread",
 					"-mtune=native",
 				);
-				SDKROOT = macosx;
+				SDKROOT = macosx10.9;
 			};
 			name = Release;
 		};
@@ -1346,8 +1341,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1435,6 +1430,7 @@
 					"\"$(SRCROOT)/../../../addons/MediaInfoDLL/libs\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_NAME = MoviePrintDebug;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx10.9;
@@ -1446,8 +1442,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1534,6 +1530,7 @@
 					"\"$(SRCROOT)/../../../addons/MediaInfoDLL/libs\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_NAME = MoviePrint;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx10.9;
